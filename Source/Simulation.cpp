@@ -2,6 +2,8 @@
 
 #include "Simulation.hpp"
 
+#include <cfenv>
+
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
 
@@ -105,25 +107,32 @@ void Simulation::setTimeStep() {
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
                     + 1.0 / (parameters_.meshsize->getDyMin() * parameters_.meshsize->getDyMin());
+
   // Determine maximum velocity
   maxUStencil_.reset();
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
   if (parameters_.geometry.dim == 3) {
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
-    parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
+    if (maxUStencil_.getMaxValues()[2] != 0)
+      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
   } else {
-    parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
+    if (maxUStencil_.getMaxValues()[0] != 0)
+      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
   }
 
   // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
   // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
-  localMin = std::min(
-    parameters_.flow.Re / (2 * factor),
-    std::min(
-      parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 / (maxUStencil_.getMaxValues()[1]))
-    )
-  );
+  if (maxUStencil_.getMaxValues()[0] != 0 && maxUStencil_.getMaxValues()[1] != 0) {
+    localMin = std::min(
+      parameters_.flow.Re / (2 * factor),
+      std::min(
+        parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 / (maxUStencil_.getMaxValues()[1]))
+      )
+    );
+  } else {
+    localMin = std::min(parameters_.flow.Re / (2 * factor), parameters_.timestep.dt);
+  }
 
   // Here, we select the type of operation before compiling. This allows to use the correct
   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous
