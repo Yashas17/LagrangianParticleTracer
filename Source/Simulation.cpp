@@ -2,8 +2,6 @@
 
 #include "Simulation.hpp"
 
-#include <cfenv>
-
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
 
