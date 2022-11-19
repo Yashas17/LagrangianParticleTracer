@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
 
 #ifndef NDEBUG
   spdlog::warn("Running in Debug mode; make sure to switch to Release mode for production/benchmark runs.");
+  feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW);
 #else
   spdlog::info("Running in Release mode");
 #endif
@@ -127,25 +128,6 @@ int main(int argc, char* argv[]) {
       simulation->plotVTK(timeSteps, time);
       timeVtk += parameters.vtk.interval;
     }
-
-#ifndef NDEBUG
-    if (fetestexcept(FE_ALL_EXCEPT)) {
-      std::cout<<"In Main\n";
-      if (fetestexcept(FE_DIVBYZERO)) {
-        std::runtime_error("FE_DIVBYZERO!");
-        exit(1);
-      } else if (fetestexcept(FE_INVALID)) {
-        std::runtime_error("FE_INVALID error!");
-        exit(2);
-      } else if (fetestexcept(FE_OVERFLOW)) {
-        std::runtime_error("FE_OVERFLOW error!");
-        exit(3);
-      } else if (fetestexcept(FE_UNDERFLOW)) {
-        std::runtime_error("FE_UNDERFLOW error!");
-        exit(4);
-      }
-    }
-#endif
   }
   spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
