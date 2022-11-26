@@ -112,6 +112,11 @@ void Simulation::setTimeStep() {
   maxUBoundaryIterator_.iterate();
   if (parameters_.geometry.dim == 3) {
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
+    /**
+     *We need the following 'if' condition to ensure that we do not encounter divison by zero. In case the 'if'
+     *condition is not satisfied, the value of dt will be same as previous time step or if it is the first time step,
+     *the user defined time-step will be used. If user has not defined the timestrep, dt will be set to 1 by default.
+     **/
     if (maxUStencil_.getMaxValues()[2] != 0)
       parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
   } else {
