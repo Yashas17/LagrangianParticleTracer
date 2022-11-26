@@ -15,6 +15,7 @@
 #include "Stencils/NeumannBoundaryStencils.hpp"
 #include "Stencils/ObstacleStencil.hpp"
 #include "Stencils/PeriodicBoundaryStencils.hpp"
+#include "Stencils/RHSStencil.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
 
@@ -41,6 +42,9 @@ protected:
   FieldIterator<FlowField>  velocityIterator_;
   FieldIterator<FlowField>  obstacleIterator_;
 
+  Stencils::RHSStencil rhsStencil_;
+  FieldIterator<FlowField> rhsIterator_;
+  
   std::unique_ptr<Solvers::LinearSolver> solver_;
 
   virtual void setTimeStep();
