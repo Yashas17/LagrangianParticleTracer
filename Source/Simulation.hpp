@@ -61,3 +61,17 @@ public:
   /** Plots the flow field */
   virtual void plotVTK(int timeStep, RealType simulationTime);
 };
+
+class TurbulentSimulation: public Simulation{
+  public:
+  TurbulentSimulation(Parameters& parameters, FlowField& flowField);
+  ~TurbulentSimulation() = default;
+
+  /** Initialises the flow field according to the scenario */
+  void initializeFlowField() override;
+
+  void solveTimestep() override;
+
+  /** Plots the flow field */
+  void plotVTK(int timeStep, RealType simulationTime) override;
+}
