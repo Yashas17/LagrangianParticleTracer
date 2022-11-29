@@ -81,9 +81,9 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    // WS2: initialise turbulent flow field and turbulent simulation object
     if (rank == 0) {
-      spdlog::info("Start Tubulent simulation in {}D", parameters.geometry.dim);
+      spdlog::info("Start Turbulent simulation in {}D", parameters.geometry.dim);
     }
     flowField  = new FlowField(parameters);
     if (flowField == NULL) {

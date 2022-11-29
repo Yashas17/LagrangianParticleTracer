@@ -14,8 +14,8 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flow
   globalBoundaryFactory_(parameters),
   wallVelocityIterator_(globalBoundaryFactory_.getGlobalBoundaryVelocityIterator(flowField_)),
   wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
-  fghStencil_(parameters),
-  fghIterator_(flowField_, parameters, fghStencil_),
+  fghTurbStencil_(parameters),
+  fghIterator_(flowField_, parameters, fghTurbStencil_),
   velocityStencil_(parameters),
   obstacleStencil_(parameters),
   velocityIterator_(flowField_, parameters, velocityStencil_),
@@ -79,7 +79,7 @@ void TurbulentSimulation::solveTimestep() {
   fghIterator_.iterate();
   // Set global boundary values
   wallFGHIterator_.iterate();
-  // TODO WS1: compute the right hand side (RHS)
+  // Compute the right hand side (RHS)
   rhsIterator_.iterate();
   // Solve for pressure
   solver_->solve();

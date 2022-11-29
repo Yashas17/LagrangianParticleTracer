@@ -63,15 +63,18 @@ public:
 };
 
 class TurbulentSimulation: public Simulation{
+  protected:
+    Stencils::FGHTurbStencil     fghTurbStencil_;
+
   public:
-  TurbulentSimulation(Parameters& parameters, FlowField& flowField);
-  ~TurbulentSimulation() = default;
+    TurbulentSimulation(Parameters& parameters, FlowField& flowField);
+    ~TurbulentSimulation() = default;
 
-  /** Initialises the flow field according to the scenario */
-  void initializeFlowField() override;
+    /** Initialises the flow field according to the scenario */
+    void initializeFlowField() override;
 
-  void solveTimestep() override;
+    void solveTimestep() override;
 
-  /** Plots the flow field */
-  void plotVTK(int timeStep, RealType simulationTime) override;
+    /** Plots the flow field */
+    void plotVTK(int timeStep, RealType simulationTime) override;
 }
