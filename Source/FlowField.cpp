@@ -16,7 +16,9 @@ FlowField::FlowField(int Nx, int Ny):
   velocity_(VectorField(Nx + 3, Ny + 3)),
   flags_(IntScalarField(Nx + 3, Ny + 3)),
   FGH_(VectorField(Nx + 3, Ny + 3)),
-  RHS_(ScalarField(Nx + 3, Ny + 3)) {
+  RHS_(ScalarField(Nx + 3, Ny + 3)),
+  h_(ScalarField(Nx + 3, Ny + 3)),
+  vt_(ScalarField(Nx + 3, Ny + 3)) {
 
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -33,7 +35,9 @@ FlowField::FlowField(int Nx, int Ny, int Nz):
   velocity_(VectorField(Nx + 3, Ny + 3, Nz + 3)),
   flags_(IntScalarField(Nx + 3, Ny + 3, Nz + 3)),
   FGH_(VectorField(Nx + 3, Ny + 3, Nz + 3)),
-  RHS_(ScalarField(Nx + 3, Ny + 3, Nz + 3)) {
+  RHS_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  h_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  vt_(ScalarField(Nx + 3, Ny + 3, Nz + 3)) {
 
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -86,6 +90,10 @@ IntScalarField& FlowField::getFlags() { return flags_; }
 VectorField& FlowField::getFGH() { return FGH_; }
 
 ScalarField& FlowField::getRHS() { return RHS_; }
+
+ScalarField& FlowField::getH() { return h_; }
+
+ScalarField& FlowField::getVt() { return vt_; }
 
 void FlowField::getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j) {
   RealType* vHere = getVelocity().getVector(i, j);

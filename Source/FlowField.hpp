@@ -25,6 +25,9 @@ private:
   VectorField FGH_;
   ScalarField RHS_; //! Right hand side for the Poisson equation
 
+  ScalarField h_;  //! Distance to the nearest wall from cell
+  ScalarField vt_; //! Turbulent Viscosity
+
 public:
   /** Constructor for the 2D flow field
    *
@@ -89,6 +92,9 @@ public:
 
   ScalarField& getRHS();
 
+  ScalarField& getH();
+  ScalarField& getVt();
+  
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j);
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j, int k);
 };
