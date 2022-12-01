@@ -27,6 +27,7 @@ namespace Stencils {
     // case, but can be used for 2D as well.
     RealType localVelocity_[27 * 3];
     RealType localMeshsize_[27 * 3];
+    RealType localVTotal_[27];
 
   public:
     FGHTurbStencil(const Parameters& parameters);
