@@ -19,6 +19,8 @@
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
 
+#include "ParallelManagers/PetscParallelManager.hpp"
+
 class Simulation {
 protected:
   Parameters& parameters_;
@@ -44,6 +46,8 @@ protected:
 
   Stencils::RHSStencil rhsStencil_;
   FieldIterator<FlowField> rhsIterator_;
+
+  ParallelManagers::PetscParallelManager petscParallelManager_; 
   
   std::unique_ptr<Solvers::LinearSolver> solver_;
 
