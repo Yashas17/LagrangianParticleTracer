@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Definitions.hpp"
-#include "FlowField.hpp"
-#include "Parameters.hpp"
-#include "Iterators.hpp"
+#include "../Definitions.hpp"
+#include "../FlowField.hpp"
+#include "../Parameters.hpp"
+#include "../Iterators.hpp"
 
-#include "Stencils/PressureBufferFillStencil.hpp"
-#include "Stencils/PressureBufferReadStencil.hpp"
-#include "Stencils/VelocityBufferFillStencil.hpp"
-#include "Stencils/VelocityBufferReadStencil.hpp"
+#include "../Stencils/PressureBufferFillStencil.hpp"
+#include "../Stencils/PressureBufferReadStencil.hpp"
+#include "../Stencils/VelocityBufferFillStencil.hpp"
+#include "../Stencils/VelocityBufferReadStencil.hpp"
 
 namespace ParallelManagers {
 
@@ -24,6 +24,11 @@ namespace ParallelManagers {
     Stencils::PressureBufferReadStencil pressureBufferReadStencil_;
     ParallelBoundaryIterator<FlowField> pressureBufferFillIterator_;
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_;
+
+    Stencils::VelocityBufferFillStencil velocityBufferFillStencil_;
+    Stencils::VelocityBufferReadStencil velocityBufferReadStencil_;
+    ParallelBoundaryIterator<FlowField> velocityBufferFillIterator_;
+    ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_;
 
   public:
     void communicatePressure();

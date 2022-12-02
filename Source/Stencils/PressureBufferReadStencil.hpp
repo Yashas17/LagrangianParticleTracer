@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BoundaryStencil.hpp"
-#include "FlowField.hpp"
-#include "Parameters.hpp"
+#include "../FlowField.hpp"
+#include "../Parameters.hpp"
 #include <vector>
 
 namespace Stencils {
