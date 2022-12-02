@@ -757,7 +757,6 @@ namespace Stencils {
 
     return (lvt[sIndexP1] * (lv[indexP1] - lv[index0]) / dx1 - lvt[sIndex0] * (lv[index0] - lv[indexM1]) / dx0) / dxAvg;
   }
-  // (vt(i+1,j)*(u (i+1,j) - u(i,j))/dx1 - vt(i,j)*(u(i,j) + u(i+1,j))/dx0)/dxSum
 
   inline RealType uyvx_y(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
@@ -813,26 +812,210 @@ namespace Stencils {
     const int dz0m = lm(mapd(0, 0, -1, 2));
     const int dz1m = lm(mapd(1, 0, -1, 2));
 
-    // Avg viscosity at (i + 0.5, z + 0.5)
+    // Avg viscosity at (i + 0.5, k + 0.5)
     RealType v0 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx01 * dz01 * lvt(mapd(0, 0, 1))
                    + dx11 * dz11 * lvt(mapd(1, 0, 1)) + dx10 * dz10 * lvt(mapd(1, 0, 0)))
                   / ((dx00 + dx10) * (dz00 + dz01));
 
-    // Avg viscosity at (i + 0.5, z - 0.5)
+    // Avg viscosity at (i + 0.5, k - 0.5)
     RealType v1 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx0m * dz0m * lvt(mapd(0, 0, -1))
                    + dx1m * dz1m * lvt(mapd(1, 0, -1)) + dx10 * dz10 * lvt(mapd(1, 0, 0)))
                   / ((dx00 + dx10) * (dz00 + dz0m));
 
-    // dudz at (i + 0.5 , z + 0.5)
-    RealType a = 2 * (lv(mapd(0, 1, 0, 0)) - lv(mapd(0, 0, 0, 0))) / (dz00 + dz01);
-    // dwdx at (i + 0.5, z + 0.5)
+    // dudz at (i + 0.5, k + 0.5)
+    RealType a = 2 * (lv(mapd(0, 0, 1, 0)) - lv(mapd(0, 0, 0, 0))) / (dz00 + dz01);
+    // dwdx at (i + 0.5, k + 0.5)
     RealType b = 2 * (lv(mapd(1, 0, 0, 2)) - lv(mapd(0, 0, 0, 2))) / (dx00 + dx10);
-    // dudz at (i + 0.5, z - 0.5)
+    // dudz at (i + 0.5, k - 0.5)
     RealType c = 2 * (lv(mapd(0, 0, 0, 0)) - lv(mapd(0, 0, -1, 0))) / (dz00 + dz0m);
-    // dwdx at (i +0.5, z - 0.5)
+    // dwdx at (i +0.5, k - 0.5)
     RealType d = 2 * (lv(mapd(1, 0, -1, 2)) - lv(mapd(0, 0, -1, 2))) / (dx1m + dx0m);
 
     return (v0 * (a + b) - v1 * (c + d)) / dz00;
+  }
+
+  inline RealType vy_y(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
+
+    const int indexM1 = mapd(0, -1, 0, 1);
+    const int index0  = mapd(0, 0, 0, 1);
+    const int indexP1 = mapd(0, 1, 0, 1);
+
+    const int sIndex0  = mapd(0, 0, 0);
+    const int sIndexP1 = mapd(0, 1, 0);
+
+    const RealType dy0   = lm[index0];
+    const RealType dy1   = lm[indexP1];
+    const RealType dyAvg = (dy0 + dy1) * 0.5;
+
+    return (lvt[sIndexP1] * (lv[indexP1] - lv[index0]) / dy1 - lvt[sIndex0] * (lv[index0] - lv[indexM1]) / dy0) / dyAvg;
+  }
+
+  inline RealType vxuy_x(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
+
+    const int dx00 = lm(mapd(0, 0, 0, 0));
+    const int dx10 = lm(mapd(1, 0, 0, 0));
+    const int dx01 = lm(mapd(0, 1, 0, 0));
+    const int dx11 = lm(mapd(1, 1, 0, 0));
+    const int dxm0 = lm(mapd(-1, 0, 0, 0));
+    const int dxm1 = lm(mapd(-1, 1, 0, 0));
+
+    const int dy00 = lm(mapd(0, 0, 0, 1));
+    const int dy10 = lm(mapd(1, 0, 0, 1));
+    const int dy01 = lm(mapd(0, 1, 0, 1));
+    const int dy11 = lm(mapd(1, 1, 0, 1));
+    const int dym0 = lm(mapd(-1, 0, 0, 1));
+    const int dym1 = lm(mapd(-1, 1, 0, 1));
+
+    // Avg viscosity at (i + 0.5, j + 0.5)
+    RealType v0 = (dx00 * dy00 * lvt(mapd(0, 0, 0)) + dx01 * dy01 * lvt(mapd(0, 1, 0))
+                   + dx11 * dy11 * lvt(mapd(1, 1, 0)) + dx10 * dy10 * lvt(mapd(1, 0, 0)))
+                  / ((dx00 + dx10) * (dy00 + dy01));
+
+    // Avg viscosity at (i + 0.5, j - 0.5)
+    RealType v1 = (dx00 * dy00 * lvt(mapd(0, 0, 0)) + dxm0 * dym0 * lvt(mapd(-1, 0, 0))
+                   + dxm1 * dym1 * lvt(mapd(-1, 1, 0)) + dx01 * dy01 * lvt(mapd(0, 1, 0)))
+                  / ((dx00 + dxm0) * (dy00 + dy01));
+
+    // dudy at (i + 0.5 , j + 0.5)
+    RealType a = 2 * (lv(mapd(0, 1, 0, 0)) - lv(mapd(0, 0, 0, 0))) / (dy00 + dy01);
+    // dvdx at (i + 0.5, j + 0.5)
+    RealType b = 2 * (lv(mapd(1, 0, 0, 1)) - lv(mapd(0, 0, 0, 1))) / (dx00 + dx10);
+    // dudy at (i - 0.5, j + 0.5)
+    RealType c = 2 * (lv(mapd(0, 1, 0, 0)) - lv(mapd(0, 0, 0, 0))) / (dy00 + dy01);
+    // dvdx at (i - 0.5, j + 0.5)
+    RealType d = 2 * (lv(mapd(0, 0, 0, 1)) - lv(mapd(-1, 0, 0, 1))) / (dxm0 + dx00);
+
+    return (v0 * (a + b) - v1 * (c + d)) / dx00;
+  }
+
+  inline RealType vzwy_z(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
+
+    const int dy00 = lm(mapd(0, 0, 0, 1));
+    const int dy10 = lm(mapd(0, 1, 0, 1));
+    const int dy01 = lm(mapd(0, 0, 1, 1));
+    const int dy11 = lm(mapd(0, 1, 1, 1));
+    const int dy0m = lm(mapd(0, 0, -1, 1));
+    const int dy1m = lm(mapd(0, 1, -1, 1));
+
+    const int dz00 = lm(mapd(0, 0, 0, 2));
+    const int dz10 = lm(mapd(0, 1, 0, 2));
+    const int dz01 = lm(mapd(0, 0, 1, 2));
+    const int dz11 = lm(mapd(0, 1, 1, 2));
+    const int dz0m = lm(mapd(0, 0, -1, 2));
+    const int dz1m = lm(mapd(0, 1, -1, 2));
+
+    // Avg viscosity at (j + 0.5, k + 0.5)
+    RealType v0 = (dy00 * dz00 * lvt(mapd(0, 0, 0)) + dy01 * dz01 * lvt(mapd(0, 0, 1))
+                   + dy11 * dz11 * lvt(mapd(0, 1, 1)) + dy10 * dz10 * lvt(mapd(0, 1, 0)))
+                  / ((dx00 + dx10) * (dz00 + dz01));
+
+    // Avg viscosity at (j + 0.5, k - 0.5)
+    RealType v1 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx0m * dz0m * lvt(mapd(0, 0, -1))
+                   + dx1m * dz1m * lvt(mapd(1, 0, -1)) + dx10 * dz10 * lvt(mapd(1, 0, 0)))
+                  / ((dx00 + dx10) * (dz00 + dz0m));
+
+    // dvdz at (j + 0.5, k + 0.5)
+    RealType a = 2 * (lv(mapd(0, 0, 1, 1)) - lv(mapd(0, 0, 0, 1))) / (dz00 + dz01);
+    // dwdx at (j + 0.5, k + 0.5)
+    RealType b = 2 * (lv(mapd(0, 1, 0, 2)) - lv(mapd(0, 0, 0, 2))) / (dy00 + dy10);
+    // dvdz at (i + 0.5, z - 0.5)
+    RealType c = 2 * (lv(mapd(0, 0, 0, 1)) - lv(mapd(0, 0, -1, 1))) / (dz00 + dz0m);
+    // dwdx at (i +0.5, z - 0.5)
+    RealType d = 2 * (lv(mapd(0, 1, -1, 2)) - lv(mapd(0, 0, -1, 2))) / (dy1m + dy0m);
+
+    return (v0 * (a + b) - v1 * (c + d)) / dz00;
+  }
+
+  inline RealType wz_z(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
+
+    const int indexM1 = mapd(0, 0, -1, 2);
+    const int index0  = mapd(0, 0, 0, 2);
+    const int indexP1 = mapd(0, 0, 1, 2);
+
+    const int sIndex0  = mapd(0, 0, 0);
+    const int sIndexP1 = mapd(0, 0, 1);
+
+    const RealType dz0   = lm[index0];
+    const RealType dz1   = lm[indexP1];
+    const RealType dzAvg = (dz0 + dz1) * 0.5;
+
+    return (lvt[sIndexP1] * (lv[indexP1] - lv[index0]) / dz1 - lvt[sIndex0] * (lv[index0] - lv[indexM1]) / dz0) / dzAvg;
+  }
+
+  inline RealType wxuz_x(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
+
+    const int dx00 = lm(mapd(0, 0, 0, 0));
+    const int dx10 = lm(mapd(1, 0, 0, 0));
+    const int dx01 = lm(mapd(0, 0, 1, 0));
+    const int dx11 = lm(mapd(1, 0, 1, 0));
+    const int dxm0 = lm(mapd(-1, 0, 0, 0));
+    const int dxm1 = lm(mapd(-1, 0, 1, 0));
+
+    const int dz00 = lm(mapd(0, 0, 0, 2));
+    const int dz10 = lm(mapd(1, 0, 0, 2));
+    const int dz01 = lm(mapd(0, 0, 1, 2));
+    const int dz11 = lm(mapd(1, 0, 1, 2));
+    const int dzm0 = lm(mapd(-1, 0, 0, 2));
+    const int dzm1 = lm(mapd(-1, 0, 1, 2));
+
+    // Avg viscosity at (i + 0.5, k + 0.5)
+    RealType v0 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx01 * dz01 * lvt(mapd(0, 0, 1))
+                   + dx11 * dz11 * lvt(mapd(1, 0, 1)) + dx10 * dz10 * lvt(mapd(1, 0, 0)))
+                  / ((dx00 + dx10) * (dz00 + dz01));
+
+    // Avg viscosity at (i - 0.5, k + 0.5)
+    RealType v1 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dxm0 * dzm0 * lvt(mapd(-1, 0, 0))
+                   + dxm1 * dzm1 * lvt(mapd(-1, 0, 1)) + dx01 * dz01 * lvt(mapd(0, 0, 1)))
+                  / ((dx00 + dxm0) * (dz00 + dz01));
+
+    // dudz at (i + 0.5, k + 0.5)
+    RealType a = 2 * (lv(mapd(0, 0, 1, 0)) - lv(mapd(0, 0, 0, 0))) / (dz00 + dz01);
+    // dwdx at (i + 0.5, k + 0.5)
+    RealType b = 2 * (lv(mapd(1, 0, 0, 2)) - lv(mapd(0, 0, 0, 2))) / (dx00 + dx10);
+    // dudz at (i - 0.5, k + 0.5)
+    RealType c = 2 * (lv(mapd(-1, 0, 1, 0)) - lv(mapd(-1, 0, 0, 0))) / (dz00 + dz01);
+    // dwdx at (i - 0.5, k + 0.5)
+    RealType d = 2 * (lv(mapd(0, 0, 0, 2)) - lv(mapd(-1, 0, 0, 2))) / (dx00 + dxm0);
+
+    return (v0 * (a + b) - v1 * (c + d)) / dx00;
+  }
+
+  inline RealType wyvz_y(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
+
+    const int dy00 = lm(mapd(0, 0, 0, 1));
+    const int dy10 = lm(mapd(0, 1, 0, 1));
+    const int dy01 = lm(mapd(0, 0, 1, 1));
+    const int dy11 = lm(mapd(0, 1, 1, 1));
+    const int dym0 = lm(mapd(0, -1, 0, 1));
+    const int dym1 = lm(mapd(0, -1, 1, 1));
+
+    const int dz00 = lm(mapd(0, 0, 0, 2));
+    const int dz10 = lm(mapd(0, 1, 0, 2));
+    const int dz01 = lm(mapd(0, 0, 1, 2));
+    const int dz11 = lm(mapd(0, 1, 1, 2));
+    const int dzm0 = lm(mapd(0, -1, 0, 2));
+    const int dzm1 = lm(mapd(0, -1, 1, 2));
+
+    // Avg viscosity at (j + 0.5, k + 0.5)
+    RealType v0 = (dy00 * dz00 * lvt(mapd(0, 0, 0)) + dy01 * dz01 * lvt(mapd(0, 0, 1))
+                   + dy11 * dz11 * lvt(mapd(0, 1, 1)) + dy10 * dz10 * lvt(mapd(0, 1, 0)))
+                  / ((dy00 + dy10) * (dz00 + dz01));
+
+    // Avg viscosity at (j - 0.5, k + 0.5)
+    RealType v1 = (dy00 * dz00 * lvt(mapd(0, 0, 0)) + dym0 * dzm0 * lvt(mapd(0, -1, 0))
+                   + dym1 * dzm1 * lvt(mapd(0, -1, 1)) + dy01 * dz01 * lvt(mapd(0, 0, 1)))
+                  / ((dy00 + dym0) * (dz00 + dz01));
+
+    // dvdz at (j + 0.5, k + 0.5)
+    RealType a = 2 * (lv(mapd(0, 0, 1, 1)) - lv(mapd(0, 0, 0, 1))) / (dz00 + dz01);
+    // dwdy at (j + 0.5, k + 0.5)
+    RealType b = 2 * (lv(mapd(0, 1, 0, 2)) - lv(mapd(0, 0, 0, 2))) / (dy00 + dy10);
+    // dvdz at (j - 0.5, k + 0.5)
+    RealType c = 2 * (lv(mapd(0, -1, 1, 1)) - lv(mapd(0, -1, 0, 1))) / (dz00 + dz01);
+    // dwdy at (j - 0.5, k + 0.5)
+    RealType d = 2 * (lv(mapd(0, 0, 0, 2)) - lv(mapd(0, 0, -1, 2))) / (dx00 + dxm0);
+
+    return (v0 * (a + b) - v1 * (c + d)) / dy00;
   }
 
   inline RealType computeF2D(
@@ -895,8 +1078,7 @@ namespace Stencils {
     RealType              dt
   ) {
     return localVelocity[mapd(0, 0, 0, 0)] 
-          + dt * (2 * ux_x(localVelocity, localMeshsize, localVTotal) 
-                + uyvx_y(localVelocity, localMeshsize, localVTotal) 
+        + dt * (2 * ux_x(localVelocity, localMeshsize, localVTotal) + uyvx_y(localVelocity, localMeshsize, localVTotal) 
                 + parameters.environment.gx);
   }
 
@@ -907,10 +1089,9 @@ namespace Stencils {
     const Parameters&     parameters,
     RealType              dt
   ) {
-    return localVelocity[mapd(0, 0, 0, 1)]
-        + dt * (1 / parameters.flow.Re * (d2vdx2(localVelocity, localMeshsize)
-            + d2vdy2(localVelocity, localMeshsize)) - duvdx(localVelocity, parameters, localMeshsize)
-            - dv2dy(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
+    return localVelocity[mapd(0, 0, 0, 1)] 
+        + dt * ( 2 * vy_y(localVelocity, localMeshsize, localVTotal) + vxuy_x(localVelocity, localMeshsize, localVTotal)
+                + parameters.environment.gy);
   }
 
   inline RealType computeF3D(
@@ -920,8 +1101,9 @@ namespace Stencils {
     const Parameters&     parameters,
     RealType              dt
   ) {
-    return localVelocity[mapd(0,0,0,0)] + dt * (2 * ux_x(localVelocity, localMeshsize, localVTotal) + uyvx_y(localVelocity, localMeshsize, localVTotal)
-           + uzwx_z(localVelocity, localMeshsize, localVTotal) + parameters.environment.gx);
+    return localVelocity[mapd(0,0,0,0)] 
+        + dt * (2 * ux_x(localVelocity, localMeshsize, localVTotal) + uyvx_y(localVelocity, localMeshsize, localVTotal)
+                + uzwx_z(localVelocity, localMeshsize, localVTotal) + parameters.environment.gx);
   }
 
   inline RealType computeG3D(
@@ -932,10 +1114,8 @@ namespace Stencils {
     RealType              dt
   ) {
     return localVelocity[mapd(0, 0, 0, 1)]
-        + dt * (1 / parameters.flow.Re * (d2vdx2(localVelocity, localMeshsize)
-            + d2vdy2(localVelocity, localMeshsize) + d2vdz2(localVelocity, localMeshsize))
-            - dv2dy(localVelocity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
-            - dvwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
+        + dt * (2 * vy_y(localVelocity, localMeshsize, localVTotal) + vxuy_x(localVelocity, localMeshsize, localVTotal)
+                + vzwy_z(localVelocity, localMeshsize, localVTotal) + parameters.environment.gy);
   }
 
   inline RealType computeH3D(
@@ -946,10 +1126,8 @@ namespace Stencils {
     RealType              dt
   ) {
     return localVelocity[mapd(0, 0, 0, 2)]
-        + dt * (1 / parameters.flow.Re * (d2wdx2(localVelocity, localMeshsize)
-            + d2wdy2(localVelocity, localMeshsize) + d2wdz2(localVelocity, localMeshsize))
-            - dw2dz(localVelocity, parameters, localMeshsize) - duwdx(localVelocity, parameters, localMeshsize)
-            - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
+        + dt * (2 * wz_z(localVelocity, localMeshsize, localVTotal) + wxuz_x(localVelocity, localMeshsize, localVTotal)
+                + wyvz_y(localVelocity, localMeshsize, localVTotal) + parameters.environment.gz);
   }
 
 } // namespace Stencils
