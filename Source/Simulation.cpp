@@ -24,10 +24,8 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   rhsIterator_(flowField_, parameters, rhsStencil_),
   petscParallelManager_(parameters, flowField_),
 #ifdef ENABLE_PETSC
-  ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
 #else
-  ,
   solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters))
 #endif
 {
