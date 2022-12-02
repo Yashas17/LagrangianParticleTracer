@@ -9,16 +9,11 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
                                 std::vector<RealType>&& rightBufferFrom,
                                 std::vector<RealType>&& bottomBufferFrom,
                                 std::vector<RealType>&& topBufferFrom):
-  BoundaryStencil<FlowField>(parameters) {
-    //size includes the ghost cells
-    cellsX = parameters.parallel.localSize[0] + 3;
-    cellsY = parameters.parallel.localSize[1] + 3;
-
-    leftBuffer = leftBufferFrom;
-    rightBuffer = rightBufferFrom;
-    bottomBuffer = bottomBufferFrom;
-    topBuffer = topBufferFrom;
-  }
+  BoundaryStencil<FlowField>(parameters),
+    cellsX(parameters.parallel.localSize[0] + 3), cellsY(parameters.parallel.localSize[1] + 3),
+    leftBuffer(std::move(leftBufferFrom)), rightBuffer(std::move(rightBufferFrom)),
+    bottomBuffer(std::move(bottomBufferFrom)), topBuffer(std::move(topBufferFrom))
+   { }
 
 //3d constructor
 Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
@@ -28,19 +23,12 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
                                 std::vector<RealType>&& topBufferFrom,
                                 std::vector<RealType>&& frontBufferFrom,
                                 std::vector<RealType>&& backBufferFrom):
-  BoundaryStencil<FlowField>(parameters) {
-    //size includes the ghost cells
-    cellsX = parameters.parallel.localSize[0] + 3;
-    cellsY = parameters.parallel.localSize[1] + 3;
-    cellsZ = parameters.parallel.localSize[2] + 3;
-
-    leftBuffer = leftBufferFrom;
-    rightBuffer = rightBufferFrom;
-    bottomBuffer = bottomBufferFrom;
-    topBuffer = topBufferFrom;
-    frontBuffer = frontBufferFrom;
-    backBuffer = backBufferFrom;
-  }
+  BoundaryStencil<FlowField>(parameters),
+    cellsX(parameters.parallel.localSize[0] + 3), cellsY(parameters.parallel.localSize[1] + 3),
+    cellsZ(parameters.parallel.localSize[2] + 3), leftBuffer(std::move(leftBufferFrom)), 
+    rightBuffer(std::move(rightBufferFrom)), bottomBuffer(std::move(bottomBufferFrom)), 
+    topBuffer(std::move(topBufferFrom)), frontBuffer(std::move(frontBufferFrom)), 
+    backBuffer(std::move(backBufferFrom)) { }
 
 //2d cases
 void Stencils::VelocityBufferReadStencil::applyLeftWall(
