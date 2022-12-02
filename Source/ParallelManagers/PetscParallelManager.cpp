@@ -408,12 +408,12 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
 
     //Read the buffers into the flowField
     Stencils::VelocityBufferReadStencil velocityBufferReadStencil_(parameters_, 
-                                                                  leftBufferRecv,
-                                                                  rightBufferRecv,
-                                                                  bottomBufferRecv,
-                                                                  topBufferRecv,
-                                                                  frontBufferRecv,
-                                                                  backBufferRecv);
+                                                                  std::move(leftBufferRecv),
+                                                                  std::move(rightBufferRecv),
+                                                                  std::move(bottomBufferRecv),
+                                                                  std::move(topBufferRecv),
+                                                                  std::move(frontBufferRecv),
+                                                                  std::move(backBufferRecv));
     ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_(flowField_,
                                                                     parameters_,
                                                                     velocityBufferReadStencil_,
