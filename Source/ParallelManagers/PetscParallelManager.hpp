@@ -21,14 +21,14 @@ namespace ParallelManagers {
     FlowField& flowField_;
 
     Stencils::PressureBufferFillStencil pressureBufferFillStencil_;
-    Stencils::PressureBufferReadStencil pressureBufferReadStencil_;
+    //Stencils::PressureBufferReadStencil pressureBufferReadStencil_;
     ParallelBoundaryIterator<FlowField> pressureBufferFillIterator_;
-    ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_;
+    //ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_;
 
     Stencils::VelocityBufferFillStencil velocityBufferFillStencil_;
-    Stencils::VelocityBufferReadStencil velocityBufferReadStencil_;
+    //Stencils::VelocityBufferReadStencil velocityBufferReadStencil_;
     ParallelBoundaryIterator<FlowField> velocityBufferFillIterator_;
-    ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_;
+    //ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_;
 
   public:
     void communicatePressure();

@@ -14,10 +14,10 @@ Stencils::PressureBufferReadStencil::PressureBufferReadStencil
     cellsX = parameters.parallel.localSize[0];
     cellsY = parameters.parallel.localSize[1];
 
-    leftBuffer = std::move(leftBufferFrom);
-    rightBuffer = std::move(rightBufferFrom);
-    bottomBuffer = std::move(bottomBufferFrom);
-    topBuffer = std::move(topBufferFrom);
+    leftBuffer = leftBufferFrom;
+    rightBuffer = rightBufferFrom;
+    bottomBuffer = bottomBufferFrom;
+    topBuffer = topBufferFrom;
   }
 
 //3d constructor
@@ -34,12 +34,12 @@ Stencils::PressureBufferReadStencil::PressureBufferReadStencil
     cellsY = parameters.parallel.localSize[1];
     cellsZ = parameters.parallel.localSize[2];
 
-    leftBuffer = std::move(leftBufferFrom);
-    rightBuffer = std::move(rightBufferFrom);
-    bottomBuffer = std::move(bottomBufferFrom);
-    topBuffer = std::move(topBufferFrom);
-    frontBuffer = std::move(frontBufferFrom);
-    backBuffer = std::move(backBufferFrom);
+    leftBuffer = leftBufferFrom;
+    rightBuffer = rightBufferFrom;
+    bottomBuffer = bottomBufferFrom;
+    topBuffer = topBufferFrom;
+    frontBuffer = frontBufferFrom;
+    backBuffer = backBufferFrom;
   }
 
 //2d cases

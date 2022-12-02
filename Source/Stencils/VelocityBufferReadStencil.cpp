@@ -14,10 +14,10 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
     cellsX = parameters.parallel.localSize[0] + 3;
     cellsY = parameters.parallel.localSize[1] + 3;
 
-    leftBuffer = std::move(leftBufferFrom);
-    rightBuffer = std::move(rightBufferFrom);
-    bottomBuffer = std::move(bottomBufferFrom);
-    topBuffer = std::move(topBufferFrom);
+    leftBuffer = leftBufferFrom;
+    rightBuffer = rightBufferFrom;
+    bottomBuffer = bottomBufferFrom;
+    topBuffer = topBufferFrom;
   }
 
 //3d constructor
@@ -34,12 +34,12 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
     cellsY = parameters.parallel.localSize[1] + 3;
     cellsZ = parameters.parallel.localSize[2] + 3;
 
-    leftBuffer = std::move(leftBufferFrom);
-    rightBuffer = std::move(rightBufferFrom);
-    bottomBuffer = std::move(bottomBufferFrom);
-    topBuffer = std::move(topBufferFrom);
-    frontBuffer = std::move(frontBufferFrom);
-    backBuffer = std::move(backBufferFrom);
+    leftBuffer = leftBufferFrom;
+    rightBuffer = rightBufferFrom;
+    bottomBuffer = bottomBufferFrom;
+    topBuffer = topBufferFrom;
+    frontBuffer = frontBufferFrom;
+    backBuffer = backBufferFrom;
   }
 
 //2d cases
