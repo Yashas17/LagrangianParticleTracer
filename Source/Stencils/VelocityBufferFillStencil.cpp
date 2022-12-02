@@ -10,29 +10,29 @@ Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(const Parameters&
     if(parameters.geometry.dim == 2){
 
       //size includes the ghost cells
-      cellsX = parameters.parallel.localSize[0];
-      cellsY = parameters.parallel.localSize[1];
+      cellsX = parameters.parallel.localSize[0] + 3;
+      cellsY = parameters.parallel.localSize[1] + 3;
 
       //2 times for both velocity directions, flattened
-      std::vector<RealType> leftBuffer(2 * cellsY); //u,v
-      std::vector<RealType> rightBuffer(3 * cellsY); //u,v, another u
-      std::vector<RealType> bottomBuffer(2 * cellsX); //u,v
-      std::vector<RealType> topBuffer(3 * cellsX); //u,v, another v
+      leftBuffer.resize(2 * cellsY); //u,v
+      rightBuffer.resize(3 * cellsY); //u,v, another u
+      bottomBuffer.resize(2 * cellsX); //u,v
+      topBuffer.resize(3 * cellsX); //u,v, another v
 
     } else if (parameters.geometry.dim == 3){
 
       //size includes the ghost cells
-      cellsX = parameters.parallel.localSize[0];
-      cellsY = parameters.parallel.localSize[1];
-      cellsZ = parameters.parallel.localSize[2];
+      cellsX = parameters.parallel.localSize[0] + 3;
+      cellsY = parameters.parallel.localSize[1] + 3;
+      cellsZ = parameters.parallel.localSize[2] + 3;
 
       //3 times for all velocity directions, flattened
-      std::vector<RealType> leftBuffer(3 * cellsY*cellsZ); //u,v,w
-      std::vector<RealType> rightBuffer(4 * cellsY*cellsZ); //u,v,w, another u 
-      std::vector<RealType> bottomBuffer(3 * cellsX*cellsZ); //u,v,w
-      std::vector<RealType> topBuffer(4 * cellsX*cellsZ); //u,v,w, another v 
-      std::vector<RealType> frontBuffer(3 * cellsX*cellsY); //u,v,w
-      std::vector<RealType> backBuffer(4 * cellsX*cellsY); //u,v,w another w
+      leftBuffer.resize(3 * cellsY*cellsZ); //u,v,w
+      rightBuffer.resize(4 * cellsY*cellsZ); //u,v,w, another u 
+      bottomBuffer.resize(3 * cellsX*cellsZ); //u,v,w
+      topBuffer.resize(4 * cellsX*cellsZ); //u,v,w, another v 
+      frontBuffer.resize(3 * cellsX*cellsY); //u,v,w
+      backBuffer.resize(4 * cellsX*cellsY); //u,v,w another w
 
     }
     

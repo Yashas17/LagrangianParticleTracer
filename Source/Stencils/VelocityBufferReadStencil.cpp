@@ -5,14 +5,14 @@
 
 //2d constructor
 Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
-  (const Parameters& parameters,std::vector<RealType>& leftBufferFrom, 
-                                std::vector<RealType>& rightBufferFrom,
-                                std::vector<RealType>& bottomBufferFrom,
-                                std::vector<RealType>& topBufferFrom):
+  (const Parameters& parameters,std::vector<RealType>&& leftBufferFrom, 
+                                std::vector<RealType>&& rightBufferFrom,
+                                std::vector<RealType>&& bottomBufferFrom,
+                                std::vector<RealType>&& topBufferFrom):
   BoundaryStencil<FlowField>(parameters) {
     //size includes the ghost cells
-    cellsX = parameters.parallel.localSize[0];
-    cellsY = parameters.parallel.localSize[1];
+    cellsX = parameters.parallel.localSize[0] + 3;
+    cellsY = parameters.parallel.localSize[1] + 3;
 
     leftBuffer = std::move(leftBufferFrom);
     rightBuffer = std::move(rightBufferFrom);
@@ -22,17 +22,17 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
 
 //3d constructor
 Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil
-  (const Parameters& parameters,std::vector<RealType>& leftBufferFrom, 
-                                std::vector<RealType>& rightBufferFrom,
-                                std::vector<RealType>& bottomBufferFrom,
-                                std::vector<RealType>& topBufferFrom,
-                                std::vector<RealType>& frontBufferFrom,
-                                std::vector<RealType>& backBufferFrom):
+  (const Parameters& parameters,std::vector<RealType>&& leftBufferFrom, 
+                                std::vector<RealType>&& rightBufferFrom,
+                                std::vector<RealType>&& bottomBufferFrom,
+                                std::vector<RealType>&& topBufferFrom,
+                                std::vector<RealType>&& frontBufferFrom,
+                                std::vector<RealType>&& backBufferFrom):
   BoundaryStencil<FlowField>(parameters) {
     //size includes the ghost cells
-    cellsX = parameters.parallel.localSize[0];
-    cellsY = parameters.parallel.localSize[1];
-    cellsZ = parameters.parallel.localSize[2];
+    cellsX = parameters.parallel.localSize[0] + 3;
+    cellsY = parameters.parallel.localSize[1] + 3;
+    cellsZ = parameters.parallel.localSize[2] + 3;
 
     leftBuffer = std::move(leftBufferFrom);
     rightBuffer = std::move(rightBufferFrom);

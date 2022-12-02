@@ -23,18 +23,18 @@ namespace Stencils {
 
     //2d constructor
     VelocityBufferReadStencil(const Parameters& parameters, 
-                              std::vector<RealType>& leftBufferFrom, 
-                              std::vector<RealType>& rightBufferFrom,
-                              std::vector<RealType>& bottomBufferFrom,
-                              std::vector<RealType>& topBufferFrom);
+                              std::vector<RealType>&& leftBufferFrom, 
+                              std::vector<RealType>&& rightBufferFrom,
+                              std::vector<RealType>&& bottomBufferFrom,
+                              std::vector<RealType>&& topBufferFrom);
     //3d constructor
     VelocityBufferReadStencil(const Parameters& parameters, 
-                              std::vector<RealType>& leftBufferFrom, 
-                              std::vector<RealType>& rightBufferFrom,
-                              std::vector<RealType>& bottomBufferFrom,
-                              std::vector<RealType>& topBufferFrom,
-                              std::vector<RealType>& frontBufferFrom,
-                              std::vector<RealType>& backBufferFrom);
+                              std::vector<RealType>&& leftBufferFrom, 
+                              std::vector<RealType>&& rightBufferFrom,
+                              std::vector<RealType>&& bottomBufferFrom,
+                              std::vector<RealType>&& topBufferFrom,
+                              std::vector<RealType>&& frontBufferFrom,
+                              std::vector<RealType>&& backBufferFrom);
     
     ~VelocityBufferReadStencil() override = default;
 

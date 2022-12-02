@@ -10,27 +10,27 @@ Stencils::PressureBufferFillStencil::PressureBufferFillStencil(const Parameters&
     if(parameters.geometry.dim == 2){
 
       //size includes the ghost cells
-      cellsX = parameters.parallel.localSize[0];
-      cellsY = parameters.parallel.localSize[1];
+      cellsX = parameters.parallel.localSize[0] + 3;
+      cellsY = parameters.parallel.localSize[1] + 3;
 
-      std::vector<RealType> leftBuffer(cellsY);
-      std::vector<RealType> rightBuffer(cellsY);
-      std::vector<RealType> bottomBuffer(cellsX);
-      std::vector<RealType> topBuffer(cellsX);
+      leftBuffer.resize(cellsY);
+      rightBuffer.resize(cellsY);
+      bottomBuffer.resize(cellsX);
+      topBuffer.resize(cellsX);
 
     } else if (parameters.geometry.dim == 3){
 
       //size includes the ghost cells
-      cellsX = parameters.parallel.localSize[0];
-      cellsY = parameters.parallel.localSize[1];
-      cellsZ = parameters.parallel.localSize[2];
+      cellsX = parameters.parallel.localSize[0] + 3;
+      cellsY = parameters.parallel.localSize[1] + 3;
+      cellsZ = parameters.parallel.localSize[2] + 3;
 
-      std::vector<RealType> leftBuffer(cellsY*cellsZ);
-      std::vector<RealType> rightBuffer(cellsY*cellsZ);
-      std::vector<RealType> bottomBuffer(cellsX*cellsZ);
-      std::vector<RealType> topBuffer(cellsX*cellsZ);
-      std::vector<RealType> frontBuffer(cellsX*cellsY);
-      std::vector<RealType> backBuffer(cellsX*cellsY);
+      leftBuffer.resize(cellsY*cellsZ);
+      rightBuffer.resize(cellsY*cellsZ);
+      bottomBuffer.resize(cellsX*cellsZ);
+      topBuffer.resize(cellsX*cellsZ);
+      frontBuffer.resize(cellsX*cellsY);
+      backBuffer.resize(cellsX*cellsY);
 
     }
     
