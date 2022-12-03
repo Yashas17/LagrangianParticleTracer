@@ -33,56 +33,56 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     std::vector<RealType> topBufferRecv(cellsX);
 
     //send from left, receive on right
-    MPI_Sendrecv(&pressureBufferFillStencil_.leftBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.leftBuffer.data(),
                   cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.leftNb,
                   0,
-                  &rightBufferRecv[0],
+                  rightBufferRecv.data(),
                   cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.rightNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from right, receive on left
-    MPI_Sendrecv(&pressureBufferFillStencil_.rightBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.rightBuffer.data(),
                   cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.rightNb,
                   0,
-                  &leftBufferRecv[0],
+                  leftBufferRecv.data(),
                   cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.leftNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from bottom, receive on top
-    MPI_Sendrecv(&pressureBufferFillStencil_.bottomBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.bottomBuffer.data(),
                   cellsX,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.bottomNb,
                   0,
-                  &topBufferRecv[0],
+                  topBufferRecv.data(),
                   cellsX,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.topNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from top, receive on bottom
-    MPI_Sendrecv(&pressureBufferFillStencil_.topBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.topBuffer.data(),
                   cellsX,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.topNb,
                   0,
-                  &bottomBufferRecv[0],
+                  bottomBufferRecv.data(),
                   cellsX,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.bottomNb,
                   0,
                   PETSC_COMM_WORLD,
@@ -119,84 +119,84 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     std::vector<RealType> backBufferRecv(cellsX*cellsY);
 
     //send from left, receive on right
-    MPI_Sendrecv(&pressureBufferFillStencil_.leftBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.leftBuffer.data(),
                   cellsY*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.leftNb,
                   0,
-                  &rightBufferRecv[0],
+                  rightBufferRecv.data(),
                   cellsY*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.rightNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from right, receive on left
-    MPI_Sendrecv(&pressureBufferFillStencil_.rightBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.rightBuffer.data(),
                   cellsY*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.rightNb,
                   0,
-                  &leftBufferRecv[0],
+                  leftBufferRecv.data(),
                   cellsY*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.leftNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from bottom, receive on top
-    MPI_Sendrecv(&pressureBufferFillStencil_.bottomBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.bottomBuffer.data(),
                   cellsX*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.bottomNb,
                   0,
-                  &topBufferRecv[0],
+                  topBufferRecv.data(),
                   cellsX*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.topNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from top, receive on bottom
-    MPI_Sendrecv(&pressureBufferFillStencil_.topBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.topBuffer.data(),
                   cellsX*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.topNb,
                   0,
-                  &bottomBufferRecv[0],
+                  bottomBufferRecv.data(),
                   cellsX*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.bottomNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from front, receive on back
-    MPI_Sendrecv(&pressureBufferFillStencil_.frontBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.frontBuffer.data(),
                   cellsX*cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.frontNb,
                   0,
-                  &backBufferRecv[0],
+                  backBufferRecv.data(),
                   cellsX*cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.backNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from back, receive on front
-    MPI_Sendrecv(&pressureBufferFillStencil_.backBuffer[0],
+    MPI_Sendrecv(pressureBufferFillStencil_.backBuffer.data(),
                   cellsX*cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.backNb,
                   0,
-                  &frontBufferRecv[0],
+                  frontBufferRecv.data(),
                   cellsX*cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.frontNb,
                   0,
                   PETSC_COMM_WORLD,
@@ -237,56 +237,56 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     std::vector<RealType> topBufferRecv(2 * cellsX);
 
     //send from left, receive on right
-    MPI_Sendrecv(&velocityBufferFillStencil_.leftBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.leftBuffer.data(),
                   2 * cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.leftNb,
                   0,
-                  &rightBufferRecv[0],
+                  rightBufferRecv.data(),
                   2 * cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.rightNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from right, receive on left
-    MPI_Sendrecv(&velocityBufferFillStencil_.rightBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.rightBuffer.data(),
                   3 * cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.rightNb,
                   0,
-                  &leftBufferRecv[0],
+                  leftBufferRecv.data(),
                   3 * cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.leftNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from bottom, receive on top
-    MPI_Sendrecv(&velocityBufferFillStencil_.bottomBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.bottomBuffer.data(),
                   2 * cellsX,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.bottomNb,
                   0,
-                  &topBufferRecv[0],
+                  topBufferRecv.data(),
                   2 * cellsX,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.topNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from top, receive on bottom
-    MPI_Sendrecv(&velocityBufferFillStencil_.topBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.topBuffer.data(),
                   3 * cellsX,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.topNb,
                   0,
-                  &bottomBufferRecv[0],
+                  bottomBufferRecv.data(),
                   3 * cellsX,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.bottomNb,
                   0,
                   PETSC_COMM_WORLD,
@@ -323,84 +323,84 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     std::vector<RealType> backBufferRecv(3 * cellsX*cellsY);
 
     //send from left, receive on right
-    MPI_Sendrecv(&velocityBufferFillStencil_.leftBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.leftBuffer.data(),
                   3 * cellsY*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.leftNb,
                   0,
-                  &rightBufferRecv[0],
+                  rightBufferRecv.data(),
                   3 * cellsY*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.rightNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from right, receive on left
-    MPI_Sendrecv(&velocityBufferFillStencil_.rightBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.rightBuffer.data(),
                   4 * cellsY*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.rightNb,
                   0,
-                  &leftBufferRecv[0],
+                  leftBufferRecv.data(),
                   4 * cellsY*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.leftNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from bottom, receive on top
-    MPI_Sendrecv(&velocityBufferFillStencil_.bottomBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.bottomBuffer.data(),
                   3 * cellsX*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.bottomNb,
                   0,
-                  &topBufferRecv[0],
+                  topBufferRecv.data(),
                   3 * cellsX*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.topNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from top, receive on bottom
-    MPI_Sendrecv(&velocityBufferFillStencil_.topBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.topBuffer.data(),
                   4 * cellsX*cellsZ,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.topNb,
                   0,
-                  &bottomBufferRecv[0],
+                  bottomBufferRecv.data(),
                   4 * cellsX*cellsZ,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.bottomNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from front, receive on back
-    MPI_Sendrecv(&velocityBufferFillStencil_.frontBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.frontBuffer.data(),
                   3 * cellsX*cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.frontNb,
                   0,
-                  &backBufferRecv[0],
+                  backBufferRecv.data(),
                   3 * cellsX*cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.backNb,
                   0,
                   PETSC_COMM_WORLD,
                   MPI_STATUS_IGNORE);
 
     //send from back, receive on front
-    MPI_Sendrecv(&velocityBufferFillStencil_.backBuffer[0],
+    MPI_Sendrecv(velocityBufferFillStencil_.backBuffer.data(),
                   4 * cellsX*cellsY,
-                  MPI_DOUBLE, //TODO: also make it work for float
+                  MY_MPI_FLOAT, 
                   parameters_.parallel.backNb,
                   0,
-                  &frontBufferRecv[0],
+                  frontBufferRecv.data(),
                   4 * cellsX*cellsY,
-                  MPI_DOUBLE,
+                  MY_MPI_FLOAT,
                   parameters_.parallel.frontNb,
                   0,
                   PETSC_COMM_WORLD,
