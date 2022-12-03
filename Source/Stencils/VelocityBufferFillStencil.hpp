@@ -1,9 +1,11 @@
 #pragma once
 
+#include <vector>
+
 #include "BoundaryStencil.hpp"
+
 #include "../FlowField.hpp"
 #include "../Parameters.hpp"
-#include <vector>
 
 namespace Stencils {
 
@@ -11,9 +13,9 @@ namespace Stencils {
    */
   class VelocityBufferFillStencil: public BoundaryStencil<FlowField> {
   public:
-    int cellsX;
-    int cellsY;
-    int cellsZ;
+    int                   cellsX;
+    int                   cellsY;
+    int                   cellsZ;
     std::vector<RealType> leftBuffer;
     std::vector<RealType> rightBuffer;
     std::vector<RealType> bottomBuffer;

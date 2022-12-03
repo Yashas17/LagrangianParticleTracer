@@ -1,9 +1,11 @@
 #pragma once
 
+#include <vector>
+
 #include "BoundaryStencil.hpp"
+
 #include "../FlowField.hpp"
 #include "../Parameters.hpp"
-#include <vector>
 
 namespace Stencils {
 
@@ -11,9 +13,9 @@ namespace Stencils {
    */
   class VelocityBufferReadStencil: public BoundaryStencil<FlowField> {
   public:
-    int cellsX;
-    int cellsY;
-    int cellsZ;
+    int                   cellsX;
+    int                   cellsY;
+    int                   cellsZ;
     std::vector<RealType> leftBuffer;
     std::vector<RealType> rightBuffer;
     std::vector<RealType> bottomBuffer;
@@ -21,21 +23,25 @@ namespace Stencils {
     std::vector<RealType> frontBuffer;
     std::vector<RealType> backBuffer;
 
-    //2d constructor
-    VelocityBufferReadStencil(const Parameters& parameters, 
-                              std::vector<RealType>&& leftBufferFrom, 
-                              std::vector<RealType>&& rightBufferFrom,
-                              std::vector<RealType>&& bottomBufferFrom,
-                              std::vector<RealType>&& topBufferFrom);
-    //3d constructor
-    VelocityBufferReadStencil(const Parameters& parameters, 
-                              std::vector<RealType>&& leftBufferFrom, 
-                              std::vector<RealType>&& rightBufferFrom,
-                              std::vector<RealType>&& bottomBufferFrom,
-                              std::vector<RealType>&& topBufferFrom,
-                              std::vector<RealType>&& frontBufferFrom,
-                              std::vector<RealType>&& backBufferFrom);
-    
+    // 2d constructor
+    VelocityBufferReadStencil(
+      const Parameters&       parameters,
+      std::vector<RealType>&& leftBufferFrom,
+      std::vector<RealType>&& rightBufferFrom,
+      std::vector<RealType>&& bottomBufferFrom,
+      std::vector<RealType>&& topBufferFrom
+    );
+    // 3d constructor
+    VelocityBufferReadStencil(
+      const Parameters&       parameters,
+      std::vector<RealType>&& leftBufferFrom,
+      std::vector<RealType>&& rightBufferFrom,
+      std::vector<RealType>&& bottomBufferFrom,
+      std::vector<RealType>&& topBufferFrom,
+      std::vector<RealType>&& frontBufferFrom,
+      std::vector<RealType>&& backBufferFrom
+    );
+
     ~VelocityBufferReadStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
