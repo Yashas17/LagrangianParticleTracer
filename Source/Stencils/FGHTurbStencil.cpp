@@ -1,7 +1,7 @@
 #include "StdAfx.hpp"
 
 #include "Definitions.hpp"
-#include "FGHStencil.hpp"
+#include "FGHTurbStencil.hpp"
 #include "StencilFunctions.hpp"
 
 Stencils::FGHTurbStencil::FGHTurbStencil(const Parameters& parameters):

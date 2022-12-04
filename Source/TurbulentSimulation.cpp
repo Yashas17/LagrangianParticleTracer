@@ -1,6 +1,6 @@
 #include "StdAfx.hpp"
 
-#include "Simulation.hpp"
+#include "TurbulentSimulation.hpp"
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
@@ -93,7 +93,7 @@ void TurbulentSimulation::solveTimestep() {
 }
 
 void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
-  Stencils::VTKStencil     vtkStencil(parameters_);
+  Stencils::VTKTurbStencil vtkStencil(parameters_);
   FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
 
   vtkIterator.iterate();
