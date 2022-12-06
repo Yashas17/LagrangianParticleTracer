@@ -760,19 +760,19 @@ namespace Stencils {
 
   inline RealType uyvx_y(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
-    const int dx00 = lm(mapd(0, 0, 0, 0));
-    const int dx10 = lm(mapd(1, 0, 0, 0));
-    const int dx01 = lm(mapd(0, 1, 0, 0));
-    const int dx11 = lm(mapd(1, 1, 0, 0));
-    const int dx0m = lm(mapd(0, -1, 0, 0));
-    const int dx1m = lm(mapd(1, -1, 0, 0));
+    const RealType dx00 = lm(mapd(0, 0, 0, 0));
+    const RealType dx10 = lm(mapd(1, 0, 0, 0));
+    const RealType dx01 = lm(mapd(0, 1, 0, 0));
+    const RealType dx11 = lm(mapd(1, 1, 0, 0));
+    const RealType dx0m = lm(mapd(0, -1, 0, 0));
+    const RealType dx1m = lm(mapd(1, -1, 0, 0));
 
-    const int dy00 = lm(mapd(0, 0, 0, 1));
-    const int dy10 = lm(mapd(1, 0, 0, 1));
-    const int dy01 = lm(mapd(0, 1, 0, 1));
-    const int dy11 = lm(mapd(1, 1, 0, 1));
-    const int dy0m = lm(mapd(0, -1, 0, 1));
-    const int dy1m = lm(mapd(1, -1, 0, 1));
+    const RealType dy00 = lm(mapd(0, 0, 0, 1));
+    const RealType dy10 = lm(mapd(1, 0, 0, 1));
+    const RealType dy01 = lm(mapd(0, 1, 0, 1));
+    const RealType dy11 = lm(mapd(1, 1, 0, 1));
+    const RealType dy0m = lm(mapd(0, -1, 0, 1));
+    const RealType dy1m = lm(mapd(1, -1, 0, 1));
 
     // Avg viscosity at (i + 0.5, j + 0.5)
     RealType v0 = (dx00 * dy00 * lvt(mapd(0, 0, 0)) + dx01 * dy01 * lvt(mapd(0, 1, 0))
@@ -798,19 +798,19 @@ namespace Stencils {
 
   inline RealType uzwx_z(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
-    const int dx00 = lm(mapd(0, 0, 0, 0));
-    const int dx10 = lm(mapd(1, 0, 0, 0));
-    const int dx01 = lm(mapd(0, 0, 1, 0));
-    const int dx11 = lm(mapd(1, 0, 1, 0));
-    const int dx0m = lm(mapd(0, 0, -1, 0));
-    const int dx1m = lm(mapd(1, 0, -1, 0));
+    const RealType dx00 = lm(mapd(0, 0, 0, 0));
+    const RealType dx10 = lm(mapd(1, 0, 0, 0));
+    const RealType dx01 = lm(mapd(0, 0, 1, 0));
+    const RealType dx11 = lm(mapd(1, 0, 1, 0));
+    const RealType dx0m = lm(mapd(0, 0, -1, 0));
+    const RealType dx1m = lm(mapd(1, 0, -1, 0));
 
-    const int dz00 = lm(mapd(0, 0, 0, 2));
-    const int dz10 = lm(mapd(1, 0, 0, 2));
-    const int dz01 = lm(mapd(0, 0, 1, 2));
-    const int dz11 = lm(mapd(1, 0, 1, 2));
-    const int dz0m = lm(mapd(0, 0, -1, 2));
-    const int dz1m = lm(mapd(1, 0, -1, 2));
+    const RealType dz00 = lm(mapd(0, 0, 0, 2));
+    const RealType dz10 = lm(mapd(1, 0, 0, 2));
+    const RealType dz01 = lm(mapd(0, 0, 1, 2));
+    const RealType dz11 = lm(mapd(1, 0, 1, 2));
+    const RealType dz0m = lm(mapd(0, 0, -1, 2));
+    const RealType dz1m = lm(mapd(1, 0, -1, 2));
 
     // Avg viscosity at (i + 0.5, k + 0.5)
     RealType v0 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx01 * dz01 * lvt(mapd(0, 0, 1))
@@ -852,26 +852,26 @@ namespace Stencils {
 
   inline RealType vxuy_x(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
-    const int dx00 = lm(mapd(0, 0, 0, 0));
-    const int dx10 = lm(mapd(1, 0, 0, 0));
-    const int dx01 = lm(mapd(0, 1, 0, 0));
-    const int dx11 = lm(mapd(1, 1, 0, 0));
-    const int dxm0 = lm(mapd(-1, 0, 0, 0));
-    const int dxm1 = lm(mapd(-1, 1, 0, 0));
+    const RealType dx00 = lm(mapd(0, 0, 0, 0));
+    const RealType dx10 = lm(mapd(1, 0, 0, 0));
+    const RealType dx01 = lm(mapd(0, 1, 0, 0));
+    const RealType dx11 = lm(mapd(1, 1, 0, 0));
+    const RealType dxm0 = lm(mapd(-1, 0, 0, 0));
+    const RealType dxm1 = lm(mapd(-1, 1, 0, 0));
 
-    const int dy00 = lm(mapd(0, 0, 0, 1));
-    const int dy10 = lm(mapd(1, 0, 0, 1));
-    const int dy01 = lm(mapd(0, 1, 0, 1));
-    const int dy11 = lm(mapd(1, 1, 0, 1));
-    const int dym0 = lm(mapd(-1, 0, 0, 1));
-    const int dym1 = lm(mapd(-1, 1, 0, 1));
+    const RealType dy00 = lm(mapd(0, 0, 0, 1));
+    const RealType dy10 = lm(mapd(1, 0, 0, 1));
+    const RealType dy01 = lm(mapd(0, 1, 0, 1));
+    const RealType dy11 = lm(mapd(1, 1, 0, 1));
+    const RealType dym0 = lm(mapd(-1, 0, 0, 1));
+    const RealType dym1 = lm(mapd(-1, 1, 0, 1));
 
     // Avg viscosity at (i + 0.5, j + 0.5)
     RealType v0 = (dx00 * dy00 * lvt(mapd(0, 0, 0)) + dx01 * dy01 * lvt(mapd(0, 1, 0))
                    + dx11 * dy11 * lvt(mapd(1, 1, 0)) + dx10 * dy10 * lvt(mapd(1, 0, 0)))
                   / ((dx00 + dx10) * (dy00 + dy01));
 
-    // Avg viscosity at (i + 0.5, j - 0.5)
+    // Avg viscosity at (i - 0.5, j + 0.5)
     RealType v1 = (dx00 * dy00 * lvt(mapd(0, 0, 0)) + dxm0 * dym0 * lvt(mapd(-1, 0, 0))
                    + dxm1 * dym1 * lvt(mapd(-1, 1, 0)) + dx01 * dy01 * lvt(mapd(0, 1, 0)))
                   / ((dx00 + dxm0) * (dy00 + dy01));
@@ -881,7 +881,7 @@ namespace Stencils {
     // dvdx at (i + 0.5, j + 0.5)
     RealType b = 2 * (lv(mapd(1, 0, 0, 1)) - lv(mapd(0, 0, 0, 1))) / (dx00 + dx10);
     // dudy at (i - 0.5, j + 0.5)
-    RealType c = 2 * (lv(mapd(0, 1, 0, 0)) - lv(mapd(0, 0, 0, 0))) / (dy00 + dy01);
+    RealType c = 2 * (lv(mapd(-1, 1, 0, 0)) - lv(mapd(-1, 0, 0, 0))) / (dym1 + dym0);
     // dvdx at (i - 0.5, j + 0.5)
     RealType d = 2 * (lv(mapd(0, 0, 0, 1)) - lv(mapd(-1, 0, 0, 1))) / (dxm0 + dx00);
 
@@ -890,37 +890,37 @@ namespace Stencils {
 
   inline RealType vzwy_z(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
-    const int dy00 = lm(mapd(0, 0, 0, 1));
-    const int dy10 = lm(mapd(0, 1, 0, 1));
-    const int dy01 = lm(mapd(0, 0, 1, 1));
-    const int dy11 = lm(mapd(0, 1, 1, 1));
-    const int dy0m = lm(mapd(0, 0, -1, 1));
-    const int dy1m = lm(mapd(0, 1, -1, 1));
+    const RealType dy00 = lm(mapd(0, 0, 0, 1));
+    const RealType dy10 = lm(mapd(0, 1, 0, 1));
+    const RealType dy01 = lm(mapd(0, 0, 1, 1));
+    const RealType dy11 = lm(mapd(0, 1, 1, 1));
+    const RealType dy0m = lm(mapd(0, 0, -1, 1));
+    const RealType dy1m = lm(mapd(0, 1, -1, 1));
 
-    const int dz00 = lm(mapd(0, 0, 0, 2));
-    const int dz10 = lm(mapd(0, 1, 0, 2));
-    const int dz01 = lm(mapd(0, 0, 1, 2));
-    const int dz11 = lm(mapd(0, 1, 1, 2));
-    const int dz0m = lm(mapd(0, 0, -1, 2));
-    const int dz1m = lm(mapd(0, 1, -1, 2));
+    const RealType dz00 = lm(mapd(0, 0, 0, 2));
+    const RealType dz10 = lm(mapd(0, 1, 0, 2));
+    const RealType dz01 = lm(mapd(0, 0, 1, 2));
+    const RealType dz11 = lm(mapd(0, 1, 1, 2));
+    const RealType dz0m = lm(mapd(0, 0, -1, 2));
+    const RealType dz1m = lm(mapd(0, 1, -1, 2));
 
     // Avg viscosity at (j + 0.5, k + 0.5)
     RealType v0 = (dy00 * dz00 * lvt(mapd(0, 0, 0)) + dy01 * dz01 * lvt(mapd(0, 0, 1))
                    + dy11 * dz11 * lvt(mapd(0, 1, 1)) + dy10 * dz10 * lvt(mapd(0, 1, 0)))
-                  / ((dx00 + dx10) * (dz00 + dz01));
+                  / ((dy00 + dy10) * (dz00 + dz01));
 
     // Avg viscosity at (j + 0.5, k - 0.5)
-    RealType v1 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx0m * dz0m * lvt(mapd(0, 0, -1))
-                   + dx1m * dz1m * lvt(mapd(1, 0, -1)) + dx10 * dz10 * lvt(mapd(1, 0, 0)))
-                  / ((dx00 + dx10) * (dz00 + dz0m));
+    RealType v1 = (dy00 * dz00 * lvt(mapd(0, 0, 0)) + dy0m * dz0m * lvt(mapd(0, 0, -1))
+                   + dy1m * dz1m * lvt(mapd(0, 1, -1)) + dy10 * dz10 * lvt(mapd(0, 1, 0)))
+                  / ((dy00 + dy10) * (dz00 + dz0m));
 
     // dvdz at (j + 0.5, k + 0.5)
     RealType a = 2 * (lv(mapd(0, 0, 1, 1)) - lv(mapd(0, 0, 0, 1))) / (dz00 + dz01);
-    // dwdx at (j + 0.5, k + 0.5)
+    // dwdy at (j + 0.5, k + 0.5)
     RealType b = 2 * (lv(mapd(0, 1, 0, 2)) - lv(mapd(0, 0, 0, 2))) / (dy00 + dy10);
-    // dvdz at (i + 0.5, z - 0.5)
+    // dvdz at (j + 0.5, k - 0.5)
     RealType c = 2 * (lv(mapd(0, 0, 0, 1)) - lv(mapd(0, 0, -1, 1))) / (dz00 + dz0m);
-    // dwdx at (i +0.5, z - 0.5)
+    // dwdy at (j + 0.5, k - 0.5)
     RealType d = 2 * (lv(mapd(0, 1, -1, 2)) - lv(mapd(0, 0, -1, 2))) / (dy1m + dy0m);
 
     return (v0 * (a + b) - v1 * (c + d)) / dz00;
@@ -944,19 +944,19 @@ namespace Stencils {
 
   inline RealType wxuz_x(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
-    const int dx00 = lm(mapd(0, 0, 0, 0));
-    const int dx10 = lm(mapd(1, 0, 0, 0));
-    const int dx01 = lm(mapd(0, 0, 1, 0));
-    const int dx11 = lm(mapd(1, 0, 1, 0));
-    const int dxm0 = lm(mapd(-1, 0, 0, 0));
-    const int dxm1 = lm(mapd(-1, 0, 1, 0));
+    const RealType dx00 = lm(mapd(0, 0, 0, 0));
+    const RealType dx10 = lm(mapd(1, 0, 0, 0));
+    const RealType dx01 = lm(mapd(0, 0, 1, 0));
+    const RealType dx11 = lm(mapd(1, 0, 1, 0));
+    const RealType dxm0 = lm(mapd(-1, 0, 0, 0));
+    const RealType dxm1 = lm(mapd(-1, 0, 1, 0));
 
-    const int dz00 = lm(mapd(0, 0, 0, 2));
-    const int dz10 = lm(mapd(1, 0, 0, 2));
-    const int dz01 = lm(mapd(0, 0, 1, 2));
-    const int dz11 = lm(mapd(1, 0, 1, 2));
-    const int dzm0 = lm(mapd(-1, 0, 0, 2));
-    const int dzm1 = lm(mapd(-1, 0, 1, 2));
+    const RealType dz00 = lm(mapd(0, 0, 0, 2));
+    const RealType dz10 = lm(mapd(1, 0, 0, 2));
+    const RealType dz01 = lm(mapd(0, 0, 1, 2));
+    const RealType dz11 = lm(mapd(1, 0, 1, 2));
+    const RealType dzm0 = lm(mapd(-1, 0, 0, 2));
+    const RealType dzm1 = lm(mapd(-1, 0, 1, 2));
 
     // Avg viscosity at (i + 0.5, k + 0.5)
     RealType v0 = (dx00 * dz00 * lvt(mapd(0, 0, 0)) + dx01 * dz01 * lvt(mapd(0, 0, 1))
@@ -982,19 +982,19 @@ namespace Stencils {
 
   inline RealType wyvz_y(const RealType* const lv, const RealType* const lm, const RealType* const lvt) {
 
-    const int dy00 = lm(mapd(0, 0, 0, 1));
-    const int dy10 = lm(mapd(0, 1, 0, 1));
-    const int dy01 = lm(mapd(0, 0, 1, 1));
-    const int dy11 = lm(mapd(0, 1, 1, 1));
-    const int dym0 = lm(mapd(0, -1, 0, 1));
-    const int dym1 = lm(mapd(0, -1, 1, 1));
+    const RealType dy00 = lm(mapd(0, 0, 0, 1));
+    const RealType dy10 = lm(mapd(0, 1, 0, 1));
+    const RealType dy01 = lm(mapd(0, 0, 1, 1));
+    const RealType dy11 = lm(mapd(0, 1, 1, 1));
+    const RealType dym0 = lm(mapd(0, -1, 0, 1));
+    const RealType dym1 = lm(mapd(0, -1, 1, 1));
 
-    const int dz00 = lm(mapd(0, 0, 0, 2));
-    const int dz10 = lm(mapd(0, 1, 0, 2));
-    const int dz01 = lm(mapd(0, 0, 1, 2));
-    const int dz11 = lm(mapd(0, 1, 1, 2));
-    const int dzm0 = lm(mapd(0, -1, 0, 2));
-    const int dzm1 = lm(mapd(0, -1, 1, 2));
+    const RealType dz00 = lm(mapd(0, 0, 0, 2));
+    const RealType dz10 = lm(mapd(0, 1, 0, 2));
+    const RealType dz01 = lm(mapd(0, 0, 1, 2));
+    const RealType dz11 = lm(mapd(0, 1, 1, 2));
+    const RealType dzm0 = lm(mapd(0, -1, 0, 2));
+    const RealType dzm1 = lm(mapd(0, -1, 1, 2));
 
     // Avg viscosity at (j + 0.5, k + 0.5)
     RealType v0 = (dy00 * dz00 * lvt(mapd(0, 0, 0)) + dy01 * dz01 * lvt(mapd(0, 0, 1))
@@ -1013,7 +1013,7 @@ namespace Stencils {
     // dvdz at (j - 0.5, k + 0.5)
     RealType c = 2 * (lv(mapd(0, -1, 1, 1)) - lv(mapd(0, -1, 0, 1))) / (dz00 + dz01);
     // dwdy at (j - 0.5, k + 0.5)
-    RealType d = 2 * (lv(mapd(0, 0, 0, 2)) - lv(mapd(0, 0, -1, 2))) / (dx00 + dxm0);
+    RealType d = 2 * (lv(mapd(0, 0, 0, 2)) - lv(mapd(0, -1, 0, 2))) / (dy00 + dym0);
 
     return (v0 * (a + b) - v1 * (c + d)) / dy00;
   }
