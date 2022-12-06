@@ -48,6 +48,8 @@ set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${META_PROJECT_NAME})
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
+option(DISABLE_OUTPUT ON)
+
 set(OPT_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 include(FetchContent)
 FetchContent_Declare(
