@@ -50,6 +50,10 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 option(DISABLE_OUTPUT ON)
 
+if(DISABLE_OUTPUT)
+    add_compile_definitions(DISABLE_OUTPUT)
+endif()
+
 set(OPT_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 include(FetchContent)
 FetchContent_Declare(
