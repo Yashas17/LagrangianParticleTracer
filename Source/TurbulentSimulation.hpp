@@ -19,10 +19,14 @@
 #include "Stencils/RHSStencil.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKTurbStencil.hpp"
+#include "Stencils/TimeStepStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
   Stencils::FGHTurbStencil fghTurbStencil_;
+
+  Stencils::TimeStepStencil timeStepStencil_;
+  FieldIterator<FlowField> timeStepIterator_;
 
 public:
   TurbulentSimulation(Parameters& parameters, FlowField& flowField);
