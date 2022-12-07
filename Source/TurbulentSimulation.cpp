@@ -1,11 +1,12 @@
 #include "StdAfx.hpp"
 
-#include "Simulation.hpp"
+#include "TurbulentSimulation.hpp"
+#include "Stencils/hStencil.hpp"
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
 
-Simulation::Simulation(Parameters& parameters, FlowField& flowField):
+TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
   flowField_(flowField),
   maxUStencil_(parameters),
@@ -14,24 +15,25 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   globalBoundaryFactory_(parameters),
   wallVelocityIterator_(globalBoundaryFactory_.getGlobalBoundaryVelocityIterator(flowField_)),
   wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
-  fghStencil_(parameters),
-  fghIterator_(flowField_, parameters, fghStencil_),
+  fghTurbStencil_(parameters),
+  fghIterator_(flowField_, parameters, fghTurbStencil_),
   velocityStencil_(parameters),
   obstacleStencil_(parameters),
   velocityIterator_(flowField_, parameters, velocityStencil_),
   obstacleIterator_(flowField_, parameters, obstacleStencil_),
   rhsStencil_(parameters),
-  rhsIterator_(flowField_, parameters, rhsStencil_),
-  petscParallelManager_(parameters, flowField_),
+  rhsIterator_(flowField_, parameters, rhsStencil_)
 #ifdef ENABLE_PETSC
+  ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
 #else
+  ,
   solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters))
 #endif
 {
 }
 
-void Simulation::initializeFlowField() {
+void TurbulentSimulation::initializeFlowField() {
   if (parameters_.simulation.scenario == "taylor-green") {
     // Currently, a particular initialisation is only required for the taylor-green vortex.
     Stencils::InitTaylorGreenFlowFieldStencil stencil(parameters_);
@@ -42,6 +44,11 @@ void Simulation::initializeFlowField() {
     FieldIterator<FlowField>    iterator(flowField_, parameters_, stencil, 0, 1);
     iterator.iterate();
     wallVelocityIterator_.iterate();
+    
+    Stencils::hStencil hStencil(parameters_);
+    FieldIterator<FlowField> hIterator(flowField_, parameters_, hStencil, 0, 1);
+    hIterator.iterate();
+
   } else if (parameters_.simulation.scenario == "pressure-channel") {
     // Set pressure boundaries here for left wall
     const RealType value = parameters_.walls.scalarLeft;
@@ -71,7 +78,7 @@ void Simulation::initializeFlowField() {
   solver_->reInitMatrix();
 }
 
-void Simulation::solveTimestep() {
+void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   // Compute FGH
@@ -83,27 +90,23 @@ void Simulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
-  petscParallelManager_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
-  petscParallelManager_.communicateVelocities();
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 }
 
-void Simulation::plotVTK(int timeStep, RealType simulationTime) {
-#ifndef DISABLE_OUTPUT
-  Stencils::VTKStencil     vtkStencil(parameters_);
+void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
+  Stencils::VTKTurbStencil vtkStencil(parameters_);
   FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
 
   vtkIterator.iterate();
   vtkStencil.write(flowField_, timeStep, simulationTime);
-#endif
 }
 
-void Simulation::setTimeStep() {
+void TurbulentSimulation::setTimeStep() {
   RealType localMin, globalMin;
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
@@ -116,9 +119,9 @@ void Simulation::setTimeStep() {
   if (parameters_.geometry.dim == 3) {
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
     /**
-     *We need the following 'if' condition to ensure that we do not encounter division by zero. In case the 'if'
+     *We need the following 'if' condition to ensure that we do not encounter divison by zero. In case the 'if'
      *condition is not satisfied, the value of dt will be same as previous time step or if it is the first time step,
-     *the user defined time-step will be used. If user has not defined the timestep, dt will be set to 1 by default.
+     *the user defined time-step will be used. If user has not defined the timestrep, dt will be set to 1 by default.
      **/
     if (maxUStencil_.getMaxValues()[2] != 0)
       parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
