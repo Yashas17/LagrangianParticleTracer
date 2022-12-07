@@ -43,6 +43,10 @@ void TurbulentSimulation::initializeFlowField() {
     FieldIterator<FlowField>    iterator(flowField_, parameters_, stencil, 0, 1);
     iterator.iterate();
     wallVelocityIterator_.iterate();
+    Stencils::hStencil hStencil(parameters_);
+    FieldIterator<FlowField> hIterator(flowField_, parameters_, hStencil, 0, 1);
+    hIterator.iterate();
+
   } else if (parameters_.simulation.scenario == "pressure-channel") {
     // Set pressure boundaries here for left wall
     const RealType value = parameters_.walls.scalarLeft;
