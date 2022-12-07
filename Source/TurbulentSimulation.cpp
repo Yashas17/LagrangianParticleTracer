@@ -1,6 +1,7 @@
 #include "StdAfx.hpp"
 
 #include "TurbulentSimulation.hpp"
+#include "Stencils/hStencil.hpp"
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
@@ -43,6 +44,7 @@ void TurbulentSimulation::initializeFlowField() {
     FieldIterator<FlowField>    iterator(flowField_, parameters_, stencil, 0, 1);
     iterator.iterate();
     wallVelocityIterator_.iterate();
+    
     Stencils::hStencil hStencil(parameters_);
     FieldIterator<FlowField> hIterator(flowField_, parameters_, hStencil, 0, 1);
     hIterator.iterate();
