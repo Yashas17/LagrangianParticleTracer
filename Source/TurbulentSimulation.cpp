@@ -83,7 +83,6 @@ void TurbulentSimulation::initializeFlowField() {
 
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
-  setTimeStep();
   timeStepIterator.iterate();
   // Compute FGH
   fghIterator_.iterate();
@@ -110,7 +109,7 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
   vtkStencil.write(flowField_, timeStep, simulationTime);
 }
 
-// void TurbulentSimulation::setTimeStep() {
+void TurbulentSimulation::setTimeStep() {
 //   RealType localMin, globalMin;
 //   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
 //   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
@@ -156,4 +155,4 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 
 //   parameters_.timestep.dt = globalMin;
 //   parameters_.timestep.dt *= parameters_.timestep.tau;
-// }
+}
