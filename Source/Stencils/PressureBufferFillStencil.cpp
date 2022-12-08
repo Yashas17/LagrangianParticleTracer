@@ -14,10 +14,10 @@ Stencils::PressureBufferFillStencil::PressureBufferFillStencil(const Parameters&
     cellsX = parameters.parallel.localSize[0] + 3;
     cellsY = parameters.parallel.localSize[1] + 3;
 
-    leftBuffer.resize(cellsY);
-    rightBuffer.resize(cellsY);
-    bottomBuffer.resize(cellsX);
-    topBuffer.resize(cellsX);
+    leftBuffer.resize(cellsY, 0.0);
+    rightBuffer.resize(cellsY, 0.0);
+    bottomBuffer.resize(cellsX, 0.0);
+    topBuffer.resize(cellsX, 0.0);
 
   } else if (parameters.geometry.dim == 3) {
 
@@ -26,12 +26,12 @@ Stencils::PressureBufferFillStencil::PressureBufferFillStencil(const Parameters&
     cellsY = parameters.parallel.localSize[1] + 3;
     cellsZ = parameters.parallel.localSize[2] + 3;
 
-    leftBuffer.resize(cellsY * cellsZ);
-    rightBuffer.resize(cellsY * cellsZ);
-    bottomBuffer.resize(cellsX * cellsZ);
-    topBuffer.resize(cellsX * cellsZ);
-    frontBuffer.resize(cellsX * cellsY);
-    backBuffer.resize(cellsX * cellsY);
+    leftBuffer.resize(cellsY * cellsZ, 0.0);
+    rightBuffer.resize(cellsY * cellsZ, 0.0);
+    bottomBuffer.resize(cellsX * cellsZ, 0.0);
+    topBuffer.resize(cellsX * cellsZ, 0.0);
+    frontBuffer.resize(cellsX * cellsY, 0.0);
+    backBuffer.resize(cellsX * cellsY, 0.0);
   }
 }
 

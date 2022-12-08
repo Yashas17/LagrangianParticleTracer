@@ -255,9 +255,9 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     velocityBufferFillIterator_.iterate();
 
     // prepare receive buffers, send buffers are already on the stencil
-    std::vector<RealType> leftBufferRecv(3 * cellsY);
+    std::vector<RealType> leftBufferRecv(4 * cellsY);
     std::vector<RealType> rightBufferRecv(2 * cellsY);
-    std::vector<RealType> bottomBufferRecv(3 * cellsX);
+    std::vector<RealType> bottomBufferRecv(4 * cellsX);
     std::vector<RealType> topBufferRecv(2 * cellsX);
 
     // send from left, receive on right
@@ -279,12 +279,12 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     // send from right, receive on left
     MPI_Sendrecv(
       velocityBufferFillStencil_.rightBuffer.data(),
-      3 * cellsY,
+      4 * cellsY,
       MY_MPI_FLOAT,
       parameters_.parallel.rightNb,
       1,
       leftBufferRecv.data(),
-      3 * cellsY,
+      4 * cellsY,
       MY_MPI_FLOAT,
       parameters_.parallel.leftNb,
       1,
@@ -311,12 +311,12 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     // send from top, receive on bottom
     MPI_Sendrecv(
       velocityBufferFillStencil_.topBuffer.data(),
-      3 * cellsX,
+      4 * cellsX,
       MY_MPI_FLOAT,
       parameters_.parallel.topNb,
       3,
       bottomBufferRecv.data(),
-      3 * cellsX,
+      4 * cellsX,
       MY_MPI_FLOAT,
       parameters_.parallel.bottomNb,
       3,

@@ -15,9 +15,9 @@ Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(const Parameters&
 
     // 2 times for both velocity directions, flattened
     leftBuffer.resize(2 * cellsY);   // u,v
-    rightBuffer.resize(3 * cellsY);  // u,v, another u
+    rightBuffer.resize(4 * cellsY);  // u,v, another u
     bottomBuffer.resize(2 * cellsX); // u,v
-    topBuffer.resize(3 * cellsX);    // u,v, another v
+    topBuffer.resize(4 * cellsX);    // u,v, another v
 
   } else if (parameters.geometry.dim == 3) {
 
@@ -47,9 +47,10 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, in
 void Stencils::VelocityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getVelocity().getNx());
   assert(cellsY == flowField.getVelocity().getNy());
-  rightBuffer[3 * j]     = flowField.getVelocity().getVector(i, j)[0];     // j changes
-  rightBuffer[3 * j + 1] = flowField.getVelocity().getVector(i, j)[1];     // j changes
-  rightBuffer[3 * j + 2] = flowField.getVelocity().getVector(i - 1, j)[0]; // another u
+  rightBuffer[4 * j]     = flowField.getVelocity().getVector(i, j)[0];     // j changes
+  rightBuffer[4 * j + 1] = flowField.getVelocity().getVector(i, j)[1];     // j changes
+  rightBuffer[4 * j + 2] = flowField.getVelocity().getVector(i - 1, j)[0]; // another u
+  rightBuffer[4 * j + 3] = flowField.getVelocity().getVector(i - 1, j)[1]; // another u
 }
 
 void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j) {
@@ -62,9 +63,10 @@ void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, 
 void Stencils::VelocityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getVelocity().getNx());
   assert(cellsY == flowField.getVelocity().getNy());
-  topBuffer[3 * i]     = flowField.getVelocity().getVector(i, j)[0];     // i changes
-  topBuffer[3 * i + 1] = flowField.getVelocity().getVector(i, j)[1];     // i changes
-  topBuffer[3 * i + 2] = flowField.getVelocity().getVector(i, j - 1)[1]; // another v
+  topBuffer[4 * i]     = flowField.getVelocity().getVector(i, j)[0];     // i changes
+  topBuffer[4 * i + 1] = flowField.getVelocity().getVector(i, j)[1];     // i changes
+  topBuffer[4 * i + 2] = flowField.getVelocity().getVector(i, j - 1)[0]; // another v
+  topBuffer[4 * i + 3] = flowField.getVelocity().getVector(i, j - 1)[1]; // another v
 }
 
 // 3d cases
