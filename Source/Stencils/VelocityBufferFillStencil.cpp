@@ -6,7 +6,6 @@
 
 Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(const Parameters& parameters):
   BoundaryStencil<FlowField>(parameters) {
-
   // allocate buffer arrays
   if (parameters.geometry.dim == 2) {
 
@@ -39,22 +38,30 @@ Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(const Parameters&
 
 // 2d cases
 void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j) {
+  assert(cellsX == flowField.getVelocity().getNx());
+  assert(cellsY == flowField.getVelocity().getNy());
   leftBuffer[2 * j]     = flowField.getVelocity().getVector(i, j)[0]; // j changes
   leftBuffer[2 * j + 1] = flowField.getVelocity().getVector(i, j)[1]; // j changes
 }
 
 void Stencils::VelocityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j) {
+  assert(cellsX == flowField.getVelocity().getNx());
+  assert(cellsY == flowField.getVelocity().getNy());
   rightBuffer[3 * j]     = flowField.getVelocity().getVector(i, j)[0];     // j changes
   rightBuffer[3 * j + 1] = flowField.getVelocity().getVector(i, j)[1];     // j changes
   rightBuffer[3 * j + 2] = flowField.getVelocity().getVector(i - 1, j)[0]; // another u
 }
 
 void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j) {
+  assert(cellsX == flowField.getVelocity().getNx());
+  assert(cellsY == flowField.getVelocity().getNy());
   bottomBuffer[2 * i]     = flowField.getVelocity().getVector(i, j)[0]; // i changes
   bottomBuffer[2 * i + 1] = flowField.getVelocity().getVector(i, j)[1]; // i changes
 }
 
 void Stencils::VelocityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j) {
+  assert(cellsX == flowField.getVelocity().getNx());
+  assert(cellsY == flowField.getVelocity().getNy());
   topBuffer[3 * i]     = flowField.getVelocity().getVector(i, j)[0];     // i changes
   topBuffer[3 * i + 1] = flowField.getVelocity().getVector(i, j)[1];     // i changes
   topBuffer[3 * i + 2] = flowField.getVelocity().getVector(i, j - 1)[1]; // another v

@@ -21,6 +21,9 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     int cellsX = flowField_.getPressure().getNx();
     int cellsY = flowField_.getPressure().getNy();
 
+    //std::cout << parameters_.parallel.localSize[0] << ", " << cellsX << std::endl;
+    //std::cout << parameters_.parallel.localSize[1] << ", " << cellsY << std::endl;
+
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
 
