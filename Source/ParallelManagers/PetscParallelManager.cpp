@@ -30,6 +30,9 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     std::vector<RealType> bottomBufferRecv(cellsX);
     std::vector<RealType> topBufferRecv(cellsX);
 
+    if(pressureBufferFillStencil_.leftBuffer.size() != cellsY){
+      throw std::runtime_error(std::to_string(pressureBufferFillStencil_.leftBuffer.size()) + "!=" + std::to_string(cellsY));
+    }
     // send from left, receive on right
     MPI_Sendrecv(
       pressureBufferFillStencil_.leftBuffer.data(),
