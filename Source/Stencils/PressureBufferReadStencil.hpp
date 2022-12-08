@@ -25,21 +25,21 @@ namespace Stencils {
 
     // 2d constructor
     PressureBufferReadStencil(
-      const Parameters&      parameters,
-      std::vector<RealType>& leftBufferFrom,
-      std::vector<RealType>& rightBufferFrom,
-      std::vector<RealType>& bottomBufferFrom,
-      std::vector<RealType>& topBufferFrom
+      const Parameters&       parameters,
+      std::vector<RealType>&& leftBufferFrom,
+      std::vector<RealType>&& rightBufferFrom,
+      std::vector<RealType>&& bottomBufferFrom,
+      std::vector<RealType>&& topBufferFrom
     );
     // 3d constructor
     PressureBufferReadStencil(
-      const Parameters&      parameters,
-      std::vector<RealType>& leftBufferFrom,
-      std::vector<RealType>& rightBufferFrom,
-      std::vector<RealType>& bottomBufferFrom,
-      std::vector<RealType>& topBufferFrom,
-      std::vector<RealType>& frontBufferFrom,
-      std::vector<RealType>& backBufferFrom
+      const Parameters&       parameters,
+      std::vector<RealType>&& leftBufferFrom,
+      std::vector<RealType>&& rightBufferFrom,
+      std::vector<RealType>&& bottomBufferFrom,
+      std::vector<RealType>&& topBufferFrom,
+      std::vector<RealType>&& frontBufferFrom,
+      std::vector<RealType>&& backBufferFrom
     );
 
     ~PressureBufferReadStencil() override = default;

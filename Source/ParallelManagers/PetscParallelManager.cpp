@@ -21,8 +21,8 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     int cellsX = flowField_.getPressure().getNx();
     int cellsY = flowField_.getPressure().getNy();
 
-    //std::cout << parameters_.parallel.localSize[0] << ", " << cellsX << std::endl;
-    //std::cout << parameters_.parallel.localSize[1] << ", " << cellsY << std::endl;
+    // std::cout << parameters_.parallel.localSize[0] << ", " << cellsX << std::endl;
+    // std::cout << parameters_.parallel.localSize[1] << ", " << cellsY << std::endl;
 
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
@@ -33,8 +33,10 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     std::vector<RealType> bottomBufferRecv(cellsX);
     std::vector<RealType> topBufferRecv(cellsX);
 
-    if(pressureBufferFillStencil_.leftBuffer.size() != cellsY){
-      throw std::runtime_error(std::to_string(pressureBufferFillStencil_.leftBuffer.size()) + "!=" + std::to_string(cellsY));
+    if (pressureBufferFillStencil_.leftBuffer.size() != cellsY) {
+      throw std::runtime_error(
+        std::to_string(pressureBufferFillStencil_.leftBuffer.size()) + "!=" + std::to_string(cellsY)
+      );
     }
     // send from left, receive on right
     MPI_Sendrecv(
@@ -102,7 +104,11 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
     // Read the buffers into the flowField
     Stencils::PressureBufferReadStencil pressureBufferReadStencil_(
-      parameters_, leftBufferRecv, rightBufferRecv, bottomBufferRecv, topBufferRecv
+      parameters_,
+      std::move(leftBufferRecv),
+      std::move(rightBufferRecv),
+      std::move(bottomBufferRecv),
+      std::move(topBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_(
       flowField_, parameters_, pressureBufferReadStencil_, 2, -1
@@ -224,7 +230,13 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
     // Read the buffers into the flowField
     Stencils::PressureBufferReadStencil pressureBufferReadStencil_(
-      parameters_, leftBufferRecv, rightBufferRecv, bottomBufferRecv, topBufferRecv, frontBufferRecv, backBufferRecv
+      parameters_,
+      std::move(leftBufferRecv),
+      std::move(rightBufferRecv),
+      std::move(bottomBufferRecv),
+      std::move(topBufferRecv),
+      std::move(frontBufferRecv),
+      std::move(backBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_(
       flowField_, parameters_, pressureBufferReadStencil_, 2, -1
