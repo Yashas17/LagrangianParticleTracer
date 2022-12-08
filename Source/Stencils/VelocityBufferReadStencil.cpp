@@ -13,8 +13,8 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil(
   std::vector<RealType>&& topBufferFrom
 ):
   BoundaryStencil<FlowField>(parameters),
-  cellsX(parameters.parallel.localSize[0] + 3),
-  cellsY(parameters.parallel.localSize[1] + 3),
+  cellsX(parameters.parallel.localSize[0]),
+  cellsY(parameters.parallel.localSize[1]),
   leftBuffer(std::move(leftBufferFrom)),
   rightBuffer(std::move(rightBufferFrom)),
   bottomBuffer(std::move(bottomBufferFrom)),
@@ -31,9 +31,9 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil(
   std::vector<RealType>&& backBufferFrom
 ):
   BoundaryStencil<FlowField>(parameters),
-  cellsX(parameters.parallel.localSize[0] + 3),
-  cellsY(parameters.parallel.localSize[1] + 3),
-  cellsZ(parameters.parallel.localSize[2] + 3),
+  cellsX(parameters.parallel.localSize[0]),
+  cellsY(parameters.parallel.localSize[1]),
+  cellsZ(parameters.parallel.localSize[2]),
   leftBuffer(std::move(leftBufferFrom)),
   rightBuffer(std::move(rightBufferFrom)),
   bottomBuffer(std::move(bottomBufferFrom)),

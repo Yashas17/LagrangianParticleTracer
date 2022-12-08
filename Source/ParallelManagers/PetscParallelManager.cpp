@@ -18,8 +18,8 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
   if (parameters_.geometry.dim == 2) { // 2d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
+    int cellsX = flowField_.getPressure().getNx();
+    int cellsY = flowField_.getPressure().getNy();
 
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
@@ -108,9 +108,9 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
   } else if (parameters_.geometry.dim == 3) { // 3d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
-    int cellsZ = flowField_.getCellsZ();
+    int cellsX = flowField_.getPressure().getNx();
+    int cellsY = flowField_.getPressure().getNy();
+    int cellsZ = flowField_.getPressure().getNz();
 
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
@@ -233,8 +233,8 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 void ParallelManagers::PetscParallelManager::communicateVelocities() {
   if (parameters_.geometry.dim == 2) { // 2d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
+    int cellsX = flowField_.getVelocity().getNx();
+    int cellsY = flowField_.getVelocity().getNy();
 
     // Fill the buffers
     velocityBufferFillIterator_.iterate();
@@ -324,9 +324,9 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
 
   } else if (parameters_.geometry.dim == 3) { // 3d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
-    int cellsZ = flowField_.getCellsZ();
+    int cellsX = flowField_.getVelocity().getNx();
+    int cellsY = flowField_.getVelocity().getNy();
+    int cellsZ = flowField_.getVelocity().getNz();
 
     // Fill the buffers
     velocityBufferFillIterator_.iterate();
