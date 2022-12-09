@@ -326,7 +326,7 @@ void GhostLayerIterator<FlowFieldType>::iterate() {
     }
   } else if (Iterator<FlowFieldType>::parameters_.geometry.dim == 3) {
     if (Iterator<FlowFieldType>::parameters_.parallel.leftNb >= 0) {
-      stencil_.applyLeftWall3D(Iterator<FlowFieldType>::flowField_, lowOffset_, j, k);
+      stencil_.applyLeftWall3D(Iterator<FlowFieldType>::flowField_);
     }
 
     if (Iterator<FlowFieldType>::parameters_.parallel.rightNb >= 0) {
@@ -334,7 +334,7 @@ void GhostLayerIterator<FlowFieldType>::iterate() {
     }
 
     if (Iterator<FlowFieldType>::parameters_.parallel.bottomNb >= 0) {
-      stencil_.applyBottomWall3D(Iterator<FlowFieldType>::flowField_, i, lowOffset_, k);
+      stencil_.applyBottomWall3D(Iterator<FlowFieldType>::flowField_);
     }
 
     if (Iterator<FlowFieldType>::parameters_.parallel.topNb >= 0) {
@@ -342,7 +342,7 @@ void GhostLayerIterator<FlowFieldType>::iterate() {
     }
 
     if (Iterator<FlowFieldType>::parameters_.parallel.frontNb >= 0) {
-      stencil_.applyFrontWall3D(Iterator<FlowFieldType>::flowField_, i, j, lowOffset_);
+      stencil_.applyFrontWall3D(Iterator<FlowFieldType>::flowField_);
     }
 
     if (Iterator<FlowFieldType>::parameters_.parallel.backNb >= 0) {

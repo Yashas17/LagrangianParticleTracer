@@ -4,6 +4,7 @@
 
 #include "Stencils/BoundaryStencil.hpp"
 #include "Stencils/FieldStencil.hpp"
+#include "Stencils/GhostLayerStencil.hpp"
 
 /** Iterator class
  *
@@ -139,7 +140,7 @@ public:
 template <class FlowFieldType>
 class GhostLayerIterator: public Iterator<FlowFieldType> {
 private:
-  Stencils::BatchedBoundaryStencil<FlowFieldType>& stencil_;
+  Stencils::GhostLayerStencil<FlowFieldType>& stencil_;
 
 public:
   GhostLayerIterator(
