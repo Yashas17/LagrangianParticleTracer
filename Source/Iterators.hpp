@@ -143,7 +143,7 @@ private:
 
 public:
   GhostLayerIterator(
-    FlowFieldType& flowField, const Parameters& parameters, Stencils::BoundaryStencil<FlowFieldType>& stencil
+    FlowFieldType& flowField, const Parameters& parameters, Stencils::GhostLayerStencil<FlowFieldType>& stencil
   );
 
   virtual ~GhostLayerIterator() override = default;
