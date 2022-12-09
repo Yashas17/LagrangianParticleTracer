@@ -30,9 +30,9 @@ namespace ParallelManagers {
 
   public:
     void communicatePressure();
-    void communicateVelocities();
+    void communicateVelocity();
 
-    PetscParallelManagerNonBlocking(Parameters& parameters, FlowField& flowField);
+    PetscParallelManagerNonBlocking(FlowField& flowField, Parameters& parameters);
     ~PetscParallelManagerNonBlocking();
   };
 

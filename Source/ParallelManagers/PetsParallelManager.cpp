@@ -3,7 +3,7 @@
 #include "PetscParallelManager.hpp"
 
 ParallelManagers::PetscParallelManagerNonBlocking::PetscParallelManagerNonBlocking(
-  Parameters& parameters, FlowField& flowField
+  FlowField& flowField, Parameters& parameters
 ):
   parameters_(parameters),
   flowField_(flowField),
@@ -20,4 +20,4 @@ ParallelManagers::PetscParallelManagerNonBlocking::~PetscParallelManagerNonBlock
 
 void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {}
 
-void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocities() {}
+void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {}

@@ -2,6 +2,7 @@
 
 #include "Simulation.hpp"
 
+#include "ParallelManagers/PetscParallelManager.hpp"
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
 
@@ -21,7 +22,8 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   velocityIterator_(flowField_, parameters, velocityStencil_),
   obstacleIterator_(flowField_, parameters, obstacleStencil_),
   rhsStencil_(parameters),
-  rhsIterator_(flowField_, parameters, rhsStencil_)
+  rhsIterator_(flowField_, parameters, rhsStencil_),
+  parallelManager_(flowField, parameters)
 #ifdef ENABLE_PETSC
   ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
@@ -84,10 +86,12 @@ void Simulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
+  parallelManager_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
+  parallelManager_.communicateVelocity();
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 }
@@ -105,37 +109,25 @@ void Simulation::setTimeStep() {
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
                     + 1.0 / (parameters_.meshsize->getDyMin() * parameters_.meshsize->getDyMin());
-
   // Determine maximum velocity
   maxUStencil_.reset();
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
+
+  double maxU0 = div_by_zero_safe_div(1.0, maxUStencil_.getMaxValues()[0]);
+  double maxU1 = div_by_zero_safe_div(1.0, maxUStencil_.getMaxValues()[1]);
+  double maxU2 = div_by_zero_safe_div(1.0, maxUStencil_.getMaxValues()[2]);
+
   if (parameters_.geometry.dim == 3) {
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
-    /**
-     *We need the following 'if' condition to ensure that we do not encounter divison by zero. In case the 'if'
-     *condition is not satisfied, the value of dt will be same as previous time step or if it is the first time step,
-     *the user defined time-step will be used. If user has not defined the timestrep, dt will be set to 1 by default.
-     **/
-    if (maxUStencil_.getMaxValues()[2] != 0)
-      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
+    parameters_.timestep.dt = maxU2;
   } else {
-    if (maxUStencil_.getMaxValues()[0] != 0)
-      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
+    parameters_.timestep.dt = maxU0;
   }
 
   // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
   // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
-  if (maxUStencil_.getMaxValues()[0] != 0 && maxUStencil_.getMaxValues()[1] != 0) {
-    localMin = std::min(
-      parameters_.flow.Re / (2 * factor),
-      std::min(
-        parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 / (maxUStencil_.getMaxValues()[1]))
-      )
-    );
-  } else {
-    localMin = std::min(parameters_.flow.Re / (2 * factor), parameters_.timestep.dt);
-  }
+  localMin = std::min(parameters_.flow.Re / (2.0 * factor), std::min(parameters_.timestep.dt, std::min(maxU0, maxU1)));
 
   // Here, we select the type of operation before compiling. This allows to use the correct
   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous
