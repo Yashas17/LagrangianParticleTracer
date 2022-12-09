@@ -136,4 +136,19 @@ public:
   virtual void iterate() override;
 };
 
+template <class FlowFieldType>
+class GhostLayerIterator: public Iterator<FlowFieldType> {
+private:
+  Stencils::BatchedBoundaryStencil<FlowFieldType>& stencil_;
+
+public:
+  GhostLayerIterator(
+    FlowFieldType& flowField, const Parameters& parameters, Stencils::BoundaryStencil<FlowFieldType>& stencil
+  );
+
+  virtual ~GhostLayerIterator() override = default;
+
+  virtual void iterate() override;
+};
+
 #include "Iterators.cpph"
