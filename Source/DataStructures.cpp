@@ -16,6 +16,8 @@ ScalarField::ScalarField(int Nx, int Ny, int Nz):
 
 RealType& ScalarField::getScalar(int i, int j, int k) { return data_[index2array(i, j, k)]; }
 
+RealType* ScalarField::getScalarOffset(int i, int j, int k) { return data_ + index2array(i, j, k); }
+
 void ScalarField::show(const std::string title) {
   std::cout << std::endl << "--- " << title << " ---" << std::endl;
   for (int k = 0; k < sizeZ_; k++) {

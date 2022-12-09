@@ -104,6 +104,10 @@ void Simulation::plotVTK(int timeStep, RealType simulationTime) {
   vtkStencil.write(flowField_, timeStep, simulationTime);
 }
 
+inline RealType div_by_zero_safe_div(RealType a, RealType b) {
+  return b == 0.0 ? std::numeric_limits<RealType>::max() : a / b;
+}
+
 void Simulation::setTimeStep() {
   RealType localMin, globalMin;
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);

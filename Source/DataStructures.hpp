@@ -127,6 +127,8 @@ public:
    */
   RealType& getScalar(int i, int j, int k = 0);
 
+  RealType* getScalarOffset(int i, int j, int k = 0);
+
   /** Prints the contents of the field
    *
    * Shows the content of the scalar field by printing them to stdout. Only clear if the
