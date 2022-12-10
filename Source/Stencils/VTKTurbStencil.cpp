@@ -101,7 +101,7 @@ void Stencils::VTKTurbStencil::apply(FlowField& flowField, int i, int j) {
     
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " 0" << std::endl;
-    turbulentViscosityStream_ << flowField.getVt.getScalar(i,j);
+    turbulentViscosityStream_ << flowField.getVt().getScalar(i,j);
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
@@ -120,7 +120,7 @@ void Stencils::VTKTurbStencil::apply(FlowField& flowField, int i, int j, int k) 
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " " << velocity[2] << std::endl;
-    turbulentViscosityStream_ << flowField.getVt.getScalar(i,j,k);
+    turbulentViscosityStream_ << flowField.getVt().getScalar(i,j,k);
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;

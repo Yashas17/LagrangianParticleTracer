@@ -2,12 +2,14 @@
 
 #include "VtStencil.hpp"
 
-Stencils::vtStencil::VtStencil(const Parameters& parameters):
+#include "StencilFunctions.hpp"
+
+Stencils::VtStencil::VtStencil(const Parameters& parameters):
   FieldStencil<FlowField>(parameters) {}
 
-void Stencils::vtStencil::apply(FlowField& flowField, int i, int j) {
-  RealType* const vt = flowField.getVt().getScalar(i, j);
-  RealType* const lm = flowField.getLm().getScalar(i, j);
+void Stencils::VtStencil::apply(FlowField& flowField, int i, int j) {
+  RealType       vt = flowField.getVt().getScalar(i, j);
+  const RealType lm = flowField.getLm().getScalar(i, j);
   loadLocalVelocity2D(flowField, localVelocity_, i, j);
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
 
@@ -18,11 +20,11 @@ void Stencils::vtStencil::apply(FlowField& flowField, int i, int j) {
   vt = lm * lm * sqrt(S11 * S11 + S22 * S22 + 2 * S12 * S12);
 }
 
-void Stencils::vtStencil::apply(FlowField& flowField, int i, int j, int k) {
-  RealType* const vt = flowField.getVt().getScalar(i, j, k);
-  RealType* const lm = flowField.getLm().getScalar(i, j, k);
-  loadLocalVelocity2D(flowField, localVelocity_, i, j, k);
-  loadLocalMeshsize2D(parameters_, localMeshsize_, i, j, k);
+void Stencils::VtStencil::apply(FlowField& flowField, int i, int j, int k) {
+  RealType       vt = flowField.getVt().getScalar(i, j, k);
+  const RealType lm = flowField.getLm().getScalar(i, j, k);
+  loadLocalVelocity3D(flowField, localVelocity_, i, j, k);
+  loadLocalMeshsize3D(parameters_, localMeshsize_, i, j, k);
 
   RealType S11 = dudx(localVelocity_, localMeshsize_);
   RealType S22 = dvdy(localVelocity_, localMeshsize_);

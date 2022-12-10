@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <cmath>
+
 #include "Definitions.hpp"
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"

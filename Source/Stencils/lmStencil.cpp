@@ -1,15 +1,12 @@
 #include "lmStencil.hpp"
 
-#include <algorithm>
-#include <cmath>
-
 Stencils::lmStencil::lmStencil(const Parameters& parameters):
   FieldStencil<FlowField>(parameters) {}
 
 void Stencils::lmStencil::apply(FlowField& flowField, int i, int j) {
 
-  RealType* const h  = flowField.getH().getScalar(i, j);
-  RealType* const lm = flowField.getLm().getScalar(i, j);
+  const RealType h  = flowField.getH().getScalar(i, j);
+  RealType       lm = flowField.getLm().getScalar(i, j);
 
   RealType delta = -1;
 
@@ -17,14 +14,13 @@ void Stencils::lmStencil::apply(FlowField& flowField, int i, int j) {
     const RealType posX = parameters_.meshsize->getPosX(i, j);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 0.382 * posX / std::pow(Rex, 0.2);
-  }
-  elseif(parameters_.turbulence.boundaryLayer == 1) {
+  } else if (parameters_.turbulence.boundaryLayer == 1) {
     const RealType posX = parameters_.meshsize->getPosX(i, j);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 4.91 * posX / std::pow(Rex, 0.5);
-  }
-  elseif(parameters_.turbulence.boundaryLayer == 0) { delta = 0; }
-  else {
+  } else if (parameters_.turbulence.boundaryLayer == 0) {
+    delta = 0;
+  } else {
     throw std::runtime_error("Undefined Boundary Layer Function");
   }
 
@@ -33,8 +29,8 @@ void Stencils::lmStencil::apply(FlowField& flowField, int i, int j) {
 
 void Stencils::lmStencil::apply(FlowField& flowField, int i, int j, int k) {
 
-  RealType* const h  = flowField.getH().getScalar(i, j, k);
-  RealType* const lm = flowField.getLm().getScalar(i, j, k);
+  const RealType h  = flowField.getH().getScalar(i, j, k);
+  RealType       lm = flowField.getLm().getScalar(i, j, k);
 
   RealType delta = -1;
 
@@ -42,14 +38,13 @@ void Stencils::lmStencil::apply(FlowField& flowField, int i, int j, int k) {
     const RealType posX = parameters_.meshsize->getPosX(i, j, k);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 0.382 * posX / std::pow(Rex, 0.2);
-  }
-  elseif(parameters_.turbulence.boundaryLayer == 1) {
+  } else if (parameters_.turbulence.boundaryLayer == 1) {
     const RealType posX = parameters_.meshsize->getPosX(i, j, k);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 4.91 * posX / std::pow(Rex, 0.5);
-  }
-  elseif(parameters_.turbulence.boundaryLayer == 0) { delta = 0; }
-  else {
+  } else if (parameters_.turbulence.boundaryLayer == 0) {
+    delta = 0;
+  } else {
     throw std::runtime_error("Undefined Boundary Layer Function");
   }
 

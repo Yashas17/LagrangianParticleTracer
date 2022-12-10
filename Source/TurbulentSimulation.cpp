@@ -6,7 +6,7 @@
 #include "Solvers/SORSolver.hpp"
 #include "Stencils/hStencil.hpp"
 #include "Stencils/lmStencil.hpp"
-#include "Stencils/vtStencil.hpp"
+#include "Stencils/VtStencil.hpp"
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),

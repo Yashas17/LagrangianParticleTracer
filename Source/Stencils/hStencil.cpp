@@ -10,7 +10,7 @@ Stencils::hStencil::hStencil(const Parameters& parameters):
   yLimit_(parameters.bfStep.yRatio * parameters.geometry.lengthY) {}
 
 void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
-  RealType* const value = flowField.getH().getScalar(i, j);
+  RealType value = flowField.getH().getScalar(i, j);
 
   const RealType posX = parameters_.meshsize->getPosX(i, j);
   const RealType posY = parameters_.meshsize->getPosY(i, j);
@@ -19,7 +19,7 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
 }
 
 void Stencils::hStencil::apply(FlowField& flowField, int i, int j, int k) {
-  RealType* const value = flowField.getH().getScalar(i, j, k);
+  RealType value = flowField.getH().getScalar(i, j, k);
 
   const RealType posX = parameters_.meshsize->getPosX(i, j, k);
   const RealType posY = parameters_.meshsize->getPosY(i, j, k);
