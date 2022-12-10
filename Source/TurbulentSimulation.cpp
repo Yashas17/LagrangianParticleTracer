@@ -4,38 +4,15 @@
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
-#include "Stencils/hStencil.hpp"
-#include "Stencils/lmStencil.hpp"
-#include "Stencils/VtStencil.hpp"
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
-  parameters_(parameters),
-  flowField_(flowField),
-  maxUStencil_(parameters),
-  maxUFieldIterator_(flowField_, parameters, maxUStencil_),
-  maxUBoundaryIterator_(flowField_, parameters, maxUStencil_),
-  globalBoundaryFactory_(parameters),
-  wallVelocityIterator_(globalBoundaryFactory_.getGlobalBoundaryVelocityIterator(flowField_)),
-  wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
+  Simulation(parameters,flowField),
   fghTurbStencil_(parameters),
-  fghIterator_(flowField_, parameters, fghTurbStencil_),
-  velocityStencil_(parameters),
-  obstacleStencil_(parameters),
-  velocityIterator_(flowField_, parameters, velocityStencil_),
-  obstacleIterator_(flowField_, parameters, obstacleStencil_),
-  rhsStencil_(parameters),
-  rhsIterator_(flowField_, parameters, rhsStencil_),
+  fghTurbIterator_(flowField_, parameters, fghTurbStencil_),
   timeStepStencil_(parameters),
   timeStepIterator_(flowField_, parameters, timeStepStencil_),
   vtStencil_(parameters),
   vtIterator_(flowField_,parameters, vtStencil_)
-#ifdef ENABLE_PETSC
-  ,
-  solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
-#else
-  ,
-  solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters))
-#endif
 {
 }
 
@@ -92,12 +69,12 @@ void TurbulentSimulation::initializeFlowField() {
 
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
-  timeStepIterator.iterate();
+  timeStepIterator_.iterate();
   setTimeStep();
   // Compute turbulent viscosity
   vtIterator_.iterate();
   // Compute FGH
-  fghIterator_.iterate();
+  fghTurbIterator_.iterate();
   // Set global boundary values
   wallFGHIterator_.iterate();
   // Compute the right hand side (RHS)
@@ -125,7 +102,7 @@ void TurbulentSimulation::setTimeStep() {
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
   
   RealType localMin, globalMin;
-  localMin = std::min(flowField_.getDt());
+  localMin = timeStepStencil_.dt;
 
   // Here, we select the type of operation before compiling. This allows to use the correct
   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous

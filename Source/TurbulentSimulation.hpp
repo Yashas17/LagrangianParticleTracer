@@ -20,10 +20,14 @@
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKTurbStencil.hpp"
 #include "Stencils/TimeStepStencil.hpp"
+#include "Stencils/hStencil.hpp"
+#include "Stencils/lmStencil.hpp"
+#include "Stencils/VtStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
   Stencils::FGHTurbStencil fghTurbStencil_;
+  FieldIterator<FlowField> fghTurbIterator_;
 
   Stencils::TimeStepStencil timeStepStencil_;
   FieldIterator<FlowField> timeStepIterator_;
@@ -40,6 +44,8 @@ public:
 
   void solveTimestep() override;
 
+  void setTimeStep() override;
+
   /** Plots the flow field */
   void plotVTK(int timeStep, RealType simulationTime) override;
-}
+};

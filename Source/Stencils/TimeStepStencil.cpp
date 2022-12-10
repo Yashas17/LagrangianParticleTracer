@@ -15,8 +15,7 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
   const RealType dx = parameters_.meshsize->getDx(i, j);
   const RealType dy = parameters_.meshsize->getDy(i, j);
 
-  RealType cell_dt = flowField.getDt().getScalar(i, j);
-  cell_dt = parameters_.timestep.dt;
+  RealType cell_dt = parameters_.timestep.dt;
 
   ASSERTION(parameters_.geometry.dim == 2);
   RealType factor = 1.0 / (dx * dx) + 1.0 / (dy * dy);
@@ -37,6 +36,9 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
   } else {
     cell_dt = std::min(1 / (vTotal * factor), cell_dt);
   }
+
+  if(cell_dt < dt)
+    dt = cell_dt;
 }
 
 void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k) {
@@ -49,8 +51,7 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k)
   const RealType dy = parameters_.meshsize->getDy(i, j, k);
   const RealType dz = parameters_.meshsize->getDz(i, j, k);
 
-  RealType cell_dt = flowField.getDt().getScalar(i, j, k);
-  cell_dt = parameters_.timestep.dt;
+  RealType cell_dt = parameters_.timestep.dt;
 
   ASSERTION(parameters_.geometry.dim == 3);
   RealType factor = 1.0 / (dx * dx) + 1.0 / (dy * dy) + 1.0 / (dz * dz);
@@ -70,4 +71,7 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k)
   } else {
     cell_dt = std::min(1 / (vTotal * factor), cell_dt);
   }
+  
+  if(cell_dt < dt)
+    dt = cell_dt;
 }

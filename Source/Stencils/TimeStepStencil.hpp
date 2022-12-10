@@ -13,6 +13,9 @@ namespace Stencils {
     TimeStepStencil(const Parameters& parameters);
     ~TimeStepStencil() override = default;
 
+    // Time step
+    RealType dt{MY_FLOAT_MAX};
+
     void apply(FlowField& flowField, int i, int j) override;
     void apply(FlowField& flowField, int i, int j, int k) override;
   };

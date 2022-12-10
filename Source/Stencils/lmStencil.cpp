@@ -1,3 +1,5 @@
+#include "StdAfx.hpp"
+
 #include "lmStencil.hpp"
 
 Stencils::lmStencil::lmStencil(const Parameters& parameters):

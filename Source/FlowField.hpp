@@ -28,7 +28,6 @@ private:
   ScalarField h_;  //! Distance to the nearest wall from cell
   ScalarField vt_; //! Turbulent Viscosity
   ScalarField lm_; //! Mixing Length
-  ScalarField dt_; //! Time-step requirement for each cell ()
 
 public:
   /** Constructor for the 2D flow field
@@ -97,7 +96,6 @@ public:
   ScalarField& getH();
   ScalarField& getVt();
   ScalarField& getLm();
-  ScalarField& getDt();
   
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j);
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j, int k);
