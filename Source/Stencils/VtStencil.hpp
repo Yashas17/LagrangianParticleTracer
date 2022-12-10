@@ -14,8 +14,8 @@ namespace Stencils {
     RealType localMeshsize_[27 * 3];
 
   public:
-    vtStencil(const Parameters& parameters);
-    ~vtStencil() override = default;
+    VtStencil(const Parameters& parameters);
+    ~VtStencil() override = default;
 
     void apply(FlowField& flowField, int i, int j) override;
     void apply(FlowField& flowField, int i, int j, int k) override;

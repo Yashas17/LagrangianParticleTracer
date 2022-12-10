@@ -2,7 +2,7 @@
 
 #include "VtStencil.hpp"
 
-Stencils::vtStencil::vtStencil(const Parameters& parameters):
+Stencils::vtStencil::VtStencil(const Parameters& parameters):
   FieldStencil<FlowField>(parameters) {}
 
 void Stencils::vtStencil::apply(FlowField& flowField, int i, int j) {
@@ -31,5 +31,5 @@ void Stencils::vtStencil::apply(FlowField& flowField, int i, int j, int k) {
   RealType S13 = 0.5 * (dudz(localVelocity_, localMeshsize_) + dwdx(localVelocity_, localMeshsize_));
   RealType S23 = 0.5 * (dwdy(localVelocity_, localMeshsize_) + dvdz(localVelocity_, localMeshsize_));
 
-  vt = lm * lm * sqrt(S11 * S11 + S22 * S22 + 2 * (S12 * S12 + S13 * S13 + S23 * S23));
+  vt = lm * lm * sqrt(S11 * S11 + S22 * S22 + S33 * S33 + 2 * (S12 * S12 + S13 * S13 + S23 * S23));
 }
