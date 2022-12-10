@@ -132,6 +132,11 @@ public:
   RealType xRatio = 0;
   RealType yRatio = 0;
 };
+
+class TurbulenceParameters{
+  public:
+  std::string boundaryLayer="none";
+}
 //@}
 
 /** A class to store and pass around the parameters
@@ -152,6 +157,6 @@ public:
   ParallelParameters      parallel;
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
-  // TODO WS2: include parameters for turbulence
+  TurbulenceParameters    turbulence;
   Meshsize* meshsize;
 };

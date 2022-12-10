@@ -394,8 +394,12 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     }
 
     //------------------------------------------------------
-    // TODO WS2: Turbulence
+    // Turbulence parameters
     //------------------------------------------------------
+    node = confFile.FirstChildElement()->FirstChildElement("turbulence");
+    if (node != NULL) {
+      readStringMandatory(parameters.turbulence.boundaryLayer, node, "boundaryLayer");
+    }
   }
 
   // Broadcasting of the values
