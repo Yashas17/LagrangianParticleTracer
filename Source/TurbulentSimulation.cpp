@@ -1,10 +1,12 @@
 #include "StdAfx.hpp"
 
 #include "TurbulentSimulation.hpp"
-#include "Stencils/hStencil.hpp"
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
+#include "Stencils/hStencil.hpp"
+#include "Stencils/lmStencil.hpp"
+#include "Stencils/vtStencil.hpp"
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
@@ -24,7 +26,9 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flow
   rhsStencil_(parameters),
   rhsIterator_(flowField_, parameters, rhsStencil_),
   timeStepStencil_(parameters),
-  timeStepIterator_(flowField_, parameters, timeStepStencil_)
+  timeStepIterator_(flowField_, parameters, timeStepStencil_),
+  vtStencil_(parameters),
+  vtIterator_(flowField_,parameters, vtStencil_)
 #ifdef ENABLE_PETSC
   ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
@@ -48,9 +52,14 @@ void TurbulentSimulation::initializeFlowField() {
     wallVelocityIterator_.iterate();
 
     // Initializing the "h" scalar field with the distances from the nearest walls
-    Stencils::hStencil hStencil(parameters_);
+    Stencils::hStencil       hStencil(parameters_);
     FieldIterator<FlowField> hIterator(flowField_, parameters_, hStencil, 0, 1);
     hIterator.iterate();
+
+    // Initialize mixing length scalar field
+    Stencils::lmStencil      lmStencil(parameters_);
+    FieldIterator<FlowField> lmIterator(flowField_, parameters_, lmStencil, 0, 1);
+    lmIterator.iterate();
 
   } else if (parameters_.simulation.scenario == "pressure-channel") {
     // Set pressure boundaries here for left wall
@@ -85,6 +94,8 @@ void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   timeStepIterator.iterate();
   setTimeStep();
+  // Compute turbulent viscosity
+  vtIterator_.iterate();
   // Compute FGH
   fghIterator_.iterate();
   // Set global boundary values

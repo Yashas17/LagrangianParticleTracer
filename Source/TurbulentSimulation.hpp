@@ -28,6 +28,9 @@ protected:
   Stencils::TimeStepStencil timeStepStencil_;
   FieldIterator<FlowField> timeStepIterator_;
 
+  Stencils::VtStencil vtStencil_;
+  FieldIterator<FlowField> vtIterator_;
+
 public:
   TurbulentSimulation(Parameters& parameters, FlowField& flowField);
   ~TurbulentSimulation() = default;

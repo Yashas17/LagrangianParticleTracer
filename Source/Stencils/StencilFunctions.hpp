@@ -109,6 +109,77 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
+  inline RealType dudy(const RealType* const lv, const RealType* const lm) {
+
+    RealType temp1 = (lv[mpad(-1, 1, 0, 0)] + lv[mpad(0, 1, 0, 0)]) / 2;   // avg x-velocity at (i,j+1)
+    RealType temp2 = (lv[mpad(-1, 0, 0, 0)] + lv[mpad(0, 0, 0, 0)]) / 2;   // avg x-velocity at (i,j)
+    RealType temp3 = (lv[mpad(-1, -1, 0, 0)] + lv[mpad(0, -1, 0, 0)]) / 2; // avg x-velocity at (i,j-1)
+
+    RealType d1 = 0.5 * (temp1 - temp2) / (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)]);  // dudy at (i,j+0.5)
+    RealType d2 = 0.5 * (temp2 - temp3) / (lm[mapd(0, -1, 0, 1)] + lm[mapd(0, 0, 0, 1)]); // dudy at (i,j-0.5)
+
+    return (d1 + d2) / 2;
+  }
+
+  inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
+
+    RealType temp1 = (lv[mpad(-1, 0, 0, 1)] + lv[mpad(-1, -1, 0, 1)]) / 2; // avg y-velocity at (i-1,j)
+    RealType temp2 = (lv[mpad(0, 0, 0, 1)] + lv[mpad(0, -1, 0, 1)]) / 2;   // avg y-velocity at (i,j)
+    RealType temp3 = (lv[mpad(1, 0, 0, 1)] + lv[mpad(1, -1, 0, 1)]) / 2;   // avg y-velocity at (i+1,j)
+
+    RealType d1 = 0.5 * (temp2 - temp1) / (lm[mapd(-1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]); // dvdx at (i+0.5,j)
+    RealType d2 = 0.5 * (temp3 - temp2) / (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]);  // dvdx at (i-0.5,j)
+
+    return (d1 + d2) / 2;
+  }
+
+  inline RealType dwdx(const RealType* const lv, const RealType* const lm) {
+
+    RealType temp1 = (lv[mpad(-1, 0, 0, 2)] + lv[mpad(-1, 0, -1, 2)]) / 2; // avg z-velocity at (i-1,k)
+    RealType temp2 = (lv[mpad(0, 0, 0, 2)] + lv[mpad(0, 0, -1, 2)]) / 2;   // avg z-velocity at (i,k)
+    RealType temp3 = (lv[mpad(1, 0, 0, 2)] + lv[mpad(1, 0, -1, 2)]) / 2;   // avg z-velocity at (i+1,k)
+
+    RealType d1 = 0.5 * (temp2 - temp1) / (lm[mapd(-1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]); // dwdx at (i+0.5,k)
+    RealType d2 = 0.5 * (temp3 - temp2) / (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]);  // dwdx at (i-0.5,k)
+
+    return (d1 + d2) / 2;
+  }
+
+  inline RealType dwdy(const RealType* const lv, const RealType* const lm) {
+
+    RealType temp1 = (lv[mpad(0, -1, 0, 2)] + lv[mpad(0, -1, -1, 2)]) / 2; // avg z-velocity at (j-1,k)
+    RealType temp2 = (lv[mpad(0, 0, 0, 2)] + lv[mpad(0, 0, -1, 2)]) / 2;   // avg z-velocity at (j,k)
+    RealType temp3 = (lv[mpad(0, 1, 0, 2)] + lv[mpad(0, 1, -1, 2)]) / 2;   // avg z-velocity at (j+1,k)
+
+    RealType d1 = 0.5 * (temp2 - temp1) / (lm[mapd(0, -1, 0, 1)] + lm[mapd(0, 0, 0, 1)]); // dwdy at (j+0.5,k)
+    RealType d2 = 0.5 * (temp3 - temp2) / (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)]);  // dwdy at (j-0.5,k)
+
+    return (d1 + d2) / 2;
+  }
+
+  inline RealType dudz(const RealType* const lv, const RealType* const lm) {
+
+    RealType temp1 = (lv[mpad(-1, 0, 1, 0)] + lv[mpad(0, 0, 1, 0)]) / 2;   // avg x-velocity at (i,k+1)
+    RealType temp2 = (lv[mpad(-1, 0, 0, 0)] + lv[mpad(0, 0, 0, 0)]) / 2;   // avg x-velocity at (i,k)
+    RealType temp3 = (lv[mpad(-1, 0, -1, 0)] + lv[mpad(0, 0, -1, 0)]) / 2; // avg x-velocity at (i,k-1)
+
+    RealType d1 = 0.5 * (temp1 - temp2) / (lm[mapd(0, 0, 1, 2)] + lm[mapd(0, 0, 0, 2)]);  // dudy at (i,k+0.5)
+    RealType d2 = 0.5 * (temp2 - temp3) / (lm[mapd(0, 0, -1, 2)] + lm[mapd(0, 0, 0, 2)]); // dudy at (i,k-0.5)
+
+    return (d1 + d2) / 2;
+  }
+
+  inline RealType dvdz(const RealType* const lv, const RealType* const lm) {
+
+    RealType temp1 = (lv[mpad(0, -1, 1, 1)] + lv[mpad(0, 0, 1, 1)]) / 2;   // avg x-velocity at (j,k+1)
+    RealType temp2 = (lv[mpad(0, -1, 0, 1)] + lv[mpad(0, 0, 0, 1)]) / 2;   // avg x-velocity at (j,k)
+    RealType temp3 = (lv[mpad(0, -1, -1, 1)] + lv[mpad(0, 0, -1, 1)]) / 2; // avg x-velocity at (j,k-1)
+
+    RealType d1 = 0.5 * (temp1 - temp2) / (lm[mapd(0, 0, 1, 2)] + lm[mapd(0, 0, 0, 2)]);  // dudy at (j,k+0.5)
+    RealType d2 = 0.5 * (temp2 - temp3) / (lm[mapd(0, 0, -1, 2)] + lm[mapd(0, 0, 0, 2)]); // dudy at (j,k-0.5)
+
+    return (d1 + d2) / 2;
+  }
   // Second derivative of u-component w.r.t. x-direction, evaluated at the location of the u-component.
   inline RealType d2udx2(const RealType* const lv, const RealType* const lm) {
     // Evaluate the second derivative at the location of the u-component of the velocity field;
