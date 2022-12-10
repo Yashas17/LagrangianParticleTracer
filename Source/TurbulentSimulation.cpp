@@ -1,10 +1,12 @@
 #include "StdAfx.hpp"
 
 #include "TurbulentSimulation.hpp"
-#include "Stencils/hStencil.hpp"
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
+#include "Stencils/hStencil.hpp"
+#include "Stencils/lmStencil.hpp"
+#include "Stencils/vtStencil.hpp"
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
@@ -24,7 +26,9 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flow
   rhsStencil_(parameters),
   rhsIterator_(flowField_, parameters, rhsStencil_),
   timeStepStencil_(parameters),
-  timeStepIterator_(flowField_, parameters, timeStepStencil_)
+  timeStepIterator_(flowField_, parameters, timeStepStencil_),
+  vtStencil_(parameters),
+  vtIterator_(flowField_,parameters, vtStencil_)
 #ifdef ENABLE_PETSC
   ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
@@ -48,9 +52,14 @@ void TurbulentSimulation::initializeFlowField() {
     wallVelocityIterator_.iterate();
 
     // Initializing the "h" scalar field with the distances from the nearest walls
-    Stencils::hStencil hStencil(parameters_);
+    Stencils::hStencil       hStencil(parameters_);
     FieldIterator<FlowField> hIterator(flowField_, parameters_, hStencil, 0, 1);
     hIterator.iterate();
+
+    // Initialize mixing length scalar field
+    Stencils::lmStencil      lmStencil(parameters_);
+    FieldIterator<FlowField> lmIterator(flowField_, parameters_, lmStencil, 0, 1);
+    lmIterator.iterate();
 
   } else if (parameters_.simulation.scenario == "pressure-channel") {
     // Set pressure boundaries here for left wall
@@ -83,7 +92,9 @@ void TurbulentSimulation::initializeFlowField() {
 
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
-  timeStepIterator.iterate();
+  timeStepIterator_.iterate();
+  // Compute turbulent viscosity
+  vtIterator_.iterate();
   // Compute FGH
   fghIterator_.iterate();
   // Set global boundary values
@@ -110,49 +121,51 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 }
 
 void TurbulentSimulation::setTimeStep() {
-//   RealType localMin, globalMin;
-//   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
-//   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
-//                     + 1.0 / (parameters_.meshsize->getDyMin() * parameters_.meshsize->getDyMin());
+  //   RealType localMin, globalMin;
+  //   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
+  //   RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
+  //                     + 1.0 / (parameters_.meshsize->getDyMin() * parameters_.meshsize->getDyMin());
 
-//   // Determine maximum velocity
-//   maxUStencil_.reset();
-//   maxUFieldIterator_.iterate();
-//   maxUBoundaryIterator_.iterate();
-//   if (parameters_.geometry.dim == 3) {
-//     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
-//     /**
-//      *We need the following 'if' condition to ensure that we do not encounter division by zero. In case the 'if'
-//      *condition is not satisfied, the value of dt will be same as previous time step or if it is the first time step,
-//      *the user defined time-step will be used. If user has not defined the time step, dt will be set to 1 by default.
-//      **/
-//     if (maxUStencil_.getMaxValues()[2] != 0)
-//       parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
-//   } else {
-//     if (maxUStencil_.getMaxValues()[0] != 0)
-//       parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
-//   }
+  //   // Determine maximum velocity
+  //   maxUStencil_.reset();
+  //   maxUFieldIterator_.iterate();
+  //   maxUBoundaryIterator_.iterate();
+  //   if (parameters_.geometry.dim == 3) {
+  //     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
+  //     /**
+  //      *We need the following 'if' condition to ensure that we do not encounter division by zero. In case the 'if'
+  //      *condition is not satisfied, the value of dt will be same as previous time step or if it is the first time
+  //      step, *the user defined time-step will be used. If user has not defined the time step, dt will be set to 1 by
+  //      default.
+  //      **/
+  //     if (maxUStencil_.getMaxValues()[2] != 0)
+  //       parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
+  //   } else {
+  //     if (maxUStencil_.getMaxValues()[0] != 0)
+  //       parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
+  //   }
 
-//   // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
-//   // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
-//   if (maxUStencil_.getMaxValues()[0] != 0 && maxUStencil_.getMaxValues()[1] != 0) {
-//     localMin = std::min(
-//       parameters_.flow.Re / (2 * factor),
-//       std::min(
-//         parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 / (maxUStencil_.getMaxValues()[1]))
-//       )
-//     );
-//   } else {
-//     localMin = std::min(parameters_.flow.Re / (2 * factor), parameters_.timestep.dt);
-//   }
+  //   // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
+  //   // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
+  //   if (maxUStencil_.getMaxValues()[0] != 0 && maxUStencil_.getMaxValues()[1] != 0) {
+  //     localMin = std::min(
+  //       parameters_.flow.Re / (2 * factor),
+  //       std::min(
+  //         parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 /
+  //         (maxUStencil_.getMaxValues()[1]))
+  //       )
+  //     );
+  //   } else {
+  //     localMin = std::min(parameters_.flow.Re / (2 * factor), parameters_.timestep.dt);
+  //   }
 
-//   // Here, we select the type of operation before compiling. This allows to use the correct
-//   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous
-//   // machines.
+  //   // Here, we select the type of operation before compiling. This allows to use the correct
+  //   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous
+  //   // machines.
 
-//   globalMin = MY_FLOAT_MAX;
-//   MPI_Allreduce(&localMin, &globalMin, 1, MY_MPI_FLOAT, MPI_MIN, PETSC_COMM_WORLD);
+  //   globalMin = MY_FLOAT_MAX;
+  //   MPI_Allreduce(&localMin, &globalMin, 1, MY_MPI_FLOAT, MPI_MIN, PETSC_COMM_WORLD);
 
-//   parameters_.timestep.dt = globalMin;
-//   parameters_.timestep.dt *= parameters_.timestep.tau;
+  //   parameters_.timestep.dt = globalMin;
+  //   parameters_.timestep.dt *= parameters_.timestep.tau;
 }
