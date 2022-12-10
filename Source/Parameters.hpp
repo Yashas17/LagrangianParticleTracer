@@ -133,10 +133,10 @@ public:
   RealType yRatio = 0;
 };
 
-class TurbulenceParameters{
-  public:
-  std::string boundaryLayer="none";
-}
+class TurbulenceParameters {
+public:
+  int boundaryLayer = 0;
+};
 //@}
 
 /** A class to store and pass around the parameters
@@ -158,5 +158,5 @@ public:
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
   TurbulenceParameters    turbulence;
-  Meshsize* meshsize;
+  Meshsize*               meshsize;
 };

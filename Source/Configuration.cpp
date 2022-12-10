@@ -398,7 +398,22 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     //------------------------------------------------------
     node = confFile.FirstChildElement()->FirstChildElement("turbulence");
     if (node != NULL) {
-      readStringMandatory(parameters.turbulence.boundaryLayer, node, "boundaryLayer");
+      subNode = node->FirstChildElement("boundaryLayer");
+      if (subNode != NULL) {
+        std::string boundaryLayer;
+        readStringMandatory(boundaryLayer, subNode);
+        if (boundaryLayer == "none") {
+          parameters.turbulence.boundaryLayer = 0;
+        } else if (boundaryLayer == "laminar") {
+          parameters.turbulence.boundaryLayer = 1;
+        } else if (boundaryLayer == "turbulent") {
+          parameters.turbulence.boundaryLayer = 2;
+        } else {
+          throw std::runtime_error("Unidentified boundary layer type!");
+        }
+      } else {
+        throw std::runtime_error("Boundary layer type not defined!");
+      }
     }
   }
 
@@ -458,4 +473,5 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
   MPI_Bcast(parameters.walls.vectorBack, 3, MY_MPI_FLOAT, 0, communicator);
 
   // TODO WS2: broadcast turbulence parameters
+  MPI_Bcast(&(parameters.turbulence.boundaryLayer), 1, MPI_INT, 0, communicator);
 }

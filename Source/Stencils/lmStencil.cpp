@@ -13,17 +13,17 @@ void Stencils::lmStencil::apply(FlowField& flowField, int i, int j) {
 
   RealType delta = -1;
 
-  if (parameters_.turbulence.boundaryLayer == "turbulent") {
+  if (parameters_.turbulence.boundaryLayer == 2) {
     const RealType posX = parameters_.meshsize->getPosX(i, j);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 0.382 * posX / std::pow(Rex, 0.2);
   }
-  elseif(parameters_.turbulence.boundaryLayer == "laminar") {
+  elseif(parameters_.turbulence.boundaryLayer == 1) {
     const RealType posX = parameters_.meshsize->getPosX(i, j);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 4.91 * posX / std::pow(Rex, 0.5);
   }
-  elseif(parameters_.turbulence.boundaryLayer == "none") { delta = 0; }
+  elseif(parameters_.turbulence.boundaryLayer == 0) { delta = 0; }
   else {
     throw std::runtime_error("Undefined Boundary Layer Function");
   }
@@ -38,17 +38,17 @@ void Stencils::lmStencil::apply(FlowField& flowField, int i, int j, int k) {
 
   RealType delta = -1;
 
-  if (parameters_.turbulence.boundaryLayer == "turbulent") {
+  if (parameters_.turbulence.boundaryLayer == 2) {
     const RealType posX = parameters_.meshsize->getPosX(i, j, k);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 0.382 * posX / std::pow(Rex, 0.2);
   }
-  elseif(parameters_.turbulence.boundaryLayer == "laminar") {
+  elseif(parameters_.turbulence.boundaryLayer == 1) {
     const RealType posX = parameters_.meshsize->getPosX(i, j, k);
     RealType       Rex  = parameters_.flow.Re * posX; // Flat Plate Reynolds Number
     delta               = 4.91 * posX / std::pow(Rex, 0.5);
   }
-  elseif(parameters_.turbulence.boundaryLayer == "none") { delta = 0; }
+  elseif(parameters_.turbulence.boundaryLayer == 0) { delta = 0; }
   else {
     throw std::runtime_error("Undefined Boundary Layer Function");
   }
