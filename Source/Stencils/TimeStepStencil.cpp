@@ -27,11 +27,11 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
    **/
 
   if (velocity[0] != 0)
-    cell_dt = dx / velocity[0];
+    cell_dt = dx / fabs(velocity[0]);
 
   if (velocity[0] != 0 && velocity[1] != 0) {
     cell_dt = std::min(
-      1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / velocity[0], dy / velocity[1]))
+      1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / fabs(velocity[0]), dy / fabs(velocity[1])))
     );
   } else {
     cell_dt = std::min(1 / (vTotal * factor), cell_dt);
@@ -62,16 +62,16 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k)
    **/
 
   if (velocity[2] != 0)
-    cell_dt = dz / velocity[2];
+    cell_dt = dz / fabs(velocity[2]);
 
   if (velocity[0] != 0 && velocity[1] != 0) {
     cell_dt = std::min(
-      1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / velocity[0], dy / velocity[1]))
+      1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / fabs(velocity[0]), dy / fabs(velocity[1])))
     );
   } else {
     cell_dt = std::min(1 / (vTotal * factor), cell_dt);
   }
-  
+
   if(cell_dt < dt)
     dt = cell_dt;
 }
