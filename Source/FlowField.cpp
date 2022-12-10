@@ -95,6 +95,8 @@ ScalarField& FlowField::getH() { return h_; }
 
 ScalarField& FlowField::getVt() { return vt_; }
 
+ScalarField& FlowField::getLm() { return lm_; }
+
 void FlowField::getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j) {
   RealType* vHere = getVelocity().getVector(i, j);
   RealType* vLeft = getVelocity().getVector(i - 1, j);
