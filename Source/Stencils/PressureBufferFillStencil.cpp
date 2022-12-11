@@ -48,15 +48,15 @@ void Stencils::PressureBufferFillStencil::applyRightWall2D(FlowField& flowField)
 }
 
 void Stencils::PressureBufferFillStencil::applyBottomWall2D(FlowField& flowField) {
-  bottom_buffer.resize(flowField.getPressure().getNx() - 3);
-  RealType* bottom_line_begin = flowField.getPressure().getScalarOffset(2, 2);
-  std::copy_n(bottom_line_begin, flowField.getPressure().getNx() - 3, bottom_buffer.data());
+  bottom_buffer.resize(flowField.getPressure().getNx() - 1);
+  RealType* bottom_line_begin = flowField.getPressure().getScalarOffset(1, 2);
+  std::copy_n(bottom_line_begin, flowField.getPressure().getNx() - 1, bottom_buffer.data());
 }
 
 void Stencils::PressureBufferFillStencil::applyTopWall2D(FlowField& flowField) {
-  top_buffer.resize(flowField.getPressure().getNx() - 3);
-  RealType* top_line_begin = flowField.getPressure().getScalarOffset(2, flowField.getPressure().getNy() - 2);
-  std::copy_n(top_line_begin, flowField.getPressure().getNx() - 3, top_buffer.data());
+  top_buffer.resize(flowField.getPressure().getNx() - 1);
+  RealType* top_line_begin = flowField.getPressure().getScalarOffset(1, flowField.getPressure().getNy() - 2);
+  std::copy_n(top_line_begin, flowField.getPressure().getNx() - 1, top_buffer.data());
 }
 
 void Stencils::PressureBufferFillStencil::applyLeftWall3D(FlowField& flowField) {}

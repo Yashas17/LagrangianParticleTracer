@@ -150,6 +150,10 @@ public:
   virtual ~GhostLayerIterator() override = default;
 
   virtual void iterate() override;
+
+  void iterate_left_right();
+
+  void iterate_top_bottom();
 };
 
 #include "Iterators.cpph"
