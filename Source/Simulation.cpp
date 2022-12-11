@@ -105,6 +105,7 @@ void Simulation::solveTimestep() {
 
   // TODO WS2: communicate pressure values
   petscParallelManager_.communicatePressure();
+  petscParallelManager_.communicatePressure();
 
   // // printing to test after communication
   // for(int printRank = 0; printRank < 4; printRank++){
@@ -151,6 +152,7 @@ void Simulation::solveTimestep() {
   // MPI_Barrier(PETSC_COMM_WORLD);
 
   // TODO WS2: communicate velocity values
+  petscParallelManager_.communicateVelocities();
   petscParallelManager_.communicateVelocities();
 
   // // printing to test after communication

@@ -57,7 +57,7 @@ void Stencils::PressureBufferReadStencil::applyLeftWall(FlowField& flowField, in
 void Stencils::PressureBufferReadStencil::applyRightWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getPressure().getNx());
   assert(cellsY == flowField.getPressure().getNy());
-  flowField.getPressure().getScalar(i + 1, j) = rightBuffer[j]; // j changes, i+1 for ghost
+  flowField.getPressure().getScalar(i, j) = rightBuffer[j]; // j changes
 }
 
 void Stencils::PressureBufferReadStencil::applyBottomWall(FlowField& flowField, int i, int j) {
@@ -69,7 +69,7 @@ void Stencils::PressureBufferReadStencil::applyBottomWall(FlowField& flowField, 
 void Stencils::PressureBufferReadStencil::applyTopWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getPressure().getNx());
   assert(cellsY == flowField.getPressure().getNy());
-  flowField.getPressure().getScalar(i, j + 1) = topBuffer[i]; // i changes
+  flowField.getPressure().getScalar(i, j) = topBuffer[i]; // i changes
 }
 
 // 3d cases

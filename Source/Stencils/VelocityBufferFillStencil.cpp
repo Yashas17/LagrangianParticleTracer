@@ -47,9 +47,9 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, in
 void Stencils::VelocityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getVelocity().getNx());
   assert(cellsY == flowField.getVelocity().getNy());
-  rightBuffer[3 * j]     = flowField.getVelocity().getVector(i, j)[0];     // j changes
-  rightBuffer[3 * j + 1] = flowField.getVelocity().getVector(i, j)[1];     // j changes
-  rightBuffer[3 * j + 2] = flowField.getVelocity().getVector(i - 1, j)[0]; // another u
+  rightBuffer[3 * j]     = flowField.getVelocity().getVector(i - 1, j)[0];     // j changes
+  rightBuffer[3 * j + 1] = flowField.getVelocity().getVector(i - 1, j)[1];     // j changes
+  rightBuffer[3 * j + 2] = flowField.getVelocity().getVector(i - 2, j)[0]; // another u
 }
 
 void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j) {
@@ -62,9 +62,9 @@ void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, 
 void Stencils::VelocityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getVelocity().getNx());
   assert(cellsY == flowField.getVelocity().getNy());
-  topBuffer[3 * i]     = flowField.getVelocity().getVector(i, j)[0];     // i changes
-  topBuffer[3 * i + 1] = flowField.getVelocity().getVector(i, j)[1];     // i changes
-  topBuffer[3 * i + 2] = flowField.getVelocity().getVector(i, j - 1)[1]; // another v
+  topBuffer[3 * i]     = flowField.getVelocity().getVector(i, j - 1)[0];     // i changes
+  topBuffer[3 * i + 1] = flowField.getVelocity().getVector(i, j - 1)[1];     // i changes
+  topBuffer[3 * i + 2] = flowField.getVelocity().getVector(i, j - 2)[1]; // another v
 }
 
 // 3d cases
