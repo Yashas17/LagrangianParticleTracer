@@ -17,16 +17,6 @@ void Stencils::PressureBufferFillStencil::applyLeftWall2D(FlowField& flowField) 
   for (int j = 2; j < flowField.getPressure().getNy() - 1; j++) {
     left_buffer[j - 2] = flowField.getPressure().getScalar(2, j);
   }
-#ifndef NDEBUG
-  std::stringstream ss;
-  ss << parameters_.parallel.rank << "sending to left neighbor (pressure): \n";
-  for (auto& el : left_buffer) {
-    ss << el << ", ";
-  }
-  ss << "end";
-  ss << std::endl;
-  std::cout << ss.str();
-#endif
 }
 
 void Stencils::PressureBufferFillStencil::applyRightWall2D(FlowField& flowField) {
@@ -34,16 +24,6 @@ void Stencils::PressureBufferFillStencil::applyRightWall2D(FlowField& flowField)
   for (int j = 2; j < flowField.getPressure().getNy() - 1; j++) {
     right_buffer[j - 2] = flowField.getPressure().getScalar(flowField.getPressure().getNx() - 2, j);
   }
-#ifndef NDEBUG
-  std::stringstream ss;
-  ss << parameters_.parallel.rank << "sending to right neighbor (pressure): \n";
-  for (auto& el : right_buffer) {
-    ss << el << ", ";
-  }
-  ss << "end";
-  ss << std::endl;
-  std::cout << ss.str();
-#endif
 }
 
 void Stencils::PressureBufferFillStencil::applyBottomWall2D(FlowField& flowField) {

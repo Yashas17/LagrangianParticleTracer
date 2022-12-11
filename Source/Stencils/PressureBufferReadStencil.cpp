@@ -1,4 +1,3 @@
-#pragma once
 #include "StdAfx.hpp"
 
 #include "PressureBufferReadStencil.hpp"
@@ -14,16 +13,6 @@ Stencils::PressureBufferReadStencil::PressureBufferReadStencil(const Parameters&
 Stencils::PressureBufferReadStencil::~PressureBufferReadStencil() {}
 
 void Stencils::PressureBufferReadStencil::applyLeftWall2D(FlowField& flowField) {
-#ifndef NDEBUG
-  std::stringstream ss;
-  ss << parameters_.parallel.rank << " received from left neighbor (pressure): \n";
-  for (auto& el : left_buffer) {
-    ss << el << ", ";
-  }
-  ss << "end";
-  ss << std::endl;
-  std::cout << ss.str();
-#endif
   assert(left_buffer.size() == flowField.getPressure().getNy() - 3);
   for (int j = 2; j < flowField.getPressure().getNy() - 1; j++) {
     flowField.getPressure().getScalar(1, j) = left_buffer[j - 2];
@@ -31,16 +20,6 @@ void Stencils::PressureBufferReadStencil::applyLeftWall2D(FlowField& flowField) 
 }
 
 void Stencils::PressureBufferReadStencil::applyRightWall2D(FlowField& flowField) {
-#ifndef NDEBUG
-  std::stringstream ss;
-  ss << parameters_.parallel.rank << " received from right neighbor (pressure): \n";
-  for (auto& el : right_buffer) {
-    ss << el << ", ";
-  }
-  ss << "end";
-  ss << std::endl;
-  std::cout << ss.str();
-#endif
   assert(right_buffer.size() == flowField.getPressure().getNy() - 3);
   for (int j = 2; j < flowField.getPressure().getNy() - 1; j++) {
     flowField.getPressure().getScalar(flowField.getPressure().getNx() - 1, j) = right_buffer[j - 2];

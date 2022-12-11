@@ -2,7 +2,8 @@
 
 #include "PetscParallelManager.hpp"
 
-void check_mpi_error(int err_code) {
+inline void check_mpi_error(int err_code) {
+#ifndef NDEBUG
   if (err_code != MPI_SUCCESS) {
     char* c   = new char[MPI_MAX_ERROR_STRING];
     int   len = 0;
@@ -10,6 +11,7 @@ void check_mpi_error(int err_code) {
     std::cout << err_code << std::endl;
     throw std::runtime_error(c);
   }
+#endif
 }
 
 ParallelManagers::PetscParallelManagerNonBlocking::PetscParallelManagerNonBlocking(
@@ -37,8 +39,6 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
 
     std::vector<RealType> right_recv(cellsY, std::numeric_limits<RealType>::quiet_NaN());
     std::vector<RealType> left_recv(cellsY, std::numeric_limits<RealType>::quiet_NaN());
-    std::vector<RealType> top_recv(cellsX, std::numeric_limits<RealType>::quiet_NaN());
-    std::vector<RealType> bottom_recv(cellsX, std::numeric_limits<RealType>::quiet_NaN());
 
     MPI_Request requests[8];
     MPI_Status  array_of_statuses[8];
@@ -84,15 +84,11 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
       check_mpi_error(ires);
     }
 
+    std::vector<RealType> top_recv(cellsX, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> bottom_recv(cellsX, std::numeric_limits<RealType>::quiet_NaN());
+
     int res = MPI_Waitall(4, requests, array_of_statuses);
-    // MPI Communication end
-    if (res != MPI_SUCCESS) {
-      char* c   = new char[MPI_MAX_ERROR_STRING];
-      int   len = 0;
-      MPI_Error_string(res, c, &len);
-      std::cout << res << std::endl;
-      throw std::runtime_error(c);
-    }
+    check_mpi_error(res);
 
     pressureBufferReadStencil_.left_buffer  = std::move(left_recv);
     pressureBufferReadStencil_.right_buffer = std::move(right_recv);
@@ -102,14 +98,14 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
 
     if (parameters_.parallel.topNb >= 0) {
       int rres = MPI_Irecv(
-        top_recv.data(), cellsX, MY_MPI_FLOAT, parameters_.parallel.topNb, 2, PETSC_COMM_WORLD, &requests[6]
+        top_recv.data(), cellsX, MY_MPI_FLOAT, parameters_.parallel.topNb, 2, PETSC_COMM_WORLD, &requests[4]
       );
       check_mpi_error(rres);
     }
 
     if (parameters_.parallel.bottomNb >= 0) {
       int rres = MPI_Irecv(
-        bottom_recv.data(), cellsX, MY_MPI_FLOAT, parameters_.parallel.bottomNb, 4, PETSC_COMM_WORLD, &requests[7]
+        bottom_recv.data(), cellsX, MY_MPI_FLOAT, parameters_.parallel.bottomNb, 4, PETSC_COMM_WORLD, &requests[5]
       );
       check_mpi_error(rres);
     }
@@ -122,7 +118,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
         parameters_.parallel.bottomNb,
         2,
         PETSC_COMM_WORLD,
-        &requests[4]
+        &requests[6]
       );
       check_mpi_error(ires);
     }
@@ -135,20 +131,13 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
         parameters_.parallel.topNb,
         4,
         PETSC_COMM_WORLD,
-        &requests[5]
+        &requests[7]
       );
       check_mpi_error(ires);
     }
 
     res = MPI_Waitall(4, &requests[4], &array_of_statuses[4]);
-    // MPI Communication end
-    if (res != MPI_SUCCESS) {
-      char* c   = new char[MPI_MAX_ERROR_STRING];
-      int   len = 0;
-      MPI_Error_string(res, c, &len);
-      std::cout << res << std::endl;
-      throw std::runtime_error(c);
-    }
+    check_mpi_error(res);
 
     pressureBufferReadStencil_.top_buffer    = std::move(top_recv);
     pressureBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
@@ -167,8 +156,6 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
 
     std::vector<RealType> right_recv(2 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
     std::vector<RealType> left_recv(4 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
-    std::vector<RealType> top_recv(2 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
-    std::vector<RealType> bottom_recv(4 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
 
     MPI_Request requests[8];
     MPI_Status  array_of_statuses[8];
@@ -176,14 +163,14 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
 
     if (parameters_.parallel.rightNb >= 0) {
       int ires = MPI_Irecv(
-        right_recv.data(), 2 * cellsY, MY_MPI_FLOAT, parameters_.parallel.rightNb, 1, PETSC_COMM_WORLD, &requests[2]
+        right_recv.data(), 2 * cellsY, MY_MPI_FLOAT, parameters_.parallel.rightNb, 1, PETSC_COMM_WORLD, &requests[0]
       );
       check_mpi_error(ires);
     }
 
     if (parameters_.parallel.leftNb >= 0) {
       int ires = MPI_Irecv(
-        left_recv.data(), 4 * cellsY, MY_MPI_FLOAT, parameters_.parallel.leftNb, 3, PETSC_COMM_WORLD, &requests[3]
+        left_recv.data(), 4 * cellsY, MY_MPI_FLOAT, parameters_.parallel.leftNb, 3, PETSC_COMM_WORLD, &requests[1]
       );
       check_mpi_error(ires);
     }
@@ -196,7 +183,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
         parameters_.parallel.leftNb,
         1,
         PETSC_COMM_WORLD,
-        &requests[0]
+        &requests[2]
       );
       check_mpi_error(ires);
     }
@@ -209,18 +196,16 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
         parameters_.parallel.rightNb,
         3,
         PETSC_COMM_WORLD,
-        &requests[1]
+        &requests[3]
       );
       check_mpi_error(ires);
     }
 
+    std::vector<RealType> top_recv(2 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> bottom_recv(4 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
+
     int res = MPI_Waitall(4, requests, array_of_statuses);
-    if (res != MPI_SUCCESS) {
-      char* c   = new char[MPI_MAX_ERROR_STRING];
-      int   len = 0;
-      MPI_Error_string(res, c, &len);
-      throw std::runtime_error(c);
-    }
+    check_mpi_error(res);
 
     velocityBufferReadStencil_.left_buffer  = std::move(left_recv);
     velocityBufferReadStencil_.right_buffer = std::move(right_recv);
@@ -269,12 +254,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     }
 
     res = MPI_Waitall(4, &requests[4], &array_of_statuses[4]);
-    if (res != MPI_SUCCESS) {
-      char* c   = new char[MPI_MAX_ERROR_STRING];
-      int   len = 0;
-      MPI_Error_string(res, c, &len);
-      throw std::runtime_error(c);
-    }
+    check_mpi_error(res);
 
     velocityBufferReadStencil_.top_buffer    = std::move(top_recv);
     velocityBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
