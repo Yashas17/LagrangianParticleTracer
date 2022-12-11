@@ -54,7 +54,7 @@ void Stencils::PressureBufferReadStencil::applyBottomWall2D(FlowField& flowField
 }
 
 void Stencils::PressureBufferReadStencil::applyTopWall2D(FlowField& flowField) {
-  assert(top_buffer.size() == flowField.getPrssure().getNx() - 3);
+  assert(top_buffer.size() == flowField.getPressure().getNx() - 3);
   RealType* top_ghost_line_begin = flowField.getPressure().getScalarOffset(2, flowField.getPressure().getNy() - 1);
   std::copy(top_buffer.begin(), top_buffer.end(), top_ghost_line_begin);
 }

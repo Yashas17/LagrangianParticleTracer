@@ -1,5 +1,7 @@
 #include "StdAfx.hpp"
 
+#include <fstream>
+
 #include "PetscParallelManager.hpp"
 
 void check_mpi_error(int err_code) {
@@ -10,6 +12,59 @@ void check_mpi_error(int err_code) {
     std::cout << err_code << std::endl;
     throw std::runtime_error(c);
   }
+}
+
+void dump_flowField(FlowField& flowField_, Parameters& parameters_) {
+  static int        call = 0;
+  int               rank = parameters_.parallel.rank;
+  std::ofstream     of("rank" + std::to_string(rank) + ".txt", std::ios_base::app);
+  std::stringstream ss;
+  ss.setf(std::ios::fixed);
+  ss.precision(4);
+  ss << "Timestep " << (call >> 1) << ":\n";
+  if (call % 2 == 0) {
+    ss << "Before communicating the ghost layers\n";
+  } else {
+    ss << "After communicating the ghost layers\n";
+  }
+  ss << parameters_.parallel.rank << " has neighbors: "
+     << "\tleft:" << parameters_.parallel.leftNb << "\tright:" << parameters_.parallel.rightNb
+     << "\ttop:" << parameters_.parallel.topNb << "\tbottom:" << parameters_.parallel.bottomNb << std::endl;
+  ss << "Pressure of rank " << rank << ":\n";
+  for (int j = flowField_.getPressure().getNy() - 1; j >= 0; j--) {
+    for (int i = 0; i < flowField_.getPressure().getNx(); i++) {
+      if (flowField_.getPressure().getScalar(i, j) >= 0.0) {
+        ss << " " << flowField_.getPressure().getScalar(i, j) << ", ";
+      } else {
+        ss << flowField_.getPressure().getScalar(i, j) << ", ";
+      }
+    }
+    ss << "endrow\n";
+  }
+  ss << "Velocity U of rank " << rank << ":\n";
+  for (int j = flowField_.getVelocity().getNy() - 1; j >= 0; j--) {
+    for (int i = 0; i < flowField_.getVelocity().getNx(); i++) {
+      if (flowField_.getVelocity().getVector(i, j)[0] >= 0.0) {
+        ss << " " << flowField_.getVelocity().getVector(i, j)[0] << ", ";
+      } else {
+        ss << flowField_.getVelocity().getVector(i, j)[0] << ", ";
+      }
+    }
+    ss << "endrow\n";
+  }
+  ss << "Velocity V of rank " << rank << ":\n";
+  for (int j = flowField_.getVelocity().getNy() - 1; j >= 0; j--) {
+    for (int i = 0; i < flowField_.getVelocity().getNx(); i++) {
+      if (flowField_.getVelocity().getVector(i, j)[1] >= 0.0) {
+        ss << " " << flowField_.getVelocity().getVector(i, j)[1] << ", ";
+      } else {
+        ss << flowField_.getVelocity().getVector(i, j)[1] << ", ";
+      }
+    }
+    ss << "endrow\n";
+  }
+  of << ss.str();
+  call += 1;
 }
 
 ParallelManagers::PetscParallelManagerNonBlocking::PetscParallelManagerNonBlocking(
@@ -30,6 +85,7 @@ ParallelManagers::PetscParallelManagerNonBlocking::~PetscParallelManagerNonBlock
 
 void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
   if (parameters_.geometry.dim == 2) {
+    dump_flowField(flowField_, parameters_);
     pressureBufferFillIterator_.iterate();
 
     int cellsY = flowField_.getPressure().getNy() - 3;
@@ -43,11 +99,6 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
     MPI_Request requests[8];
     MPI_Status  array_of_statuses[8];
     std::fill(requests, requests + 8, MPI_REQUEST_NULL);
-
-    std::cout
-      << parameters_.parallel.rank << " has neighbors: "
-      << "\tleft:" << parameters_.parallel.leftNb << "\tright:" << parameters_.parallel.rightNb
-      << "\ttop:" << parameters_.parallel.topNb << "\tbottom:" << parameters_.parallel.bottomNb << std::endl;
 
     if (parameters_.parallel.rightNb >= 0) {
       int rres = MPI_Irecv(
@@ -259,5 +310,6 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     velocityBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
 
     velocityBufferReadIterator_.iterate();
+    dump_flowField(flowField_, parameters_);
   }
 }
