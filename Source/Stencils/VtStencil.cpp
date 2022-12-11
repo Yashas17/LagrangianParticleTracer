@@ -8,7 +8,7 @@ Stencils::VtStencil::VtStencil(const Parameters& parameters):
   FieldStencil<FlowField>(parameters) {}
 
 void Stencils::VtStencil::apply(FlowField& flowField, int i, int j) {
-  RealType       vt = flowField.getVt().getScalar(i, j);
+  RealType&       vt = flowField.getVt().getScalar(i, j);
   const RealType lm = flowField.getLm().getScalar(i, j);
   loadLocalVelocity2D(flowField, localVelocity_, i, j);
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
@@ -21,7 +21,7 @@ void Stencils::VtStencil::apply(FlowField& flowField, int i, int j) {
 }
 
 void Stencils::VtStencil::apply(FlowField& flowField, int i, int j, int k) {
-  RealType       vt = flowField.getVt().getScalar(i, j, k);
+  RealType&       vt = flowField.getVt().getScalar(i, j, k);
   const RealType lm = flowField.getLm().getScalar(i, j, k);
   loadLocalVelocity3D(flowField, localVelocity_, i, j, k);
   loadLocalMeshsize3D(parameters_, localMeshsize_, i, j, k);

@@ -102,10 +102,16 @@ void Stencils::VTKTurbStencil::apply(FlowField& flowField, int i, int j) {
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " 0" << std::endl;
     turbulentViscosityStream_ << flowField.getVt().getScalar(i,j) << std::endl;
+#ifndef NDEBUG
+    hStream_ << flowField.getH().getScalar(i,j) << std::endl;
+#endif
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
     turbulentViscosityStream_ << "0.0" << std::endl;
+#ifndef NDEBUG
+    hStream_ << "0.0" << std::endl;
+#endif
   }
 }
 
@@ -121,10 +127,16 @@ void Stencils::VTKTurbStencil::apply(FlowField& flowField, int i, int j, int k) 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " " << velocity[2] << std::endl;
     turbulentViscosityStream_ << flowField.getVt().getScalar(i,j,k) << std::endl;
+#ifndef NDEBUG
+    hStream_ << flowField.getH().getScalar(i,j,k) << std::endl;
+#endif
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
     turbulentViscosityStream_ << "0.0" << std::endl;
+#ifndef NDEBUG
+    hStream_ << "0.0" << std::endl;
+#endif
   }
 }
 
@@ -167,6 +179,14 @@ void Stencils::VTKTurbStencil::write(FlowField& flowField, int timeStep, RealTyp
       << "LOOKUP_TABLE default" << std::endl;
     ofile_ << turbulentViscosityStream_.str() << std::endl;
     turbulentViscosityStream_.str("");
+#ifndef NDEBUG
+    // Write wall distance
+    ofile_
+      << "SCALARS h float 1" << std::endl
+      << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << hStream_.str() << std::endl;
+    hStream_.str("");
+#endif
   }
 
   if (FieldStencil<FlowField>::parameters_.geometry.dim == 3) {
@@ -189,6 +209,15 @@ void Stencils::VTKTurbStencil::write(FlowField& flowField, int timeStep, RealTyp
       << "LOOKUP_TABLE default" << std::endl;
     ofile_ << turbulentViscosityStream_.str() << std::endl;
     turbulentViscosityStream_.str("");
+
+#ifndef NDEBUG
+    // Write wall distance
+    ofile_
+      << "SCALARS h float 1" << std::endl
+      << "LOOKUP_TABLE default" << std::endl;
+    ofile_ << hStream_.str() << std::endl;
+    hStream_.str("");
+#endif
   }
 
   written_ = true;

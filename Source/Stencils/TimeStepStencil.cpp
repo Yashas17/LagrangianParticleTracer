@@ -26,19 +26,29 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
    *the user defined time-step will be used. If user has not defined the time step, dt will be set to 1 by default.
    **/
 
-  if (velocity[0] != 0)
-    cell_dt = dx / fabs(velocity[0]);
+  // std::cout << "i = " << i << ", j = " << j << std::endl;
+  // If the cell is NOT an obstacle
+  if (flowField.getFlags().getValue(i,j) % 2 == 0) {
+    if (velocity[0] != 0) {
+      cell_dt = dx / fabs(velocity[0]);
+      // std::cout << "case 1: " << cell_dt << std::endl;
+    }
 
-  if (velocity[0] != 0 && velocity[1] != 0) {
-    cell_dt = std::min(
-      1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / fabs(velocity[0]), dy / fabs(velocity[1])))
-    );
-  } else {
-    cell_dt = std::min(1 / (vTotal * factor), cell_dt);
+    if (velocity[0] != 0 && velocity[1] != 0) {
+      cell_dt = std::min(
+        1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / fabs(velocity[0]), dy / fabs(velocity[1])))
+      );
+      // std::cout << "case 2: " << cell_dt << std::endl;
+
+    } else {
+      cell_dt = std::min(1 / (2 * vTotal * factor), cell_dt);
+      // std::cout << "case 3: " << cell_dt << std::endl;
+
+    }
+ 
+    if(cell_dt < dt)
+      dt = cell_dt;
   }
-
-  if(cell_dt < dt)
-    dt = cell_dt;
 }
 
 void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k) {
@@ -69,7 +79,7 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k)
       1 / (2 * vTotal * factor), std::min(cell_dt, std::min(dx / fabs(velocity[0]), dy / fabs(velocity[1])))
     );
   } else {
-    cell_dt = std::min(1 / (vTotal * factor), cell_dt);
+    cell_dt = std::min(1 / (2 * vTotal * factor), cell_dt);
   }
 
   if(cell_dt < dt)

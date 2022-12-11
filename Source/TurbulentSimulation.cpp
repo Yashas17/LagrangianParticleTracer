@@ -71,6 +71,7 @@ void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   timeStepIterator_.iterate();
   setTimeStep();
+  // std::cout << parameters_.timestep.dt << std::endl;
   // Compute turbulent viscosity
   vtIterator_.iterate();
   // Compute FGH

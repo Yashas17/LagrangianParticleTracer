@@ -9,10 +9,10 @@ Stencils::hStencil::hStencil(const Parameters& parameters):
   yLimit_(parameters.bfStep.yRatio * parameters.geometry.lengthY) {}
 
 void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
-  RealType h = flowField.getH().getScalar(i, j);
+  RealType& h = flowField.getH().getScalar(i, j);
 
-  const RealType posX = parameters_.meshsize->getPosX(i, j);
-  const RealType posY = parameters_.meshsize->getPosY(i, j);
+  const RealType posX = parameters_.meshsize->getPosX(i, j) + parameters_.meshsize->getDx(i,j)/2;
+  const RealType posY = parameters_.meshsize->getPosY(i, j) + parameters_.meshsize->getDy(i,j)/2;
 
   const RealType lengthX = parameters_.geometry.lengthX;
   const RealType lengthY = parameters_.geometry.lengthY;
@@ -23,12 +23,13 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
   // Check if this is the BFS case
   if(parameters_.bfStep.xRatio > 0 && parameters_.bfStep.yRatio > 0) {
     // Case 1: the step is a left wall to the current cell
-    if(posY <= stepLengthY && (posX - stepLengthX) > 0)
+    if(posY <= stepLengthY && posX > stepLengthX)
       h = std::min(posX - stepLengthX, std::min(posY, lengthY - posY));
 
     // Case 2: the cell is above the step
-    else if(posX - stepLengthX < 0)
-      h = std::min(posY - stepLengthY, lengthY - (posY - stepLengthY));
+    else if(posX < stepLengthX) {
+      h = std::min(posY - stepLengthY, lengthY - posY);
+    }
 
     // Case 3: the cell is above the level of the step but not above the step itself
     else
@@ -42,11 +43,11 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
 }
 
 void Stencils::hStencil::apply(FlowField& flowField, int i, int j, int k) {
-  RealType h = flowField.getH().getScalar(i, j, k);
+  RealType& h = flowField.getH().getScalar(i, j, k);
 
-  const RealType posX = parameters_.meshsize->getPosX(i, j, k);
-  const RealType posY = parameters_.meshsize->getPosY(i, j, k);
-  const RealType posZ = parameters_.meshsize->getPosZ(i, j, k);
+  const RealType posX = parameters_.meshsize->getPosX(i, j, k) + parameters_.meshsize->getDx(i,j,k)/2;
+  const RealType posY = parameters_.meshsize->getPosY(i, j, k) + parameters_.meshsize->getDy(i,j,k)/2;
+  const RealType posZ = parameters_.meshsize->getPosZ(i, j, k) + parameters_.meshsize->getDz(i,j,k)/2;
 
   const RealType lengthX = parameters_.geometry.lengthX;
   const RealType lengthY = parameters_.geometry.lengthY;
@@ -58,12 +59,12 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j, int k) {
   // Check if this is the BFS case
   if(parameters_.bfStep.xRatio > 0 && parameters_.bfStep.yRatio > 0) {
     // Case 1: the step is a left wall to the current cell
-    if(posY <= stepLengthY && (posX - stepLengthX) > 0)
+    if(posY <= stepLengthY && posX > stepLengthX)
       h = std::min(posX - stepLengthX, std::min(posY, lengthY - posY));
 
     // Case 2: the cell is above the step
-    else if(posX - stepLengthX < 0)
-      h = std::min(posY - stepLengthY, lengthY - (posY - stepLengthY));
+    else if(posX < stepLengthX)
+      h = std::min(posY - stepLengthY, lengthY - posY);
 
     // Case 3: the cell is above the level of the step but not above the step itself
     else

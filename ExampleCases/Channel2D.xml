@@ -2,7 +2,7 @@
 <configuration>
     <flow Re="100" />
     <simulation finalTime="10.0" >
-        <type>dns</type>
+        <type>turbulence</type>
         <scenario>channel</scenario>
     </simulation>
     <timestep dt="1" tau="0.5" />
@@ -13,8 +13,8 @@
       sizeX="10" sizeY="20" sizeZ="10"
       stretchX="false" stretchY="true" stretchZ="true"
     >
-      <mesh>uniform</mesh>
-      <!-- mesh>stretched</mesh -->
+      <!-- <mesh>uniform</mesh> -->
+      <mesh>stretched</mesh>
     </geometry>
     <environment gx="0" gy="0" gz="0" />
     <walls>
@@ -41,8 +41,8 @@
     <stdOut interval="0.0001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
     <turbulence>
-        <boundaryLayer> turbulent </boundaryLayer>
+        <!-- <boundaryLayer>turbulent</boundaryLayer> -->
         <!-- <boundaryLayer>laminar</boundaryLayer> -->
-        <!-- <boundaryLayer>none</boundaryLayer> -->
+        <boundaryLayer>none</boundaryLayer>
     </turbulence>
 </configuration>
