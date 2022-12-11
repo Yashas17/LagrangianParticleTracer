@@ -13,10 +13,10 @@ Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(const Parameters&
 Stencils::VelocityBufferFillStencil::~VelocityBufferFillStencil() {}
 
 void Stencils::VelocityBufferFillStencil::applyLeftWall2D(FlowField& flowField) {
-  left_buffer.resize((flowField.getVelocity().getNy() - 3) * 2);
-  for (size_t j = 2; j < flowField.getVelocity().getNy() - 1; j++) {
-    left_buffer[2 * (j - 2)]     = flowField.getVelocity().getVector(2, j)[0];
-    left_buffer[2 * (j - 2) + 1] = flowField.getVelocity().getVector(2, j)[1];
+  left_buffer.resize((flowField.getVelocity().getNy()) * 2);
+  for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
+    left_buffer[2 * (j - 0)]     = flowField.getVelocity().getVector(2, j)[0];
+    left_buffer[2 * (j - 0) + 1] = flowField.getVelocity().getVector(2, j)[1];
   }
 #ifndef NDEBUG
   std::stringstream ss;
@@ -31,11 +31,11 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall2D(FlowField& flowField) 
 }
 
 void Stencils::VelocityBufferFillStencil::applyRightWall2D(FlowField& flowField) {
-  right_buffer.resize((flowField.getVelocity().getNy() - 3) * 3);
-  for (size_t j = 2; j < flowField.getVelocity().getNy() - 1; j++) {
-    right_buffer[3 * (j - 2)]     = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 3, j)[0];
-    right_buffer[3 * (j - 2) + 1] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[0];
-    right_buffer[3 * (j - 2) + 2] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[1];
+  right_buffer.resize((flowField.getVelocity().getNy()) * 3);
+  for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
+    right_buffer[3 * (j - 0)]     = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 3, j)[0];
+    right_buffer[3 * (j - 0) + 1] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[0];
+    right_buffer[3 * (j - 0) + 2] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[1];
   }
 #ifndef NDEBUG
   std::stringstream ss;
@@ -50,9 +50,9 @@ void Stencils::VelocityBufferFillStencil::applyRightWall2D(FlowField& flowField)
 }
 
 void Stencils::VelocityBufferFillStencil::applyBottomWall2D(FlowField& flowField) {
-  bottom_buffer.resize((flowField.getVelocity().getNx() - 3) * 2);
-  RealType* bottom_line_begin = flowField.getVelocity().getVector(2, 2);
-  std::copy_n(bottom_line_begin, (flowField.getVelocity().getNx() - 3) * 2, bottom_buffer.data());
+  bottom_buffer.resize((flowField.getVelocity().getNx()) * 2);
+  RealType* bottom_line_begin = flowField.getVelocity().getVector(0, 2);
+  std::copy_n(bottom_line_begin, (flowField.getVelocity().getNx()) * 2, bottom_buffer.data());
 }
 
 void Stencils::VelocityBufferFillStencil::applyTopWall2D(FlowField& flowField) {
@@ -60,14 +60,14 @@ void Stencils::VelocityBufferFillStencil::applyTopWall2D(FlowField& flowField) {
   // And then write the v from the inner line
   //
   // Copy the first line
-  top_buffer.resize((flowField.getVelocity().getNx() - 3) * 3);
-  RealType* outer_top_line_begin = flowField.getVelocity().getVector(2, flowField.getVelocity().getNy() - 2);
-  std::copy_n(outer_top_line_begin, (flowField.getVelocity().getNx() - 3) * 2, top_buffer.data());
+  top_buffer.resize((flowField.getVelocity().getNx()) * 3);
+  RealType* outer_top_line_begin = flowField.getVelocity().getVector(0, flowField.getVelocity().getNy() - 2);
+  std::copy_n(outer_top_line_begin, (flowField.getVelocity().getNx()) * 2, top_buffer.data());
 
   // Copy the second, for easier access we save the pointer of the offset
-  RealType* offset_for_inner_line = top_buffer.data() + (flowField.getVelocity().getNx() - 3) * 2;
-  for (size_t i = 2; i < flowField.getVelocity().getNx() - 1; i++) {
-    offset_for_inner_line[i - 2] = flowField.getVelocity().getVector(i, flowField.getVelocity().getNy() - 3)[1];
+  RealType* offset_for_inner_line = top_buffer.data() + (flowField.getVelocity().getNx()) * 2;
+  for (int i = 0; i < flowField.getVelocity().getNx(); i++) {
+    offset_for_inner_line[i] = flowField.getVelocity().getVector(i, flowField.getVelocity().getNy() - 3)[1];
   }
 }
 

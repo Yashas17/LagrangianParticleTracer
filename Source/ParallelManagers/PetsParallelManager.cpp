@@ -32,13 +32,13 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
   if (parameters_.geometry.dim == 2) {
     pressureBufferFillIterator_.iterate();
 
-    int cellsY = flowField_.getPressure().getNy() - 3;
-    int cellsX = flowField_.getPressure().getNx() - 3;
+    int cellsY = flowField_.getPressure().getNy();
+    int cellsX = flowField_.getPressure().getNx();
 
-    std::vector<RealType> right_recv(cellsY, -99999.0);
-    std::vector<RealType> left_recv(cellsY, -99999.0);
-    std::vector<RealType> top_recv(cellsX, -99999.0);
-    std::vector<RealType> bottom_recv(cellsX, -99999.0);
+    std::vector<RealType> right_recv(cellsY, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> left_recv(cellsY, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> top_recv(cellsX, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> bottom_recv(cellsX, std::numeric_limits<RealType>::quiet_NaN());
 
     MPI_Request requests[8];
     MPI_Status  array_of_statuses[8];
@@ -152,14 +152,15 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
 void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
   if (parameters_.geometry.dim == 2) {
     velocityBufferFillIterator_.iterate();
+    assert(flowField_.getVelocity().getNy() == flowField_.getPressure().getNy());
 
-    int cellsY = flowField_.getPressure().getNy() - 3;
-    int cellsX = flowField_.getPressure().getNx() - 3;
+    int cellsY = flowField_.getVelocity().getNy();
+    int cellsX = flowField_.getVelocity().getNx();
 
-    std::vector<RealType> right_recv(2 * cellsY, -99999.0);
-    std::vector<RealType> left_recv(3 * cellsY, -99999.0);
-    std::vector<RealType> top_recv(2 * cellsX, -99999.0);
-    std::vector<RealType> bottom_recv(3 * cellsX, -99999.0);
+    std::vector<RealType> right_recv(2 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> left_recv(3 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> top_recv(2 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> bottom_recv(3 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
 
     MPI_Request requests[8];
     MPI_Status  array_of_statuses[8];

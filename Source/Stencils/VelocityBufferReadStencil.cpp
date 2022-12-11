@@ -29,17 +29,17 @@ void Stencils::VelocityBufferReadStencil::applyLeftWall2D(FlowField& flowField) 
 
 #ifndef NDEBUG
   std::stringstream ss2;
-  ss2 << left_buffer.size() << " == " << ((flowField.getVelocity().getNy() - 3) * 3);
+  ss2 << left_buffer.size() << " == " << ((flowField.getVelocity().getNy()) * 3);
   ss2 << " doesn't hold.";
-  if (left_buffer.size() != ((flowField.getVelocity().getNy() - 3) * 3)) {
+  if (left_buffer.size() != ((flowField.getVelocity().getNy()) * 3)) {
     throw std::runtime_error(ss2.str());
   }
 #endif
-  assert(left_buffer.size() == (flowField.getVelocity().getNy() - 3) * 3);
-  for (size_t j = 2; j < flowField.getVelocity().getNy() - 1; j++) {
-    flowField.getVelocity().getVector(0, j)[0] = left_buffer[3 * (j - 2)];
-    flowField.getVelocity().getVector(1, j)[0] = left_buffer[3 * (j - 2) + 1];
-    flowField.getVelocity().getVector(1, j)[1] = left_buffer[3 * (j - 2) + 2];
+  assert(left_buffer.size() == (flowField.getVelocity().getNy()) * 3);
+  for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
+    flowField.getVelocity().getVector(0, j)[0] = left_buffer[3 * (j - 0)];
+    flowField.getVelocity().getVector(1, j)[0] = left_buffer[3 * (j - 0) + 1];
+    flowField.getVelocity().getVector(1, j)[1] = left_buffer[3 * (j - 0) + 2];
   }
 }
 
@@ -57,48 +57,48 @@ void Stencils::VelocityBufferReadStencil::applyRightWall2D(FlowField& flowField)
 
 #ifndef NDEBUG
   std::stringstream ss2;
-  ss2 << right_buffer.size() << " == " << ((flowField.getVelocity().getNy() - 3) * 2);
+  ss2 << right_buffer.size() << " == " << ((flowField.getVelocity().getNy()) * 2);
   ss2 << " doesn't hold.";
-  if (right_buffer.size() != (flowField.getVelocity().getNy() - 3) * 2) {
+  if (right_buffer.size() != (flowField.getVelocity().getNy()) * 2) {
     throw std::runtime_error(ss2.str());
   }
 #endif
-  for (size_t j = 2; j < flowField.getVelocity().getNy() - 1; j++) {
-    flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[0] = right_buffer[2 * (j - 2)];
-    flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[1] = right_buffer[2 * (j - 2) + 1];
+  for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
+    flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[0] = right_buffer[2 * (j - 0)];
+    flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[1] = right_buffer[2 * (j - 0) + 1];
   }
 }
 
 void Stencils::VelocityBufferReadStencil::applyBottomWall2D(FlowField& flowField) {
 #ifndef NDEBUG
   std::stringstream ss;
-  ss << bottom_buffer.size() << " == " << ((flowField.getVelocity().getNx() - 3) * 3);
+  ss << bottom_buffer.size() << " == " << ((flowField.getVelocity().getNx()) * 3);
   ss << " doesn't hold.";
-  if (bottom_buffer.size() != (flowField.getVelocity().getNx() - 3) * 3) {
+  if (bottom_buffer.size() != (flowField.getVelocity().getNx()) * 3) {
     throw std::runtime_error(ss.str());
   }
 #endif
   // The outer line of the received buffer will be brought to line 2
-  RealType* bottom_line_begin = flowField.getVelocity().getVector(2, 1);
-  std::copy_n(bottom_buffer.begin(), (flowField.getVelocity().getNx() - 3) * 2, bottom_line_begin);
+  RealType* bottom_line_begin = flowField.getVelocity().getVector(0, 1);
+  std::copy_n(bottom_buffer.begin(), (flowField.getVelocity().getNx() - 0) * 2, bottom_line_begin);
 
-  RealType* buffer_offset = bottom_buffer.data() + ((flowField.getVelocity().getNx() - 3) * 2);
-  for (size_t i = 2; i < flowField.getVelocity().getNx() - 1; i++) {
-    flowField.getVelocity().getVector(i, 0)[1] = buffer_offset[i - 2];
+  RealType* buffer_offset = bottom_buffer.data() + ((flowField.getVelocity().getNx()) * 2);
+  for (int i = 0; i < flowField.getVelocity().getNx(); i++) {
+    flowField.getVelocity().getVector(i, 0)[1] = buffer_offset[i];
   }
 }
 
 void Stencils::VelocityBufferReadStencil::applyTopWall2D(FlowField& flowField) {
 #ifndef NDEBUG
   std::stringstream ss;
-  ss << top_buffer.size() << " == " << ((flowField.getVelocity().getNx() - 3) * 2);
+  ss << top_buffer.size() << " == " << ((flowField.getVelocity().getNx()) * 2);
   ss << " doesn't hold.";
-  if (top_buffer.size() != (flowField.getVelocity().getNx() - 3) * 2) {
+  if (top_buffer.size() != (flowField.getVelocity().getNx()) * 2) {
     throw std::runtime_error(ss.str());
   }
 #endif
-  RealType* top_line_begin = flowField.getVelocity().getVector(2, flowField.getVelocity().getNy() - 1);
-  std::copy_n(top_buffer.begin(), (flowField.getVelocity().getNx() - 3) * 2, top_line_begin);
+  RealType* top_line_begin = flowField.getVelocity().getVector(0, flowField.getVelocity().getNy() - 1);
+  std::copy_n(top_buffer.begin(), (flowField.getVelocity().getNx()) * 2, top_line_begin);
 }
 
 void Stencils::VelocityBufferReadStencil::applyLeftWall3D(FlowField& flowField) {}
