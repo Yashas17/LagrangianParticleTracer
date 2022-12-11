@@ -158,9 +158,9 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     int cellsX = flowField_.getVelocity().getNx();
 
     std::vector<RealType> right_recv(2 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
-    std::vector<RealType> left_recv(3 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> left_recv(4 * cellsY, std::numeric_limits<RealType>::quiet_NaN());
     std::vector<RealType> top_recv(2 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
-    std::vector<RealType> bottom_recv(3 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> bottom_recv(4 * cellsX, std::numeric_limits<RealType>::quiet_NaN());
 
     MPI_Request requests[8];
     MPI_Status  array_of_statuses[8];
@@ -175,7 +175,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
 
     if (parameters_.parallel.leftNb >= 0) {
       int ires = MPI_Irecv(
-        left_recv.data(), 3 * cellsY, MY_MPI_FLOAT, parameters_.parallel.leftNb, 3, PETSC_COMM_WORLD, &requests[5]
+        left_recv.data(), 4 * cellsY, MY_MPI_FLOAT, parameters_.parallel.leftNb, 3, PETSC_COMM_WORLD, &requests[5]
       );
       check_mpi_error(ires);
     }
@@ -189,7 +189,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
 
     if (parameters_.parallel.bottomNb >= 0) {
       int ires = MPI_Irecv(
-        bottom_recv.data(), 3 * cellsX, MY_MPI_FLOAT, parameters_.parallel.bottomNb, 4, PETSC_COMM_WORLD, &requests[7]
+        bottom_recv.data(), 4 * cellsX, MY_MPI_FLOAT, parameters_.parallel.bottomNb, 4, PETSC_COMM_WORLD, &requests[7]
       );
       check_mpi_error(ires);
     }
@@ -210,7 +210,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     if (parameters_.parallel.rightNb >= 0) {
       int ires = MPI_Isend(
         velocityBufferFillStencil_.right_buffer.data(),
-        3 * cellsY,
+        4 * cellsY,
         MY_MPI_FLOAT,
         parameters_.parallel.rightNb,
         3,
@@ -236,7 +236,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     if (parameters_.parallel.topNb >= 0) {
       int ires = MPI_Isend(
         velocityBufferFillStencil_.top_buffer.data(),
-        3 * cellsX,
+        4 * cellsX,
         MY_MPI_FLOAT,
         parameters_.parallel.topNb,
         4,

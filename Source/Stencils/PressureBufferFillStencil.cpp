@@ -32,7 +32,7 @@ void Stencils::PressureBufferFillStencil::applyLeftWall2D(FlowField& flowField) 
 void Stencils::PressureBufferFillStencil::applyRightWall2D(FlowField& flowField) {
   right_buffer.resize(flowField.getPressure().getNy());
   for (int j = 0; j < flowField.getPressure().getNy(); j++) {
-    right_buffer[j] = flowField.getPressure().getScalar(flowField.getPressure().getNx() - 1, j);
+    right_buffer[j] = flowField.getPressure().getScalar(flowField.getPressure().getNx() - 2, j);
   }
 #ifndef NDEBUG
   std::stringstream ss;

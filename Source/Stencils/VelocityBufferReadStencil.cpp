@@ -29,17 +29,18 @@ void Stencils::VelocityBufferReadStencil::applyLeftWall2D(FlowField& flowField) 
 
 #ifndef NDEBUG
   std::stringstream ss2;
-  ss2 << left_buffer.size() << " == " << ((flowField.getVelocity().getNy()) * 3);
+  ss2 << left_buffer.size() << " == " << ((flowField.getVelocity().getNy()) * 4);
   ss2 << " doesn't hold.";
-  if (left_buffer.size() != ((flowField.getVelocity().getNy()) * 3)) {
+  if (left_buffer.size() != ((flowField.getVelocity().getNy()) * 4)) {
     throw std::runtime_error(ss2.str());
   }
 #endif
-  assert(left_buffer.size() == (flowField.getVelocity().getNy()) * 3);
+  assert(left_buffer.size() == (flowField.getVelocity().getNy()) * 4);
   for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
-    flowField.getVelocity().getVector(0, j)[0] = left_buffer[3 * (j - 0)];
-    flowField.getVelocity().getVector(1, j)[0] = left_buffer[3 * (j - 0) + 1];
-    flowField.getVelocity().getVector(1, j)[1] = left_buffer[3 * (j - 0) + 2];
+    flowField.getVelocity().getVector(0, j)[0] = left_buffer[4 * (j - 0)];
+    flowField.getVelocity().getVector(0, j)[1] = left_buffer[4 * (j - 0) + 1];
+    flowField.getVelocity().getVector(1, j)[0] = left_buffer[4 * (j - 0) + 2];
+    flowField.getVelocity().getVector(1, j)[1] = left_buffer[4 * (j - 0) + 3];
   }
 }
 
@@ -72,20 +73,22 @@ void Stencils::VelocityBufferReadStencil::applyRightWall2D(FlowField& flowField)
 void Stencils::VelocityBufferReadStencil::applyBottomWall2D(FlowField& flowField) {
 #ifndef NDEBUG
   std::stringstream ss;
-  ss << bottom_buffer.size() << " == " << ((flowField.getVelocity().getNx()) * 3);
+  ss << bottom_buffer.size() << " == " << ((flowField.getVelocity().getNx()) * 4);
   ss << " doesn't hold.";
-  if (bottom_buffer.size() != (flowField.getVelocity().getNx()) * 3) {
+  if (bottom_buffer.size() != (flowField.getVelocity().getNx()) * 4) {
     throw std::runtime_error(ss.str());
   }
 #endif
   // The outer line of the received buffer will be brought to line 2
   RealType* bottom_line_begin = flowField.getVelocity().getVector(0, 1);
-  std::copy_n(bottom_buffer.begin(), (flowField.getVelocity().getNx() - 0) * 2, bottom_line_begin);
+  std::copy_n(bottom_buffer.begin(), (flowField.getVelocity().getNx()) * 4, bottom_line_begin);
 
+  /*
   RealType* buffer_offset = bottom_buffer.data() + ((flowField.getVelocity().getNx()) * 2);
   for (int i = 0; i < flowField.getVelocity().getNx(); i++) {
     flowField.getVelocity().getVector(i, 0)[1] = buffer_offset[i];
   }
+  */
 }
 
 void Stencils::VelocityBufferReadStencil::applyTopWall2D(FlowField& flowField) {

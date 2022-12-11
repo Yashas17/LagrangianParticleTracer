@@ -31,11 +31,12 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall2D(FlowField& flowField) 
 }
 
 void Stencils::VelocityBufferFillStencil::applyRightWall2D(FlowField& flowField) {
-  right_buffer.resize((flowField.getVelocity().getNy()) * 3);
+  right_buffer.resize((flowField.getVelocity().getNy()) * 4);
   for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
-    right_buffer[3 * (j - 0)]     = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 3, j)[0];
-    right_buffer[3 * (j - 0) + 1] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[0];
-    right_buffer[3 * (j - 0) + 2] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[1];
+    right_buffer[4 * (j - 0)]     = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 3, j)[0];
+    right_buffer[4 * (j - 0) + 1] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 3, j)[1];
+    right_buffer[4 * (j - 0) + 2] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[0];
+    right_buffer[4 * (j - 0) + 3] = flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 2, j)[1];
   }
 #ifndef NDEBUG
   std::stringstream ss;
@@ -60,15 +61,17 @@ void Stencils::VelocityBufferFillStencil::applyTopWall2D(FlowField& flowField) {
   // And then write the v from the inner line
   //
   // Copy the first line
-  top_buffer.resize((flowField.getVelocity().getNx()) * 3);
+  top_buffer.resize((flowField.getVelocity().getNx()) * 4);
   RealType* outer_top_line_begin = flowField.getVelocity().getVector(0, flowField.getVelocity().getNy() - 2);
-  std::copy_n(outer_top_line_begin, (flowField.getVelocity().getNx()) * 2, top_buffer.data());
+  std::copy_n(outer_top_line_begin, (flowField.getVelocity().getNx()) * 4, top_buffer.data());
 
   // Copy the second, for easier access we save the pointer of the offset
+  /*
   RealType* offset_for_inner_line = top_buffer.data() + (flowField.getVelocity().getNx()) * 2;
   for (int i = 0; i < flowField.getVelocity().getNx(); i++) {
     offset_for_inner_line[i] = flowField.getVelocity().getVector(i, flowField.getVelocity().getNy() - 3)[1];
   }
+  */
 }
 
 void Stencils::VelocityBufferFillStencil::applyLeftWall3D(FlowField& flowField) {}
