@@ -75,10 +75,10 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, in
 }
 
 void Stencils::VelocityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
-  rightBuffer[4 * (j * cellsZ + k)]     = flowField.getVelocity().getVector(i, j, k)[0];     // j,k changes
-  rightBuffer[4 * (j * cellsZ + k) + 1] = flowField.getVelocity().getVector(i, j, k)[1];     // j,k changes
-  rightBuffer[4 * (j * cellsZ + k) + 2] = flowField.getVelocity().getVector(i, j, k)[2];     // j,k changes
-  rightBuffer[4 * (j * cellsZ + k) + 3] = flowField.getVelocity().getVector(i - 1, j, k)[0]; // another u
+  rightBuffer[4 * (j * cellsZ + k)]     = flowField.getVelocity().getVector(i - 1, j, k)[0];     // j,k changes
+  rightBuffer[4 * (j * cellsZ + k) + 1] = flowField.getVelocity().getVector(i - 1, j, k)[1];     // j,k changes
+  rightBuffer[4 * (j * cellsZ + k) + 2] = flowField.getVelocity().getVector(i - 1, j, k)[2];     // j,k changes
+  rightBuffer[4 * (j * cellsZ + k) + 3] = flowField.getVelocity().getVector(i - 2, j, k)[0]; // another u
 }
 
 void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
@@ -88,10 +88,10 @@ void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, 
 }
 
 void Stencils::VelocityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
-  topBuffer[4 * (i * cellsZ + k)]     = flowField.getVelocity().getVector(i, j, k)[0];     // i,k changes
-  topBuffer[4 * (i * cellsZ + k) + 1] = flowField.getVelocity().getVector(i, j, k)[1];     // i,k changes
-  topBuffer[4 * (i * cellsZ + k) + 2] = flowField.getVelocity().getVector(i, j, k)[2];     // i,k changes
-  topBuffer[4 * (i * cellsZ + k) + 3] = flowField.getVelocity().getVector(i, j - 1, k)[1]; // another v
+  topBuffer[4 * (i * cellsZ + k)]     = flowField.getVelocity().getVector(i, j - 1, k)[0];     // i,k changes
+  topBuffer[4 * (i * cellsZ + k) + 1] = flowField.getVelocity().getVector(i, j - 1, k)[1];     // i,k changes
+  topBuffer[4 * (i * cellsZ + k) + 2] = flowField.getVelocity().getVector(i, j - 1, k)[2];     // i,k changes
+  topBuffer[4 * (i * cellsZ + k) + 3] = flowField.getVelocity().getVector(i, j - 2, k)[1]; // another v
 }
 
 void Stencils::VelocityBufferFillStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
@@ -101,8 +101,8 @@ void Stencils::VelocityBufferFillStencil::applyFrontWall(FlowField& flowField, i
 }
 
 void Stencils::VelocityBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
-  backBuffer[4 * (i * cellsY + j)]     = flowField.getVelocity().getVector(i, j, k)[0];     // i,j changes
-  backBuffer[4 * (i * cellsY + j) + 1] = flowField.getVelocity().getVector(i, j, k)[1];     // i,j changes
-  backBuffer[4 * (i * cellsY + j) + 2] = flowField.getVelocity().getVector(i, j, k)[2];     // i,j changes
-  backBuffer[4 * (i * cellsY + j) + 3] = flowField.getVelocity().getVector(i, j, k - 1)[2]; // another w
+  backBuffer[4 * (i * cellsY + j)]     = flowField.getVelocity().getVector(i, j, k - 1)[0];     // i,j changes
+  backBuffer[4 * (i * cellsY + j) + 1] = flowField.getVelocity().getVector(i, j, k - 1)[1];     // i,j changes
+  backBuffer[4 * (i * cellsY + j) + 2] = flowField.getVelocity().getVector(i, j, k - 1)[2];     // i,j changes
+  backBuffer[4 * (i * cellsY + j) + 3] = flowField.getVelocity().getVector(i, j, k - 2)[2]; // another w
 }

@@ -105,6 +105,7 @@ void Simulation::solveTimestep() {
 
   // TODO WS2: communicate pressure values
   petscParallelManager_.communicatePressure();
+  //double communication to ensure the corner values are communicated
   petscParallelManager_.communicatePressure();
 
   // // printing to test after communication
@@ -153,6 +154,7 @@ void Simulation::solveTimestep() {
 
   // TODO WS2: communicate velocity values
   petscParallelManager_.communicateVelocities();
+  //double communication to ensure the corner values are communicated
   petscParallelManager_.communicateVelocities();
 
   // // printing to test after communication

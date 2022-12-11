@@ -66,7 +66,7 @@ void Stencils::PressureBufferFillStencil::applyLeftWall(FlowField& flowField, in
 }
 
 void Stencils::PressureBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
-  rightBuffer[j * cellsZ + k] = flowField.getPressure().getScalar(i, j, k); // j,k changes
+  rightBuffer[j * cellsZ + k] = flowField.getPressure().getScalar(i - 1, j, k); // j,k changes
 }
 
 void Stencils::PressureBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
@@ -74,7 +74,7 @@ void Stencils::PressureBufferFillStencil::applyBottomWall(FlowField& flowField, 
 }
 
 void Stencils::PressureBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
-  topBuffer[i * cellsZ + k] = flowField.getPressure().getScalar(i, j, k); // i,k changes
+  topBuffer[i * cellsZ + k] = flowField.getPressure().getScalar(i, j - 1, k); // i,k changes
 }
 
 void Stencils::PressureBufferFillStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
@@ -82,5 +82,5 @@ void Stencils::PressureBufferFillStencil::applyFrontWall(FlowField& flowField, i
 }
 
 void Stencils::PressureBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
-  backBuffer[i * cellsY + j] = flowField.getPressure().getScalar(i, j, k); // i,j changes
+  backBuffer[i * cellsY + j] = flowField.getPressure().getScalar(i, j, k - 1); // i,j changes
 }
