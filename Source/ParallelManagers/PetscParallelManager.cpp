@@ -9,10 +9,10 @@ ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& paramet
   parameters_(parameters),
   flowField_(flowField),
   pressureBufferFillStencil_(parameters),
-  pressureBufferFillIterator_(flowField, parameters, pressureBufferFillStencil_, 2, -1),
+  pressureBufferFillIterator_(flowField, parameters, pressureBufferFillStencil_, 1, -1),
   // the read stencils will need the data to be initialized
   velocityBufferFillStencil_(parameters),
-  velocityBufferFillIterator_(flowField, parameters, velocityBufferFillStencil_, 2, -1) {}
+  velocityBufferFillIterator_(flowField, parameters, velocityBufferFillStencil_, 1, -1) {}
 
 void ParallelManagers::PetscParallelManager::communicatePressure() {
 
@@ -111,7 +111,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
       std::move(topBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_(
-      flowField_, parameters_, pressureBufferReadStencil_, 2, -1
+      flowField_, parameters_, pressureBufferReadStencil_, 1, -1
     );
     pressureBufferReadIterator_.iterate();
 
@@ -239,7 +239,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
       std::move(backBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_(
-      flowField_, parameters_, pressureBufferReadStencil_, 2, -1
+      flowField_, parameters_, pressureBufferReadStencil_, 1, -1
     );
     pressureBufferReadIterator_.iterate();
   }
@@ -333,7 +333,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
       std::move(topBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_(
-      flowField_, parameters_, velocityBufferReadStencil_, 2, -1
+      flowField_, parameters_, velocityBufferReadStencil_, 1, -1
     );
     velocityBufferReadIterator_.iterate();
 
@@ -461,7 +461,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
       std::move(backBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_(
-      flowField_, parameters_, velocityBufferReadStencil_, 2, -1
+      flowField_, parameters_, velocityBufferReadStencil_, 1, -1
     );
     velocityBufferReadIterator_.iterate();
   }

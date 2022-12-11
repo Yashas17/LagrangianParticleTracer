@@ -51,7 +51,7 @@ Stencils::PressureBufferReadStencil::PressureBufferReadStencil(
 void Stencils::PressureBufferReadStencil::applyLeftWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getPressure().getNx());
   assert(cellsY == flowField.getPressure().getNy());
-  flowField.getPressure().getScalar(i - 1, j) = leftBuffer[j]; // j changes, i-1 for ghost layer
+  flowField.getPressure().getScalar(i, j) = leftBuffer[j]; // j changes
 }
 
 void Stencils::PressureBufferReadStencil::applyRightWall(FlowField& flowField, int i, int j) {
@@ -63,7 +63,7 @@ void Stencils::PressureBufferReadStencil::applyRightWall(FlowField& flowField, i
 void Stencils::PressureBufferReadStencil::applyBottomWall(FlowField& flowField, int i, int j) {
   assert(cellsX == flowField.getPressure().getNx());
   assert(cellsY == flowField.getPressure().getNy());
-  flowField.getPressure().getScalar(i, j - 1) = bottomBuffer[i]; // i changes
+  flowField.getPressure().getScalar(i, j) = bottomBuffer[i]; // i changes
 }
 
 void Stencils::PressureBufferReadStencil::applyTopWall(FlowField& flowField, int i, int j) {
@@ -74,7 +74,7 @@ void Stencils::PressureBufferReadStencil::applyTopWall(FlowField& flowField, int
 
 // 3d cases
 void Stencils::PressureBufferReadStencil::applyLeftWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getPressure().getScalar(i - 1, j, k) = leftBuffer[j * cellsZ + k]; // j,k changes
+  flowField.getPressure().getScalar(i, j, k) = leftBuffer[j * cellsZ + k]; // j,k changes
 }
 
 void Stencils::PressureBufferReadStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
@@ -82,17 +82,17 @@ void Stencils::PressureBufferReadStencil::applyRightWall(FlowField& flowField, i
 }
 
 void Stencils::PressureBufferReadStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getPressure().getScalar(i - 1, j, k) = bottomBuffer[i * cellsZ + k]; // i,k changes
+  flowField.getPressure().getScalar(i, j, k) = bottomBuffer[i * cellsZ + k]; // i,k changes
 }
 
 void Stencils::PressureBufferReadStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getPressure().getScalar(i + 1, j, k) = topBuffer[i * cellsZ + k]; // i,k changes
+  flowField.getPressure().getScalar(i, j + 1, k) = topBuffer[i * cellsZ + k]; // i,k changes
 }
 
 void Stencils::PressureBufferReadStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getPressure().getScalar(i - 1, j, k) = frontBuffer[i * cellsY + j]; // i,j changes
+  flowField.getPressure().getScalar(i, j, k) = frontBuffer[i * cellsY + j]; // i,j changes
 }
 
 void Stencils::PressureBufferReadStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getPressure().getScalar(i + 1, j, k) = backBuffer[i * cellsY + j]; // i,j changes
+  flowField.getPressure().getScalar(i, j, k + 1) = backBuffer[i * cellsY + j]; // i,j changes
 }
