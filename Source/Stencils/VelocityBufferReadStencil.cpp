@@ -29,18 +29,20 @@ void Stencils::VelocityBufferReadStencil::applyLeftWall2D(FlowField& flowField) 
 
 #ifndef NDEBUG
   std::stringstream ss2;
-  ss2 << left_buffer.size() << " == " << ((flowField.getVelocity().getNy()) * 4);
+  ss2 << left_buffer.size() << " == " << ((flowField.getVelocity().getNy() - 3) * 4);
   ss2 << " doesn't hold.";
-  if (left_buffer.size() != ((flowField.getVelocity().getNy()) * 4)) {
+  if (left_buffer.size() != ((flowField.getVelocity().getNy() - 3) * 4)) {
     throw std::runtime_error(ss2.str());
   }
 #endif
-  assert(left_buffer.size() == (flowField.getVelocity().getNy()) * 4);
-  for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
-    flowField.getVelocity().getVector(0, j)[0] = left_buffer[4 * (j - 0)];
-    flowField.getVelocity().getVector(0, j)[1] = left_buffer[4 * (j - 0) + 1];
-    flowField.getVelocity().getVector(1, j)[0] = left_buffer[4 * (j - 0) + 2];
-    flowField.getVelocity().getVector(1, j)[1] = left_buffer[4 * (j - 0) + 3];
+  assert(left_buffer.size() == (flowField.getVelocity().getNy() - 3) * 4);
+  for (int j = 2; j < flowField.getVelocity().getNy() - 1; j++) {
+    // Equivalent code below
+    // flowField.getVelocity().getVector(0, j)[0] = left_buffer[4 * (j - 2)];
+    // flowField.getVelocity().getVector(0, j)[1] = left_buffer[4 * (j - 2) + 1];
+    // flowField.getVelocity().getVector(1, j)[0] = left_buffer[4 * (j - 2) + 2];
+    // flowField.getVelocity().getVector(1, j)[1] = left_buffer[4 * (j - 2) + 3];
+    std::copy_n(&left_buffer[4 * (j - 2)], 4, flowField.getVelocity().getVector(0, j));
   }
 }
 
@@ -58,15 +60,18 @@ void Stencils::VelocityBufferReadStencil::applyRightWall2D(FlowField& flowField)
 
 #ifndef NDEBUG
   std::stringstream ss2;
-  ss2 << right_buffer.size() << " == " << ((flowField.getVelocity().getNy()) * 2);
+  ss2 << right_buffer.size() << " == " << ((flowField.getVelocity().getNy() - 3) * 2);
   ss2 << " doesn't hold.";
-  if (right_buffer.size() != (flowField.getVelocity().getNy()) * 2) {
+  if (right_buffer.size() != (flowField.getVelocity().getNy() - 3) * 2) {
     throw std::runtime_error(ss2.str());
   }
 #endif
-  for (int j = 0; j < flowField.getVelocity().getNy(); j++) {
-    flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[0] = right_buffer[2 * (j - 0)];
-    flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[1] = right_buffer[2 * (j - 0) + 1];
+  for (int j = 2; j < flowField.getVelocity().getNy() - 1; j++) {
+    // flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[0] = right_buffer[2 * (j - 0)];
+    // flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)[1] = right_buffer[2 * (j - 0) + 1];
+    std::copy_n(
+      &right_buffer[2 * (j - 2)], 2, flowField.getVelocity().getVector(flowField.getVelocity().getNx() - 1, j)
+    );
   }
 }
 
@@ -80,7 +85,7 @@ void Stencils::VelocityBufferReadStencil::applyBottomWall2D(FlowField& flowField
   }
 #endif
   // The outer line of the received buffer will be brought to line 2
-  RealType* bottom_line_begin = flowField.getVelocity().getVector(0, 1);
+  RealType* bottom_line_begin = flowField.getVelocity().getVector(0, 0);
   std::copy_n(bottom_buffer.begin(), (flowField.getVelocity().getNx()) * 4, bottom_line_begin);
 
   /*
