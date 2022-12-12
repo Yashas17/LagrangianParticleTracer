@@ -143,6 +143,147 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
     pressureBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
 
     pressureBufferReadIterator_.iterate_top_bottom();
+  } else if (parameters_.parallel.dimension == 3) {
+    pressureBufferFillIterator_.iterate_left_right();
+
+    int left_wall_cell_count  = (flowField_.getPressure().getNy() - 3) * (flowField_.getPressure().getNz() - 3);
+    int right_wall_cell_count = (flowField_.getPressure().getNy() - 3) * (flowField_.getPressure().getNz() - 3);
+
+    std::vector<RealType> right_recv(left_wall_cell_count, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> left_recv(right_wall_cell_count, std::numeric_limits<RealType>::quiet_NaN());
+
+    MPI_Request requests[12];
+    MPI_Status  array_of_statuses[12];
+    std::fill(requests, requests + 12, MPI_REQUEST_NULL);
+
+    if (parameters_.parallel.rightNb >= 0) {
+      int rres = MPI_Irecv(
+        right_recv.data(),
+        left_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.rightNb,
+        1,
+        PETSC_COMM_WORLD,
+        &requests[1]
+      );
+      check_mpi_error(rres);
+    }
+
+    if (parameters_.parallel.leftNb >= 0) {
+      int rres = MPI_Irecv(
+        left_recv.data(),
+        right_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.leftNb,
+        3,
+        PETSC_COMM_WORLD,
+        &requests[2]
+      );
+      check_mpi_error(rres);
+    }
+
+    if (parameters_.parallel.leftNb >= 0) {
+      int ires = MPI_Isend(
+        pressureBufferFillStencil_.left_buffer.data(),
+        left_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.leftNb,
+        1,
+        PETSC_COMM_WORLD,
+        &requests[4]
+      );
+      check_mpi_error(ires);
+    }
+
+    if (parameters_.parallel.rightNb >= 0) {
+      int ires = MPI_Isend(
+        pressureBufferFillStencil_.right_buffer.data(),
+        right_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.rightNb,
+        3,
+        PETSC_COMM_WORLD,
+        &requests[3]
+      );
+      check_mpi_error(ires);
+    }
+
+    int top_wall_cell_count    = flowField.getVelocity().getNx() * (flowField.getVelocity().getNz() - 3);
+    int bottom_wall_cell_count = flowField.getVelocity().getNx() * (flowField.getVelocity().getNz() - 3);
+
+    std::vector<RealType> top_recv(bottom_wall_cell_count, std::numeric_limits<RealType>::quiet_NaN());
+    std::vector<RealType> bottom_recv(top_wall_cell_count, std::numeric_limits<RealType>::quiet_NaN());
+
+    int res = MPI_Waitall(4, requests, array_of_statuses);
+    check_mpi_error(res);
+
+    pressureBufferReadStencil_.left_buffer  = std::move(left_recv);
+    pressureBufferReadStencil_.right_buffer = std::move(right_recv);
+    pressureBufferReadIterator_.iterate_left_right();
+
+    pressureBufferFillIterator_.iterate_top_bottom();
+
+    if (parameters_.parallel.topNb >= 0) {
+      int rres = MPI_Irecv(
+        top_recv.data(),
+        bottom_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.topNb,
+        2,
+        PETSC_COMM_WORLD,
+        &requests[4]
+      );
+      check_mpi_error(rres);
+    }
+
+    if (parameters_.parallel.bottomNb >= 0) {
+      int rres = MPI_Irecv(
+        bottom_recv.data(),
+        top_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.bottomNb,
+        4,
+        PETSC_COMM_WORLD,
+        &requests[5]
+      );
+      check_mpi_error(rres);
+    }
+
+    if (parameters_.parallel.bottomNb >= 0) {
+      int ires = MPI_Isend(
+        pressureBufferFillStencil_.bottom_buffer.data(),
+        bottom_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.bottomNb,
+        2,
+        PETSC_COMM_WORLD,
+        &requests[6]
+      );
+      check_mpi_error(ires);
+    }
+
+    if (parameters_.parallel.topNb >= 0) {
+      int ires = MPI_Isend(
+        pressureBufferFillStencil_.top_buffer.data(),
+        top_wall_cell_count,
+        MY_MPI_FLOAT,
+        parameters_.parallel.topNb,
+        4,
+        PETSC_COMM_WORLD,
+        &requests[7]
+      );
+      check_mpi_error(ires);
+    }
+
+    res = MPI_Waitall(4, &requests[4], &array_of_statuses[4]);
+    check_mpi_error(res);
+
+    pressureBufferReadStencil_.top_buffer    = std::move(top_recv);
+    pressureBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
+
+    pressureBufferReadIterator_.iterate_top_bottom();
+
+    pressureBufferFillIterator_.iterate_front_back();
   }
 }
 
@@ -259,5 +400,6 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     velocityBufferReadStencil_.top_buffer    = std::move(top_recv);
     velocityBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
     velocityBufferReadIterator_.iterate_top_bottom();
+  } else if (parameters_.parallel.dimension == 3) {
   }
 }
