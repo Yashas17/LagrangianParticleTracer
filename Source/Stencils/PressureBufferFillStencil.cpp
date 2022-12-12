@@ -58,9 +58,9 @@ void Stencils::PressureBufferFillStencil::applyRightWall3D(FlowField& flowField)
 
 void Stencils::PressureBufferFillStencil::applyBottomWall3D(FlowField& flowField) {
   bottom_buffer.resize((flowField.getPressure().getNx() - 1) * (flowField.getPressure().getNz() - 3));
-  for (int k = 2; k < flowField.getPressure().getNz() - 1; j++) {
+  for (int k = 2; k < flowField.getPressure().getNz() - 1; k++) {
     std::copy_n(
-      flowField.getPressure().getScalar(1, 2, k),
+      flowField.getPressure().getScalarOffset(1, 2, k),
       flowField.getPressure().getNx() - 1,
       bottom_buffer.data() + ((k - 2) * (flowField.getPressure().getNx() - 1))
     );
@@ -69,9 +69,9 @@ void Stencils::PressureBufferFillStencil::applyBottomWall3D(FlowField& flowField
 
 void Stencils::PressureBufferFillStencil::applyTopWall3D(FlowField& flowField) {
   bottom_buffer.resize((flowField.getPressure().getNx() - 1) * (flowField.getPressure().getNz() - 3));
-  for (int k = 2; k < flowField.getPressure().getNz() - 1; j++) {
+  for (int k = 2; k < flowField.getPressure().getNz() - 1; k++) {
     std::copy_n(
-      flowField.getPressure().getScalar(1, flowField.getPressure().getNy() - 2, k),
+      flowField.getPressure().getScalarOffset(1, flowField.getPressure().getNy() - 2, k),
       flowField.getPressure().getNx() - 1,
       bottom_buffer.data() + ((k - 2) * (flowField.getPressure().getNx() - 1))
     );
@@ -82,7 +82,7 @@ void Stencils::PressureBufferFillStencil::applyFrontWall3D(FlowField& flowField)
   // Copy the whole face so we dont deal with access iterators
   front_buffer.resize((flowField.getPressure().getNx()) * (flowField.getPressure().getNy() - 1));
   std::copy_n(
-    flowField.getPressure().getScalar(0, 1, 2),
+    flowField.getPressure().getScalarOffset(0, 1, 2),
     (flowField.getPressure().getNx()) * (flowField.getPressure().getNy() - 1),
     front_buffer.data()
   );
@@ -91,7 +91,7 @@ void Stencils::PressureBufferFillStencil::applyFrontWall3D(FlowField& flowField)
 void Stencils::PressureBufferFillStencil::applyBackWall3D(FlowField& flowField) {
   back_buffer.resize((flowField.getPressure().getNx()) * (flowField.getPressure().getNy() - 1));
   std::copy_n(
-    flowField.getPressure().getScalar(0, 1, flowField.getPressure().getNz() - 2),
+    flowField.getPressure().getScalarOffset(0, 1, flowField.getPressure().getNz() - 2),
     (flowField.getPressure().getNx()) * (flowField.getPressure().getNy() - 1),
     back_buffer.data()
   );

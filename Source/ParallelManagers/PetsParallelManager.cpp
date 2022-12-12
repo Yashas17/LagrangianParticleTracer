@@ -143,7 +143,7 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
     pressureBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
 
     pressureBufferReadIterator_.iterate_top_bottom();
-  } else if (parameters_.parallel.dimension == 3) {
+  } else if (parameters_.geometry.dim == 3) {
     pressureBufferFillIterator_.iterate_left_right();
 
     int left_wall_cell_count  = (flowField_.getPressure().getNy() - 3) * (flowField_.getPressure().getNz() - 3);
@@ -208,8 +208,8 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicatePressure() {
       check_mpi_error(ires);
     }
 
-    int top_wall_cell_count    = flowField.getVelocity().getNx() * (flowField.getVelocity().getNz() - 3);
-    int bottom_wall_cell_count = flowField.getVelocity().getNx() * (flowField.getVelocity().getNz() - 3);
+    int top_wall_cell_count    = flowField_.getVelocity().getNx() * (flowField_.getVelocity().getNz() - 3);
+    int bottom_wall_cell_count = flowField_.getVelocity().getNx() * (flowField_.getVelocity().getNz() - 3);
 
     std::vector<RealType> top_recv(bottom_wall_cell_count, std::numeric_limits<RealType>::quiet_NaN());
     std::vector<RealType> bottom_recv(top_wall_cell_count, std::numeric_limits<RealType>::quiet_NaN());
@@ -400,6 +400,6 @@ void ParallelManagers::PetscParallelManagerNonBlocking::communicateVelocity() {
     velocityBufferReadStencil_.top_buffer    = std::move(top_recv);
     velocityBufferReadStencil_.bottom_buffer = std::move(bottom_recv);
     velocityBufferReadIterator_.iterate_top_bottom();
-  } else if (parameters_.parallel.dimension == 3) {
+  } else if (parameters_.geometry.dim == 3) {
   }
 }

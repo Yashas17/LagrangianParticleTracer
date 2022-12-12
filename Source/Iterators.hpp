@@ -154,6 +154,8 @@ public:
   void iterate_left_right();
 
   void iterate_top_bottom();
+
+  void iterate_front_back();
 };
 
 #include "Iterators.cpph"

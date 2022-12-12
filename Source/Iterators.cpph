@@ -391,3 +391,16 @@ void GhostLayerIterator<FlowFieldType>::iterate_top_bottom() {
     }
   }
 }
+
+template <class FlowFieldType>
+void GhostLayerIterator<FlowFieldType>::iterate_front_back() {
+  if (Iterator<FlowFieldType>::parameters_.geometry.dim == 3) {
+    if (Iterator<FlowFieldType>::parameters_.parallel.frontNb >= 0) {
+      stencil_.applyFrontWall3D(Iterator<FlowFieldType>::flowField_);
+    }
+
+    if (Iterator<FlowFieldType>::parameters_.parallel.backNb >= 0) {
+      stencil_.applyBackWall3D(Iterator<FlowFieldType>::flowField_);
+    }
+  }
+}
