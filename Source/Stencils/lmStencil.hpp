@@ -13,7 +13,7 @@ namespace Stencils {
    */
   class lmStencil: public FieldStencil<FlowField> {
   private:
-    RealType k_ = 0.041;
+    const RealType k_ {0.41};
 
   public:
     lmStencil(const Parameters& parameters);
