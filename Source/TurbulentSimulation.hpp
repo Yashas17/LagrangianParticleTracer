@@ -6,6 +6,7 @@
 #include "Iterators.hpp"
 #include "Simulation.hpp"
 
+#include "ParallelManagers/PetscParallelManager.hpp"
 #include "Solvers/LinearSolver.hpp"
 #include "Stencils/BFInputStencils.hpp"
 #include "Stencils/BFStepInitStencil.hpp"

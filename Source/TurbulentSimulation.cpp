@@ -68,21 +68,36 @@ void TurbulentSimulation::initializeFlowField() {
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
+
   // Compute turbulent viscosity
   vtIterator_.iterate();
+  // Communicate turbulent viscosity
+  petscParallelManager_.communicateVt();
+  // double communication to ensure the corner values are communicated
+  petscParallelManager_.communicateVt();
+
   // Compute FGH
   fghTurbIterator_.iterate();
   // Set global boundary values
   wallFGHIterator_.iterate();
   // Compute the right hand side (RHS)
   rhsIterator_.iterate();
+
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
+  petscParallelManager_.communicatePressure();
+  // double communication to ensure the corner values are communicated
+  petscParallelManager_.communicatePressure();
+
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
+  petscParallelManager_.communicateVelocities();
+  // double communication to ensure the corner values are communicated
+  petscParallelManager_.communicateVelocities();
+
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 }

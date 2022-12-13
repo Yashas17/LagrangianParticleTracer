@@ -4,6 +4,7 @@
 
 #include "../Stencils/PressureBufferReadStencil.hpp"
 #include "../Stencils/VelocityBufferReadStencil.hpp"
+#include "../Stencils/VtBufferReadStencil.hpp"
 
 ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
@@ -12,7 +13,9 @@ ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& paramet
   pressureBufferFillIterator_(flowField, parameters, pressureBufferFillStencil_, 1, 0),
   // the read stencils will need the data to be initialized
   velocityBufferFillStencil_(parameters),
-  velocityBufferFillIterator_(flowField, parameters, velocityBufferFillStencil_, 1, 0) {}
+  velocityBufferFillIterator_(flowField, parameters, velocityBufferFillStencil_, 1, 0),
+  vtBufferFillStencil_(parameters),
+  vtBufferFillIterator_(flowField, parameters, vtBufferFillStencil_, 1, 0) {}
 
 void ParallelManagers::PetscParallelManager::communicatePressure() {
 
@@ -20,9 +23,6 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
     int cellsX = flowField_.getPressure().getNx();
     int cellsY = flowField_.getPressure().getNy();
-
-    // std::cout << parameters_.parallel.localSize[0] << ", " << cellsX << std::endl;
-    // std::cout << parameters_.parallel.localSize[1] << ", " << cellsY << std::endl;
 
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
@@ -464,5 +464,227 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
       flowField_, parameters_, velocityBufferReadStencil_, 1, 0
     );
     velocityBufferReadIterator_.iterate();
+  }
+}
+
+void ParallelManagers::PetscParallelManager::communicateVt() {
+
+  if (parameters_.geometry.dim == 2) { // 2d case
+
+    int cellsX = flowField_.getVt().getNx();
+    int cellsY = flowField_.getVt().getNy();
+
+    // Fill the buffers
+    vtBufferFillIterator_.iterate();
+
+    // prepare receive buffers, send buffers are already on the stencil
+    std::vector<RealType> leftBufferRecv(cellsY);
+    std::vector<RealType> rightBufferRecv(cellsY);
+    std::vector<RealType> bottomBufferRecv(cellsX);
+    std::vector<RealType> topBufferRecv(cellsX);
+
+    if (vtBufferFillStencil_.leftBuffer.size() != cellsY) {
+      throw std::runtime_error(std::to_string(vtBufferFillStencil_.leftBuffer.size()) + "!=" + std::to_string(cellsY));
+    }
+    // send from left, receive on right
+    MPI_Sendrecv(
+      vtBufferFillStencil_.leftBuffer.data(),
+      cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      0,
+      rightBufferRecv.data(),
+      cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      0,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from right, receive on left
+    MPI_Sendrecv(
+      vtBufferFillStencil_.rightBuffer.data(),
+      cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      1,
+      leftBufferRecv.data(),
+      cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      1,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from bottom, receive on top
+    MPI_Sendrecv(
+      vtBufferFillStencil_.bottomBuffer.data(),
+      cellsX,
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      2,
+      topBufferRecv.data(),
+      cellsX,
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      2,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from top, receive on bottom
+    MPI_Sendrecv(
+      vtBufferFillStencil_.topBuffer.data(),
+      cellsX,
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      3,
+      bottomBufferRecv.data(),
+      cellsX,
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      3,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // Read the buffers into the flowField
+    Stencils::VtBufferReadStencil vtBufferReadStencil_(
+      parameters_,
+      std::move(leftBufferRecv),
+      std::move(rightBufferRecv),
+      std::move(bottomBufferRecv),
+      std::move(topBufferRecv)
+    );
+    ParallelBoundaryIterator<FlowField> vtBufferReadIterator_(flowField_, parameters_, vtBufferReadStencil_, 1, 0);
+    vtBufferReadIterator_.iterate();
+
+  } else if (parameters_.geometry.dim == 3) { // 3d case
+
+    int cellsX = flowField_.getVt().getNx();
+    int cellsY = flowField_.getVt().getNy();
+    int cellsZ = flowField_.getVt().getNz();
+
+    // Fill the buffers
+    vtBufferFillIterator_.iterate();
+
+    // prepare receive buffers, send buffers are already on the stencil
+    std::vector<RealType> leftBufferRecv(cellsY * cellsZ);
+    std::vector<RealType> rightBufferRecv(cellsY * cellsZ);
+    std::vector<RealType> bottomBufferRecv(cellsX * cellsZ);
+    std::vector<RealType> topBufferRecv(cellsX * cellsZ);
+    std::vector<RealType> frontBufferRecv(cellsX * cellsY);
+    std::vector<RealType> backBufferRecv(cellsX * cellsY);
+
+    // send from left, receive on right
+    MPI_Sendrecv(
+      vtBufferFillStencil_.leftBuffer.data(),
+      cellsY * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      0,
+      rightBufferRecv.data(),
+      cellsY * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      0,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from right, receive on left
+    MPI_Sendrecv(
+      vtBufferFillStencil_.rightBuffer.data(),
+      cellsY * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.rightNb,
+      1,
+      leftBufferRecv.data(),
+      cellsY * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.leftNb,
+      1,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from bottom, receive on top
+    MPI_Sendrecv(
+      vtBufferFillStencil_.bottomBuffer.data(),
+      cellsX * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      2,
+      topBufferRecv.data(),
+      cellsX * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      2,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from top, receive on bottom
+    MPI_Sendrecv(
+      vtBufferFillStencil_.topBuffer.data(),
+      cellsX * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.topNb,
+      3,
+      bottomBufferRecv.data(),
+      cellsX * cellsZ,
+      MY_MPI_FLOAT,
+      parameters_.parallel.bottomNb,
+      3,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from front, receive on back
+    MPI_Sendrecv(
+      vtBufferFillStencil_.frontBuffer.data(),
+      cellsX * cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.frontNb,
+      4,
+      backBufferRecv.data(),
+      cellsX * cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.backNb,
+      4,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // send from back, receive on front
+    MPI_Sendrecv(
+      vtBufferFillStencil_.backBuffer.data(),
+      cellsX * cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.backNb,
+      5,
+      frontBufferRecv.data(),
+      cellsX * cellsY,
+      MY_MPI_FLOAT,
+      parameters_.parallel.frontNb,
+      5,
+      PETSC_COMM_WORLD,
+      MPI_STATUS_IGNORE
+    );
+
+    // Read the buffers into the flowField
+    Stencils::VtBufferReadStencil vtBufferReadStencil_(
+      parameters_,
+      std::move(leftBufferRecv),
+      std::move(rightBufferRecv),
+      std::move(bottomBufferRecv),
+      std::move(topBufferRecv),
+      std::move(frontBufferRecv),
+      std::move(backBufferRecv)
+    );
+    ParallelBoundaryIterator<FlowField> vtBufferReadIterator_(flowField_, parameters_, vtBufferReadStencil_, 1, 0);
+    vtBufferReadIterator_.iterate();
   }
 }

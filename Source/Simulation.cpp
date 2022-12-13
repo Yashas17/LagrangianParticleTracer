@@ -83,100 +83,19 @@ void Simulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
 
-  // // printing to test before communication
-  // for(int printRank = 0; printRank < 4; printRank++){
-  //   if(printRank == parameters_.parallel.rank){
-  //     std::cout << "Pressure before, rank = " << parameters_.parallel.rank << " indices: " 
-  //               << parameters_.parallel.indices[0] << "," << parameters_.parallel.indices[1] 
-  //               << " cellsX="<< flowField_.getCellsX()
-  //               << " cellsY="<< flowField_.getCellsY()
-  //               << std::endl;
-  //     for(int j = flowField_.getCellsY() - 1; j >= 0; j--){
-  //       for(int i = 0; i < flowField_.getCellsX(); i++){
-  //         std::cout << flowField_.getPressure().getScalar(i,j) << " ";
-  //       }
-  //       std::cout << std::endl;
-  //     }
-  //     std::cout << std::endl;
-  //   }
-  //   MPI_Barrier(PETSC_COMM_WORLD);
-  // }
-  // MPI_Barrier(PETSC_COMM_WORLD);
-
   // TODO WS2: communicate pressure values
   petscParallelManager_.communicatePressure();
   //double communication to ensure the corner values are communicated
   petscParallelManager_.communicatePressure();
 
-  // // printing to test after communication
-  // for(int printRank = 0; printRank < 4; printRank++){
-  //   if(printRank == parameters_.parallel.rank){
-  //     std::cout << "Pressure after, rank = " << parameters_.parallel.rank << " indices: " 
-  //               << parameters_.parallel.indices[0] << "," << parameters_.parallel.indices[1] 
-  //               << " cellsX="<< flowField_.getCellsX()
-  //               << " cellsY="<< flowField_.getCellsY()
-  //               << std::endl;
-  //     for(int j = flowField_.getCellsY() - 1; j >= 0; j--){
-  //       for(int i = 0; i < flowField_.getCellsX(); i++){
-  //         std::cout << flowField_.getPressure().getScalar(i,j) << " ";
-  //       }
-  //       std::cout << std::endl;
-  //     }
-  //     std::cout << std::endl;
-  //   }
-  //   MPI_Barrier(PETSC_COMM_WORLD);
-  // }
-  // MPI_Barrier(PETSC_COMM_WORLD);
-
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
-
-  // // printing to test before communication
-  // for(int printRank = 0; printRank < 4; printRank++){
-  //   if(printRank == parameters_.parallel.rank){
-  //     std::cout << "Velocity V before, rank = " << parameters_.parallel.rank << " indices: " 
-  //               << parameters_.parallel.indices[0] << "," << parameters_.parallel.indices[1] 
-  //               << " cellsX="<< flowField_.getCellsX()
-  //               << " cellsY="<< flowField_.getCellsY()
-  //               << std::endl;
-  //     for(int j = flowField_.getCellsY() - 1; j >= 0; j--){
-  //       for(int i = 0; i < flowField_.getCellsX(); i++){
-  //         std::cout << flowField_.getVelocity().getVector(i,j)[1] << " ";
-  //       }
-  //       std::cout << std::endl;
-  //     }
-  //     std::cout << std::endl;
-  //   }
-  //   MPI_Barrier(PETSC_COMM_WORLD);
-  // }
-  // MPI_Barrier(PETSC_COMM_WORLD);
 
   // TODO WS2: communicate velocity values
   petscParallelManager_.communicateVelocities();
   //double communication to ensure the corner values are communicated
   petscParallelManager_.communicateVelocities();
-
-  // // printing to test after communication
-  // for(int printRank = 0; printRank < 4; printRank++){
-  //   if(printRank == parameters_.parallel.rank){
-  //     std::cout << "Velocity V after, rank = " << parameters_.parallel.rank << " indices: " 
-  //               << parameters_.parallel.indices[0] << "," << parameters_.parallel.indices[1] 
-  //               << " cellsX="<< flowField_.getCellsX()
-  //               << " cellsY="<< flowField_.getCellsY()
-  //               << std::endl;
-  //     for(int j = flowField_.getCellsY() - 1; j >= 0; j--){
-  //       for(int i = 0; i < flowField_.getCellsX(); i++){
-  //         std::cout << flowField_.getVelocity().getVector(i,j)[1] << " ";
-  //       }
-  //       std::cout << std::endl;
-  //     }
-  //     std::cout << std::endl;
-  //   }
-  //   MPI_Barrier(PETSC_COMM_WORLD);
-  // }
-  // MPI_Barrier(PETSC_COMM_WORLD);
-
 
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
