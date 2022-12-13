@@ -13,9 +13,9 @@ namespace Stencils {
    */
   class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
   public:
-    int                   cellsX;
-    int                   cellsY;
-    int                   cellsZ;
+    int                    cellsX;
+    int                    cellsY;
+    int                    cellsZ;
     std::vector<RealType> leftBuffer;
     std::vector<RealType> rightBuffer;
     std::vector<RealType> bottomBuffer;

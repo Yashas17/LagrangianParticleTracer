@@ -9,17 +9,20 @@ ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& paramet
   parameters_(parameters),
   flowField_(flowField),
   pressureBufferFillStencil_(parameters),
-  pressureBufferFillIterator_(flowField, parameters, pressureBufferFillStencil_, 2, -1),
+  pressureBufferFillIterator_(flowField, parameters, pressureBufferFillStencil_, 1, 0),
   // the read stencils will need the data to be initialized
   velocityBufferFillStencil_(parameters),
-  velocityBufferFillIterator_(flowField, parameters, velocityBufferFillStencil_, 2, -1) {}
+  velocityBufferFillIterator_(flowField, parameters, velocityBufferFillStencil_, 1, 0) {}
 
 void ParallelManagers::PetscParallelManager::communicatePressure() {
 
   if (parameters_.geometry.dim == 2) { // 2d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
+    int cellsX = flowField_.getPressure().getNx();
+    int cellsY = flowField_.getPressure().getNy();
+
+    // std::cout << parameters_.parallel.localSize[0] << ", " << cellsX << std::endl;
+    // std::cout << parameters_.parallel.localSize[1] << ", " << cellsY << std::endl;
 
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
@@ -30,6 +33,11 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     std::vector<RealType> bottomBufferRecv(cellsX);
     std::vector<RealType> topBufferRecv(cellsX);
 
+    if (pressureBufferFillStencil_.leftBuffer.size() != cellsY) {
+      throw std::runtime_error(
+        std::to_string(pressureBufferFillStencil_.leftBuffer.size()) + "!=" + std::to_string(cellsY)
+      );
+    }
     // send from left, receive on right
     MPI_Sendrecv(
       pressureBufferFillStencil_.leftBuffer.data(),
@@ -96,18 +104,22 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
     // Read the buffers into the flowField
     Stencils::PressureBufferReadStencil pressureBufferReadStencil_(
-      parameters_, leftBufferRecv, rightBufferRecv, bottomBufferRecv, topBufferRecv
+      parameters_,
+      std::move(leftBufferRecv),
+      std::move(rightBufferRecv),
+      std::move(bottomBufferRecv),
+      std::move(topBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_(
-      flowField_, parameters_, pressureBufferReadStencil_, 2, -1
+      flowField_, parameters_, pressureBufferReadStencil_, 1, 0
     );
     pressureBufferReadIterator_.iterate();
 
   } else if (parameters_.geometry.dim == 3) { // 3d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
-    int cellsZ = flowField_.getCellsZ();
+    int cellsX = flowField_.getPressure().getNx();
+    int cellsY = flowField_.getPressure().getNy();
+    int cellsZ = flowField_.getPressure().getNz();
 
     // Fill the buffers
     pressureBufferFillIterator_.iterate();
@@ -218,10 +230,16 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 
     // Read the buffers into the flowField
     Stencils::PressureBufferReadStencil pressureBufferReadStencil_(
-      parameters_, leftBufferRecv, rightBufferRecv, bottomBufferRecv, topBufferRecv, frontBufferRecv, backBufferRecv
+      parameters_,
+      std::move(leftBufferRecv),
+      std::move(rightBufferRecv),
+      std::move(bottomBufferRecv),
+      std::move(topBufferRecv),
+      std::move(frontBufferRecv),
+      std::move(backBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_(
-      flowField_, parameters_, pressureBufferReadStencil_, 2, -1
+      flowField_, parameters_, pressureBufferReadStencil_, 1, 0
     );
     pressureBufferReadIterator_.iterate();
   }
@@ -230,8 +248,8 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
 void ParallelManagers::PetscParallelManager::communicateVelocities() {
   if (parameters_.geometry.dim == 2) { // 2d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
+    int cellsX = flowField_.getVelocity().getNx();
+    int cellsY = flowField_.getVelocity().getNy();
 
     // Fill the buffers
     velocityBufferFillIterator_.iterate();
@@ -315,15 +333,15 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
       std::move(topBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_(
-      flowField_, parameters_, velocityBufferReadStencil_, 2, -1
+      flowField_, parameters_, velocityBufferReadStencil_, 1, 0
     );
     velocityBufferReadIterator_.iterate();
 
   } else if (parameters_.geometry.dim == 3) { // 3d case
 
-    int cellsX = flowField_.getCellsX();
-    int cellsY = flowField_.getCellsY();
-    int cellsZ = flowField_.getCellsZ();
+    int cellsX = flowField_.getVelocity().getNx();
+    int cellsY = flowField_.getVelocity().getNy();
+    int cellsZ = flowField_.getVelocity().getNz();
 
     // Fill the buffers
     velocityBufferFillIterator_.iterate();
@@ -443,7 +461,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
       std::move(backBufferRecv)
     );
     ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_(
-      flowField_, parameters_, velocityBufferReadStencil_, 2, -1
+      flowField_, parameters_, velocityBufferReadStencil_, 1, 0
     );
     velocityBufferReadIterator_.iterate();
   }
