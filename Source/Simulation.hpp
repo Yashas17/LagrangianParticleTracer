@@ -5,6 +5,7 @@
 #include "GlobalBoundaryFactory.hpp"
 #include "Iterators.hpp"
 
+#include "ParallelManagers/PetscParallelManager.hpp"
 #include "Solvers/LinearSolver.hpp"
 #include "Stencils/BFInputStencils.hpp"
 #include "Stencils/BFStepInitStencil.hpp"
@@ -44,6 +45,8 @@ protected:
 
   Stencils::RHSStencil     rhsStencil_;
   FieldIterator<FlowField> rhsIterator_;
+
+  ParallelManagers::PetscParallelManager petscParallelManager_;
 
   std::unique_ptr<Solvers::LinearSolver> solver_;
 

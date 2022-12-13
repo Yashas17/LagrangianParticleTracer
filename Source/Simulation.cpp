@@ -21,12 +21,11 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   velocityIterator_(flowField_, parameters, velocityStencil_),
   obstacleIterator_(flowField_, parameters, obstacleStencil_),
   rhsStencil_(parameters),
-  rhsIterator_(flowField_, parameters, rhsStencil_)
+  rhsIterator_(flowField_, parameters, rhsStencil_),
+  petscParallelManager_(parameters, flowField_),
 #ifdef ENABLE_PETSC
-  ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
 #else
-  ,
   solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters))
 #endif
 {
@@ -84,20 +83,24 @@ void Simulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
+  petscParallelManager_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
+  petscParallelManager_.communicateVelocities();
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 }
 
 void Simulation::plotVTK(int timeStep, RealType simulationTime) {
+#ifndef DISABLE_OUTPUT
   Stencils::VTKStencil     vtkStencil(parameters_);
   FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
 
   vtkIterator.iterate();
   vtkStencil.write(flowField_, timeStep, simulationTime);
+#endif
 }
 
 void Simulation::setTimeStep() {
