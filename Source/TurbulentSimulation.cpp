@@ -69,9 +69,7 @@ void TurbulentSimulation::initializeFlowField() {
 
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
-  timeStepIterator_.iterate();
   setTimeStep();
-  // std::cout << parameters_.timestep.dt << std::endl;
   // Compute turbulent viscosity
   vtIterator_.iterate();
   // Compute FGH
@@ -101,6 +99,7 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 
 void TurbulentSimulation::setTimeStep() {
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
+  timeStepIterator_.iterate();
   
   RealType localMin, globalMin;
   localMin = timeStepStencil_.dt;
