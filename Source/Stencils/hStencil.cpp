@@ -29,7 +29,11 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
 
     // Case 2: the cell is above the step
     else if (posX < stepLengthX) {
-      h = std::min(posY - stepLengthY, lengthY - posY);
+      const RealType distanceToStepX      = stepLengthX - posX;
+      const RealType distanceToStepY      = posY - stepLengthY;
+      const RealType distanceToStepCorner = std::hypot(distanceToStepX, distanceToStepY);
+
+      h = std::min(distanceToStepCorner, std::min(posY - stepLengthY, lengthY - posY));
     }
 
     // Case 3: the cell is above the level of the step but not above the step
@@ -71,8 +75,13 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j, int k) {
       h = std::min(posX - stepLengthX, std::min(posY, lengthY - posY));
 
     // Case 2: the cell is above the step
-    else if (posX < stepLengthX)
-      h = std::min(posY - stepLengthY, lengthY - posY);
+    else if (posX < stepLengthX) {
+      const RealType distanceToStepX      = stepLengthX - posX;
+      const RealType distanceToStepY      = posY - stepLengthY;
+      const RealType distanceToStepCorner = std::hypot(distanceToStepX, distanceToStepY);
+
+      h = std::min(distanceToStepCorner, std::min(posY - stepLengthY, lengthY - posY));
+    }
 
     // Case 3: the cell is above the level of the step but not above the step itself
     else {
