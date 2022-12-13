@@ -20,7 +20,9 @@ namespace Stencils {
     std::stringstream pressureStream_;           //! Stream for the pressure data
     std::stringstream velocityStream_;           //! Stream for the velocity data
     std::stringstream turbulentViscosityStream_; //! Stream for the turbulent viscosity data
-
+#ifndef NDEBUG
+    std::stringstream hStream_;                  //! Stream for the wall distance (h)  data
+#endif
     void writeVTKHeader(std::ostream& file) const;
     void writePoints(std::ostream& file, RealType simulationTime) const;
 
