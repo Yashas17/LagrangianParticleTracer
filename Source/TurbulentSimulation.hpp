@@ -10,18 +10,18 @@
 #include "Stencils/BFInputStencils.hpp"
 #include "Stencils/BFStepInitStencil.hpp"
 #include "Stencils/FGHTurbStencil.hpp"
+#include "Stencils/hStencil.hpp"
 #include "Stencils/InitTaylorGreenFlowFieldStencil.hpp"
+#include "Stencils/lmStencil.hpp"
 #include "Stencils/MaxUStencil.hpp"
 #include "Stencils/MovingWallStencils.hpp"
 #include "Stencils/NeumannBoundaryStencils.hpp"
 #include "Stencils/ObstacleStencil.hpp"
 #include "Stencils/PeriodicBoundaryStencils.hpp"
 #include "Stencils/RHSStencil.hpp"
+#include "Stencils/TimeStepStencil.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKTurbStencil.hpp"
-#include "Stencils/TimeStepStencil.hpp"
-#include "Stencils/hStencil.hpp"
-#include "Stencils/lmStencil.hpp"
 #include "Stencils/VtStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
@@ -30,9 +30,9 @@ protected:
   FieldIterator<FlowField> fghTurbIterator_;
 
   Stencils::TimeStepStencil timeStepStencil_;
-  FieldIterator<FlowField> timeStepIterator_;
+  FieldIterator<FlowField>  timeStepIterator_;
 
-  Stencils::VtStencil vtStencil_;
+  Stencils::VtStencil      vtStencil_;
   FieldIterator<FlowField> vtIterator_;
 
 public:

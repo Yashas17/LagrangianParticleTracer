@@ -6,15 +6,13 @@
 #include "Solvers/SORSolver.hpp"
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
-  Simulation(parameters,flowField),
+  Simulation(parameters, flowField),
   fghTurbStencil_(parameters),
   fghTurbIterator_(flowField_, parameters, fghTurbStencil_),
   timeStepStencil_(parameters),
   timeStepIterator_(flowField_, parameters, timeStepStencil_),
   vtStencil_(parameters),
-  vtIterator_(flowField_,parameters, vtStencil_)
-{
-}
+  vtIterator_(flowField_, parameters, vtStencil_) {}
 
 void TurbulentSimulation::initializeFlowField() {
   if (parameters_.simulation.scenario == "taylor-green") {
@@ -100,7 +98,7 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 void TurbulentSimulation::setTimeStep() {
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
   timeStepIterator_.iterate();
-  
+
   RealType localMin, globalMin;
   localMin = timeStepStencil_.dt;
 

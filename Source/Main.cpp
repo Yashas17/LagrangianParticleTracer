@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
       spdlog::info("Start Turbulent simulation in {}D", parameters.geometry.dim);
     }
-    flowField  = new FlowField(parameters);
+    flowField = new FlowField(parameters);
     if (flowField == NULL) {
       throw std::runtime_error("flowField == NULL!");
     }

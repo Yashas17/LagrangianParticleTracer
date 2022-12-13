@@ -96,7 +96,7 @@ public:
   ScalarField& getH();
   ScalarField& getVt();
   ScalarField& getLm();
-  
+
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j);
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j, int k);
 };

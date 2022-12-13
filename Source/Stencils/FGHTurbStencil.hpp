@@ -5,7 +5,7 @@
 #include "Parameters.hpp"
 
 namespace Stencils {
-    
+
   class FGHTurbStencil: public FieldStencil<FlowField> {
   private:
     // A local velocity variable that will be used to approximate derivatives. Size matches 3D

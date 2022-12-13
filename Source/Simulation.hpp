@@ -42,9 +42,9 @@ protected:
   FieldIterator<FlowField>  velocityIterator_;
   FieldIterator<FlowField>  obstacleIterator_;
 
-  Stencils::RHSStencil rhsStencil_;
+  Stencils::RHSStencil     rhsStencil_;
   FieldIterator<FlowField> rhsIterator_;
-  
+
   std::unique_ptr<Solvers::LinearSolver> solver_;
 
   virtual void setTimeStep();

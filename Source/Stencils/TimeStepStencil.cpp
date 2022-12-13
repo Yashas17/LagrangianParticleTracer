@@ -7,7 +7,7 @@ Stencils::TimeStepStencil::TimeStepStencil(const Parameters& parameters):
 
 void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
 
-  const RealType vt       = flowField.getVt().getScalar(i, j);
+  const RealType        vt       = flowField.getVt().getScalar(i, j);
   const RealType* const velocity = flowField.getVelocity().getVector(i, j);
 
   const RealType vTotal = vt + (1 / parameters_.flow.Re);
@@ -27,7 +27,7 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
    **/
 
   // If the cell is NOT an obstacle
-  if (flowField.getFlags().getValue(i,j) % 2 == 0) {
+  if (flowField.getFlags().getValue(i, j) % 2 == 0) {
     if (velocity[0] != 0) {
       cell_dt = dx / fabs(velocity[0]);
     }
@@ -40,14 +40,14 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j) {
     } else {
       cell_dt = std::min(1 / (2 * vTotal * factor), cell_dt);
     }
- 
-    if(cell_dt < dt)
+
+    if (cell_dt < dt)
       dt = cell_dt;
   }
 }
 
 void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k) {
-  const RealType vt       = flowField.getVt().getScalar(i, j, k);
+  const RealType        vt       = flowField.getVt().getScalar(i, j, k);
   const RealType* const velocity = flowField.getVelocity().getVector(i, j, k);
 
   const RealType vTotal = vt + (1 / parameters_.flow.Re);
@@ -77,6 +77,6 @@ void Stencils::TimeStepStencil::apply(FlowField& flowField, int i, int j, int k)
     cell_dt = std::min(1 / (2 * vTotal * factor), cell_dt);
   }
 
-  if(cell_dt < dt)
+  if (cell_dt < dt)
     dt = cell_dt;
 }
