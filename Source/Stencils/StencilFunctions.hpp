@@ -1136,6 +1136,7 @@ namespace Stencils {
   ) {
     return localVelocity[mapd(0, 0, 0, 0)] 
         + dt * (2 * ux_x(localVelocity, localMeshsize, localVTotal) + uyvx_y(localVelocity, localMeshsize, localVTotal) 
+                - du2dx(localVelocity, parameters, localMeshsize) - duvdy(localVelocity, parameters, localMeshsize) 
                 + parameters.environment.gx);
   }
 
@@ -1148,7 +1149,8 @@ namespace Stencils {
   ) {
     return localVelocity[mapd(0, 0, 0, 1)] 
         + dt * ( 2 * vy_y(localVelocity, localMeshsize, localVTotal) + vxuy_x(localVelocity, localMeshsize, localVTotal)
-                + parameters.environment.gy);
+                - duvdx(localVelocity, parameters, localMeshsize) - dv2dy(localVelocity, parameters, localMeshsize) 
+            + parameters.environment.gy);
   }
 
   inline RealType computeF3D(
@@ -1160,7 +1162,9 @@ namespace Stencils {
   ) {
     return localVelocity[mapd(0,0,0,0)] 
         + dt * (2 * ux_x(localVelocity, localMeshsize, localVTotal) + uyvx_y(localVelocity, localMeshsize, localVTotal)
-                + uzwx_z(localVelocity, localMeshsize, localVTotal) + parameters.environment.gx);
+                + uzwx_z(localVelocity, localMeshsize, localVTotal) 
+                - du2dx(localVelocity, parameters, localMeshsize) - duvdy(localVelocity, parameters, localMeshsize)
+                - duwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
   }
 
   inline RealType computeG3D(
@@ -1172,7 +1176,9 @@ namespace Stencils {
   ) {
     return localVelocity[mapd(0, 0, 0, 1)]
         + dt * (2 * vy_y(localVelocity, localMeshsize, localVTotal) + vxuy_x(localVelocity, localMeshsize, localVTotal)
-                + vzwy_z(localVelocity, localMeshsize, localVTotal) + parameters.environment.gy);
+                + vzwy_z(localVelocity, localMeshsize, localVTotal) 
+                - dv2dy(localVelocity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
+                - dvwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
   }
 
   inline RealType computeH3D(
@@ -1184,7 +1190,9 @@ namespace Stencils {
   ) {
     return localVelocity[mapd(0, 0, 0, 2)]
         + dt * (2 * wz_z(localVelocity, localMeshsize, localVTotal) + wxuz_x(localVelocity, localMeshsize, localVTotal)
-                + wyvz_y(localVelocity, localMeshsize, localVTotal) + parameters.environment.gz);
+                + wyvz_y(localVelocity, localMeshsize, localVTotal) 
+                - dw2dz(localVelocity, parameters, localMeshsize) - duwdx(localVelocity, parameters, localMeshsize)
+                - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
   }
 
 } // namespace Stencils
