@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-if(CMAKE_BUILD_TYPE) # To check only if the argument is given manually
-    if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        add_compile_options(-g -fno-omit-frame-pointer -fsanitize=address)
-        add_link_options(-g -fno-omit-frame-pointer -fsanitize=address)
-    endif()
-endif()
-
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(
         COMMAND git rev-parse --abbrev-ref HEAD
