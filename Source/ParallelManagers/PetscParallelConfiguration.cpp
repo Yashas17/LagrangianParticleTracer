@@ -25,8 +25,8 @@ ParallelManagers::PetscParallelConfiguration::PetscParallelConfiguration(Paramet
 
   if (nproc != nprocFromFile) {
     throw std::runtime_error(
-      "The number of processors specified in the configuration file doesn't match the "
-      "communicator"
+      "The number of processors specified in the configuration file doesn't match the communicator" + 
+      std::to_string(nproc) + " to " + std::to_string(nprocFromFile)
     );
   }
 }
