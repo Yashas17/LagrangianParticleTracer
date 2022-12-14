@@ -42,7 +42,7 @@
     <stdOut interval="0.0001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
     <turbulence>
-        <boundaryLayer> turbulent </boundaryLayer>
+        <boundaryLayer>turbulent</boundaryLayer>
         <!-- <boundaryLayer>laminar</boundaryLayer> -->
         <!-- <boundaryLayer>none</boundaryLayer> -->
     </turbulence>
