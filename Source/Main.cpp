@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 
   // Plot initial state
 #ifndef DISABLE_OUTPUT
-  simulation->plotVTK(timeSteps, time);
+  //simulation->plotVTK(timeSteps, time);
 #endif
 
   Clock clock;
@@ -134,18 +134,18 @@ int main(int argc, char* argv[]) {
       timeStdOut += parameters.stdOut.interval;
     }
 
-    if (timeVtk <= time) {
+    //if (timeVtk <= time) {
 #ifndef DISABLE_OUTPUT
-      simulation->plotVTK(timeSteps, time);
+      //simulation->plotVTK(timeSteps, time);
 #endif
-      timeVtk += parameters.vtk.interval;
-    }
+      //timeVtk += parameters.vtk.interval;
+    //}
   }
   spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
   // Plot final solution
 #ifndef DISABLE_OUTPUT
-  simulation->plotVTK(timeSteps, time);
+  //simulation->plotVTK(timeSteps, time);
 #endif
 
   delete simulation;

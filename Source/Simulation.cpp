@@ -95,11 +95,11 @@ void Simulation::solveTimestep() {
 
 void Simulation::plotVTK(int timeStep, RealType simulationTime) {
 #ifndef DISABLE_OUTPUT
-  Stencils::VTKStencil     vtkStencil(parameters_);
-  FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
+ // Stencils::VTKStencil     vtkStencil(parameters_);
+  //FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
 
-  vtkIterator.iterate();
-  vtkStencil.write(flowField_, timeStep, simulationTime);
+  //vtkIterator.iterate();
+  //vtkStencil.write(flowField_, timeStep, simulationTime);
 #endif
 }
 
