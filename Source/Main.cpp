@@ -4,6 +4,7 @@
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
+#include "TurbulentSimulation.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
 
@@ -85,7 +86,7 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
       spdlog::info("Start Turbulent simulation in {}D", parameters.geometry.dim);
     }
-    flowField  = new FlowField(parameters);
+    flowField = new FlowField(parameters);
     if (flowField == NULL) {
       throw std::runtime_error("flowField == NULL!");
     }
@@ -141,9 +142,10 @@ int main(int argc, char* argv[]) {
       //timeVtk += parameters.vtk.interval;
     //}
   }
-  spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
+  if (parameters.parallel.rank == 0)
+    spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
-  // Plot final solution
+    // Plot final solution
 #ifndef DISABLE_OUTPUT
   //simulation->plotVTK(timeSteps, time);
 #endif

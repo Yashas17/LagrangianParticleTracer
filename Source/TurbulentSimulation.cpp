@@ -1,37 +1,18 @@
 #include "StdAfx.hpp"
 
 #include "TurbulentSimulation.hpp"
-#include "Stencils/hStencil.hpp"
 
 #include "Solvers/PetscSolver.hpp"
 #include "Solvers/SORSolver.hpp"
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
-  parameters_(parameters),
-  flowField_(flowField),
-  maxUStencil_(parameters),
-  maxUFieldIterator_(flowField_, parameters, maxUStencil_),
-  maxUBoundaryIterator_(flowField_, parameters, maxUStencil_),
-  globalBoundaryFactory_(parameters),
-  wallVelocityIterator_(globalBoundaryFactory_.getGlobalBoundaryVelocityIterator(flowField_)),
-  wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
+  Simulation(parameters, flowField),
   fghTurbStencil_(parameters),
-  fghIterator_(flowField_, parameters, fghTurbStencil_),
-  velocityStencil_(parameters),
-  obstacleStencil_(parameters),
-  velocityIterator_(flowField_, parameters, velocityStencil_),
-  obstacleIterator_(flowField_, parameters, obstacleStencil_),
-  rhsStencil_(parameters),
-  rhsIterator_(flowField_, parameters, rhsStencil_)
-#ifdef ENABLE_PETSC
-  ,
-  solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
-#else
-  ,
-  solver_(std::make_unique<Solvers::SORSolver>(flowField_, parameters))
-#endif
-{
-}
+  fghTurbIterator_(flowField_, parameters, fghTurbStencil_),
+  timeStepStencil_(parameters),
+  timeStepIterator_(flowField_, parameters, timeStepStencil_),
+  vtStencil_(parameters),
+  vtIterator_(flowField_, parameters, vtStencil_) {}
 
 void TurbulentSimulation::initializeFlowField() {
   if (parameters_.simulation.scenario == "taylor-green") {
@@ -44,10 +25,16 @@ void TurbulentSimulation::initializeFlowField() {
     FieldIterator<FlowField>    iterator(flowField_, parameters_, stencil, 0, 1);
     iterator.iterate();
     wallVelocityIterator_.iterate();
-    
-    Stencils::hStencil hStencil(parameters_);
+
+    // Initializing the "h" scalar field with the distances from the nearest walls
+    Stencils::hStencil       hStencil(parameters_);
     FieldIterator<FlowField> hIterator(flowField_, parameters_, hStencil, 0, 1);
     hIterator.iterate();
+
+    // Initialize mixing length scalar field
+    Stencils::lmStencil      lmStencil(parameters_);
+    FieldIterator<FlowField> lmIterator(flowField_, parameters_, lmStencil, 0, 1);
+    lmIterator.iterate();
 
   } else if (parameters_.simulation.scenario == "pressure-channel") {
     // Set pressure boundaries here for left wall
@@ -81,19 +68,51 @@ void TurbulentSimulation::initializeFlowField() {
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
+
+  // Compute turbulent viscosity
+  vtIterator_.iterate();
+  // Communicate turbulent viscosity
+  for(int i = 0; i<parameters_.geometry.dim; i++){
+    /*
+    we need to communicate 2 or 3 times to ensure the corner values are communicated
+    for example, the left bottom corner rank needs 2 communications to receive the corner
+    information from the right top rank.
+    */
+    petscParallelManager_.communicateVt();
+  }
+
   // Compute FGH
-  fghIterator_.iterate();
+  fghTurbIterator_.iterate();
   // Set global boundary values
   wallFGHIterator_.iterate();
   // Compute the right hand side (RHS)
   rhsIterator_.iterate();
+
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
+  for(int i = 0; i<parameters_.geometry.dim; i++){
+    /*
+    we need to communicate 2 or 3 times to ensure the corner values are communicated
+    for example, the left bottom corner rank needs 2 communications to receive the corner
+    information from the right top rank.
+    */
+    petscParallelManager_.communicatePressure();
+  }
+
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
+  for(int i = 0; i<parameters_.geometry.dim; i++){
+    /*
+    we need to communicate 2 or 3 times to ensure the corner values are communicated
+    for example, the left bottom corner rank needs 2 communications to receive the corner
+    information from the right top rank.
+    */
+    petscParallelManager_.communicateVelocities();
+  }
+
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 }
@@ -107,41 +126,11 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 }
 
 void TurbulentSimulation::setTimeStep() {
-  RealType localMin, globalMin;
   ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
-  RealType factor = 1.0 / (parameters_.meshsize->getDxMin() * parameters_.meshsize->getDxMin())
-                    + 1.0 / (parameters_.meshsize->getDyMin() * parameters_.meshsize->getDyMin());
+  timeStepIterator_.iterate();
 
-  // Determine maximum velocity
-  maxUStencil_.reset();
-  maxUFieldIterator_.iterate();
-  maxUBoundaryIterator_.iterate();
-  if (parameters_.geometry.dim == 3) {
-    factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
-    /**
-     *We need the following 'if' condition to ensure that we do not encounter divison by zero. In case the 'if'
-     *condition is not satisfied, the value of dt will be same as previous time step or if it is the first time step,
-     *the user defined time-step will be used. If user has not defined the timestrep, dt will be set to 1 by default.
-     **/
-    if (maxUStencil_.getMaxValues()[2] != 0)
-      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
-  } else {
-    if (maxUStencil_.getMaxValues()[0] != 0)
-      parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
-  }
-
-  // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
-  // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
-  if (maxUStencil_.getMaxValues()[0] != 0 && maxUStencil_.getMaxValues()[1] != 0) {
-    localMin = std::min(
-      parameters_.flow.Re / (2 * factor),
-      std::min(
-        parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 / (maxUStencil_.getMaxValues()[1]))
-      )
-    );
-  } else {
-    localMin = std::min(parameters_.flow.Re / (2 * factor), parameters_.timestep.dt);
-  }
+  RealType localMin, globalMin;
+  localMin = timeStepStencil_.dt;
 
   // Here, we select the type of operation before compiling. This allows to use the correct
   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous

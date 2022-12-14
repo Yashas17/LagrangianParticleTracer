@@ -8,6 +8,8 @@
 #include "../Stencils/PressureBufferReadStencil.hpp"
 #include "../Stencils/VelocityBufferFillStencil.hpp"
 #include "../Stencils/VelocityBufferReadStencil.hpp"
+#include "../Stencils/VtBufferFillStencil.hpp"
+#include "../Stencils/VtBufferReadStencil.hpp"
 
 namespace ParallelManagers {
 
@@ -20,18 +22,18 @@ namespace ParallelManagers {
     FlowField& flowField_;
 
     Stencils::PressureBufferFillStencil pressureBufferFillStencil_;
-    // Stencils::PressureBufferReadStencil pressureBufferReadStencil_;
     ParallelBoundaryIterator<FlowField> pressureBufferFillIterator_;
-    // ParallelBoundaryIterator<FlowField> pressureBufferReadIterator_;
 
     Stencils::VelocityBufferFillStencil velocityBufferFillStencil_;
-    // Stencils::VelocityBufferReadStencil velocityBufferReadStencil_;
     ParallelBoundaryIterator<FlowField> velocityBufferFillIterator_;
-    // ParallelBoundaryIterator<FlowField> velocityBufferReadIterator_;
+
+    Stencils::VtBufferFillStencil       vtBufferFillStencil_;
+    ParallelBoundaryIterator<FlowField> vtBufferFillIterator_;
 
   public:
     void communicatePressure();
     void communicateVelocities();
+    void communicateVt();
     PetscParallelManager(Parameters& parameters, FlowField& flowField);
     ~PetscParallelManager() = default;
   };

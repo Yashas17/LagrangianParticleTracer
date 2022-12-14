@@ -2,7 +2,7 @@
 <configuration>
     <flow Re="100" />
     <simulation finalTime="10.0" >
-        <type>dns</type>
+        <type>turbulence</type>
         <scenario>channel</scenario>
     </simulation>
     <backwardFacingStep xRatio="0.2" yRatio="0.2" />
@@ -11,11 +11,11 @@
     <geometry
       dim="2"
       lengthX="5.0" lengthY="1.0" lengthZ="1.0"
-      sizeX="10" sizeY="20" sizeZ="10"
-      stretchX="false" stretchY="true" stretchZ="true"
+      sizeX="40" sizeY="50" sizeZ="10"
+      stretchX="true" stretchY="true" stretchZ="true"
     >
-      <mesh>uniform</mesh>
-      <!--mesh>stretched</mesh-->
+      <!-- <mesh>uniform</mesh> -->
+      <mesh>stretched</mesh>
     </geometry>
     <environment gx="0" gy="0" gz="0" />
     <walls>
@@ -41,4 +41,9 @@
     <vtk interval="0.1">ChannelBackwardFacingStep2D</vtk>
     <stdOut interval="0.0001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
+    <turbulence>
+        <boundaryLayer>turbulent</boundaryLayer>
+        <!-- <boundaryLayer>laminar</boundaryLayer> -->
+        <!-- <boundaryLayer>none</boundaryLayer> -->
+    </turbulence>
 </configuration>

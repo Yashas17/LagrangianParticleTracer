@@ -11,7 +11,7 @@ namespace Stencils {
 
   /** Stencil to set periodic boundary conditions for velocity
    */
-  class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
+  class VtBufferFillStencil: public BoundaryStencil<FlowField> {
   public:
     int                    cellsX;
     int                    cellsY;
@@ -23,8 +23,8 @@ namespace Stencils {
     std::vector<RealType> frontBuffer;
     std::vector<RealType> backBuffer;
 
-    PressureBufferFillStencil(const Parameters& parameters);
-    ~PressureBufferFillStencil() override = default;
+    VtBufferFillStencil(const Parameters& parameters);
+    ~VtBufferFillStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
     void applyRightWall(FlowField& flowField, int i, int j) override;

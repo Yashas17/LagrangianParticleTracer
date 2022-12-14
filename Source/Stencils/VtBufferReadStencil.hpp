@@ -11,11 +11,11 @@ namespace Stencils {
 
   /** Stencil to set periodic boundary conditions for velocity
    */
-  class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
+  class VtBufferReadStencil: public BoundaryStencil<FlowField> {
   public:
-    int                    cellsX;
-    int                    cellsY;
-    int                    cellsZ;
+    int                   cellsX;
+    int                   cellsY;
+    int                   cellsZ;
     std::vector<RealType> leftBuffer;
     std::vector<RealType> rightBuffer;
     std::vector<RealType> bottomBuffer;
@@ -23,8 +23,26 @@ namespace Stencils {
     std::vector<RealType> frontBuffer;
     std::vector<RealType> backBuffer;
 
-    PressureBufferFillStencil(const Parameters& parameters);
-    ~PressureBufferFillStencil() override = default;
+    // 2d constructor
+    VtBufferReadStencil(
+      const Parameters&       parameters,
+      std::vector<RealType>&& leftBufferFrom,
+      std::vector<RealType>&& rightBufferFrom,
+      std::vector<RealType>&& bottomBufferFrom,
+      std::vector<RealType>&& topBufferFrom
+    );
+    // 3d constructor
+    VtBufferReadStencil(
+      const Parameters&       parameters,
+      std::vector<RealType>&& leftBufferFrom,
+      std::vector<RealType>&& rightBufferFrom,
+      std::vector<RealType>&& bottomBufferFrom,
+      std::vector<RealType>&& topBufferFrom,
+      std::vector<RealType>&& frontBufferFrom,
+      std::vector<RealType>&& backBufferFrom
+    );
+
+    ~VtBufferReadStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
     void applyRightWall(FlowField& flowField, int i, int j) override;
