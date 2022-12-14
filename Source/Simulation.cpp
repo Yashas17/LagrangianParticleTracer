@@ -84,18 +84,28 @@ void Simulation::solveTimestep() {
   solver_->solve();
 
   // TODO WS2: communicate pressure values
-  petscParallelManager_.communicatePressure();
-  //double communication to ensure the corner values are communicated
-  petscParallelManager_.communicatePressure();
+  for(int i = 0; i<parameters_.geometry.dim; i++){
+    /*
+    we need to communicate 2 or 3 times to ensure the corner values are communicated
+    for example, the left bottom corner rank needs 2 communications to receive the corner
+    information from the right top rank.
+    */
+    petscParallelManager_.communicatePressure();
+  }  
 
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
 
   // TODO WS2: communicate velocity values
-  petscParallelManager_.communicateVelocities();
-  //double communication to ensure the corner values are communicated
-  petscParallelManager_.communicateVelocities();
+  for(int i = 0; i<parameters_.geometry.dim; i++){
+    /*
+    we need to communicate 2 or 3 times to ensure the corner values are communicated
+    for example, the left bottom corner rank needs 2 communications to receive the corner
+    information from the right top rank.
+    */
+    petscParallelManager_.communicateVelocities();
+  }
 
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
