@@ -14,15 +14,14 @@ void ParticleSimulation::initializeParticles() {
     double spacingY = lengthY/(particleCount + 1);
     double spacingZ = lengthZ/(particleCount + 1);
     
-    RealType x = 0;
     RealType y;
     RealType z = 0;
 
     for (int p = 0; p < parameters_.particles.particleCount; p++) {
         y = spacingY * (p+1);
         if (dim == 3)
-            z = spacingZ * p;
-        particles_.push_back(Particles(x, y, z));
+            z = spacingZ * (p+1);
+        particles_.push_back(Particles(0, y, z));
     }
 }
 
