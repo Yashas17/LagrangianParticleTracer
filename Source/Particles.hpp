@@ -11,5 +11,6 @@ private:
   std::array<RealType, 3> calculateVelocity(int i, int j, int k); // calculate particle velocity
 
 public:
+  Particles (RealType x, RealType y, RealType z);
   void update();
 }
