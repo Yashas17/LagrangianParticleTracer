@@ -415,6 +415,15 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
         throw std::runtime_error("Boundary layer type not defined!");
       }
     }
+
+    //------------------------------------------------------
+    // Particle simulation parameters
+    //------------------------------------------------------
+    node = confFile.FirstChildElement()->FirstChildElement("particles");
+    if (node != NULL) {
+      parameters.particles.enable = true;
+      readIntMandatory(parameters.particles.particleCount, Node, "particleCount");
+    }
   }
 
   // Broadcasting of the values
@@ -474,4 +483,7 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
 
   // TODO WS2: broadcast turbulence parameters
   MPI_Bcast(&(parameters.turbulence.boundaryLayer), 1, MPI_INT, 0, communicator);
+
+  MPI_Bcast(&(parameters.particles.enable), 1, MPI_BOOL, 0, communicator);
+  MPI_Bcast(&(parameters.particles.particleCount), 1, MPI_INT, 0, communicator);
 }
