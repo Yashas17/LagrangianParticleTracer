@@ -31,7 +31,7 @@ void ParticleSimulation::initializeParticles() {
 void ParticleSimulation::solveTimeStep() {
 
   for (auto& particle : particles_) {
-    particle.update();
+    particle.update(parameters_.timestep.dt);
   }
 
   // TODO: for loop to handle obstacles
