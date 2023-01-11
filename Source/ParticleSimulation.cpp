@@ -12,6 +12,7 @@ void ParticleSimulation::initializeParticles() {
     const RealType lengthY = parameters_.geometry.lengthY;
     const RealType lengthZ = parameters_.geometry.lengthZ;
 
+    // Assuming uniform spacing between particles
     double spacingY = lengthY/(particleCount + 1);
     double spacingZ = lengthZ/(particleCount + 1);
     
@@ -20,14 +21,19 @@ void ParticleSimulation::initializeParticles() {
     ASSERTION(dim == 2 || dim == 3);
     
     if (dim == 2) {
+        // Uniform distributution of the particles in the y-direction
+        // Avoid having particles at exactly the bottom and top walls
         for (int p = 0; p < particleCount; p++) {
             y = spacingY * (p+1);
             particles_.push_back(Particles(0, y, 0));
         }
     }
     else if(dim == 3) {
-        RealType z = 0;
+        RealType z;
 
+        // Uniform distributution of the particles in the YZ-direction
+        // Total of particleCount*particleCount particles in the YZ-plane
+        // Avoid having particles at exactly the bottom, top, front, and back walls
         for (int pz = 0; pz < particleCount; pz++) {
             for (int py = 0; py < particleCount; py++) {
                 y = spacingY * (py+1);
