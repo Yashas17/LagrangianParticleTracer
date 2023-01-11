@@ -1,17 +1,21 @@
 #pragma once
 
-#include "Particles.hpp"
+#include "StdAfx.hpp"
+
+#include "FlowField.hpp"
 #include "Parameters.hpp"
+#include "Particle.hpp"
 
-class ParticleSimulation{
-    private:
-    Parameters& parameters_;
-    std::list<Particles> particles_;
+class ParticleSimulation {
+private:
+  Parameters&          parameters_;
+  FlowField&           flowField_;
+  std::list<Particle> particles_;
 
-    public:
-    ParticleSimulation(Parameters &parameters);
+public:
+  ParticleSimulation(Parameters& parameters, FlowField& flowField);
 
-    void initializeParticles();
-    void solveTimeStep();
-    void plot(int timeSteps, RealType time);
+  void initializeParticles();
+  void solveTimeStep();
+  void plot(int timeSteps, RealType time);
 };
