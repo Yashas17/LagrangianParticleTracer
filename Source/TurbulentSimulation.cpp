@@ -72,7 +72,7 @@ void TurbulentSimulation::solveTimestep() {
   // Compute turbulent viscosity
   vtIterator_.iterate();
   // Communicate turbulent viscosity
-  for(int i = 0; i<parameters_.geometry.dim; i++){
+  for (int i = 0; i < parameters_.geometry.dim; i++) {
     /*
     we need to communicate 2 or 3 times to ensure the corner values are communicated
     for example, the left bottom corner rank needs 2 communications to receive the corner
@@ -91,7 +91,7 @@ void TurbulentSimulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
-  for(int i = 0; i<parameters_.geometry.dim; i++){
+  for (int i = 0; i < parameters_.geometry.dim; i++) {
     /*
     we need to communicate 2 or 3 times to ensure the corner values are communicated
     for example, the left bottom corner rank needs 2 communications to receive the corner
@@ -104,7 +104,7 @@ void TurbulentSimulation::solveTimestep() {
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
-  for(int i = 0; i<parameters_.geometry.dim; i++){
+  for (int i = 0; i < parameters_.geometry.dim; i++) {
     /*
     we need to communicate 2 or 3 times to ensure the corner values are communicated
     for example, the left bottom corner rank needs 2 communications to receive the corner
@@ -126,7 +126,7 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 }
 
 void TurbulentSimulation::setTimeStep() {
-  ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
+  ASSERTION(parameters_v.geometry.dim == 2 || parameters_.geometry.dim == 3);
   timeStepIterator_.iterate();
 
   RealType localMin, globalMin;
