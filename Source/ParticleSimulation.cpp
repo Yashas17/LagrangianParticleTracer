@@ -1,4 +1,5 @@
 #include "ParticleSimulation.hpp"
+#include <fstream>
 
 ParticleSimulation::ParticleSimulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
@@ -68,4 +69,13 @@ void ParticleSimulation::solveTimestep() {
   // TODO: for loop to handle going out of bounds (periodicity or dying out?)
 }
 
-void ParticleSimulation::plot(int timeSteps, double time){}
+void ParticleSimulation::plot(int timeSteps, double time) {
+  int i = 1;
+
+  for (auto& particle : particles_) {
+    std::cout
+      << "Particle ID:" << i << "\t(x,y,z) = " << particle.getX() << "," << particle.getY() << "," << particle.getZ()
+      << "\n";
+    i++;
+  }
+}

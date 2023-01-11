@@ -84,21 +84,21 @@ void Simulation::solveTimestep() {
   solver_->solve();
 
   // TODO WS2: communicate pressure values
-  for(int i = 0; i<parameters_.geometry.dim; i++){
+  for (int i = 0; i < parameters_.geometry.dim; i++) {
     /*
     we need to communicate 2 or 3 times to ensure the corner values are communicated
     for example, the left bottom corner rank needs 2 communications to receive the corner
     information from the right top rank.
     */
     petscParallelManager_.communicatePressure();
-  }  
+  }
 
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
 
   // TODO WS2: communicate velocity values
-  for(int i = 0; i<parameters_.geometry.dim; i++){
+  for (int i = 0; i < parameters_.geometry.dim; i++) {
     /*
     we need to communicate 2 or 3 times to ensure the corner values are communicated
     for example, the left bottom corner rank needs 2 communications to receive the corner
@@ -113,11 +113,11 @@ void Simulation::solveTimestep() {
 
 void Simulation::plotVTK(int timeStep, RealType simulationTime) {
 #ifndef DISABLE_OUTPUT
- // Stencils::VTKStencil     vtkStencil(parameters_);
-  //FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
+  Stencils::VTKStencil     vtkStencil(parameters_);
+  FieldIterator<FlowField> vtkIterator(flowField_, parameters_, vtkStencil, 1, 0);
 
-  //vtkIterator.iterate();
-  //vtkStencil.write(flowField_, timeStep, simulationTime);
+  vtkIterator.iterate();
+  vtkStencil.write(flowField_, timeStep, simulationTime);
 #endif
 }
 

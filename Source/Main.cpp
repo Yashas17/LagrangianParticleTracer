@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
   // Plot initial state
 #ifndef DISABLE_OUTPUT
-  // simulation->plotVTK(timeSteps, time);
+  simulation->plotVTK(timeSteps, time);
 #endif
 
   Clock clock;
