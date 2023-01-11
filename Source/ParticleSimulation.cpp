@@ -1,8 +1,9 @@
 #include "ParticleSimulation.hpp"
 
 
-ParticleSimulation::ParticleSimulation(Parameters &parameters)
-: parameters_(parameters) {}
+ParticleSimulation::ParticleSimulation(Parameters& parameters, FlowField& flowField):
+  parameters_(parameters),
+  flowField_(flowField) {}
 
 void ParticleSimulation::initializeParticles() {  
     // Number of particles in each direction (2D: y - 3D: y & z)
@@ -25,10 +26,10 @@ void ParticleSimulation::initializeParticles() {
         // Avoid having particles at exactly the bottom and top walls
         for (int p = 0; p < particleCount; p++) {
             y = spacingY * (p+1);
-            particles_.push_back(Particles(0, y, 0));
+            particles_.push_back(Particles(0.0, y));
         }
     }
-    else if(dim == 3) {
+    else {
         RealType z;
 
         // Uniform distributution of the particles in the YZ-direction
@@ -38,21 +39,19 @@ void ParticleSimulation::initializeParticles() {
             for (int py = 0; py < particleCount; py++) {
                 y = spacingY * (py+1);
                 z = spacingZ * (pz+1);
-                particles_.push_back(Particles(0, y, z));
+                particles_.push_back(Particles(0.0, y, z));
             }
         }
     }
+  
 }
 
-
 void ParticleSimulation::solveTimeStep() {
-    std::list<Particles>::iterator particle;
 
     for (auto& particle : particles_){
         particle.update();
     }
 
-    // TODO: for loop to handle obstacles
-    // TODO: for loop to handle going out of bounds (periodicity or dying out?)
+  // TODO: for loop to handle obstacles
+  // TODO: for loop to handle going out of bounds (periodicity or dying out?)
 }
-
