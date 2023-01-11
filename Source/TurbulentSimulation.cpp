@@ -126,7 +126,7 @@ void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
 }
 
 void TurbulentSimulation::setTimeStep() {
-  ASSERTION(parameters_.geometry.dim == 2 || parameters_.geometry.dim == 3);
+  ASSERTION(parameters_v.geometry.dim == 2 || parameters_.geometry.dim == 3);
   timeStepIterator_.iterate();
 
   RealType localMin, globalMin;
