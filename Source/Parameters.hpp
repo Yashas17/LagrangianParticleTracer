@@ -142,7 +142,7 @@ class ParticleParameters{
   public:
   bool enable = 0;
   int particleCount = 0;
-}
+};
 
 //@}
 

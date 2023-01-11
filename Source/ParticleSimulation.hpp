@@ -16,6 +16,6 @@ public:
   ParticleSimulation(Parameters& parameters, FlowField& flowField);
 
   void initializeParticles();
-  void solveTimeStep();
+  void solveTimestep();
   void plot(int timeSteps, RealType time);
 };

@@ -7,20 +7,19 @@
 
 class Particle {
 private:
-  RealType   x_, y_, z_ = -1; // coordinates
-  FlowField& flowField_;
+  RealType           x_, y_, z_; // coordinates
+  FlowField&         flowField_;
+  Parameters&        parameters_;
+  std::array<int, 3> index_; // index of cell particle is in
 
-  std::array<int, 2> getIndex(RealType x, RealType y);             // get cell index where the particle is located
-  std::array<int, 3> getIndex(RealType x, RealType y, RealType z); // get cell index where the particle is located
-  RealType*          calculateVelocity(int i, int j);              // calculate particle velocity
-  RealType*          calculateVelocity(int i, int j, int k);       // calculate particle velocity
+  RealType* calculateVelocity(); // calculate particle velocity
 
 public:
-  Particle(RealType x, RealType y, FlowField& flowField_);
-  Particle(RealType x, RealType y, RealType z, FlowField& flowField_);
+  Particle(RealType x, RealType y, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters);
+  Particle(RealType x, RealType y, RealType z, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters);
   RealType getX();
   RealType getY();
   RealType getZ();
 
   void update(RealType dt);
-}
+};

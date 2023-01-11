@@ -422,7 +422,7 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     node = confFile.FirstChildElement()->FirstChildElement("particles");
     if (node != NULL) {
       parameters.particles.enable = true;
-      readIntMandatory(parameters.particles.particleCount, Node, "particleCount");
+      readIntMandatory(parameters.particles.particleCount, node, "particleCount");
     }
   }
 
@@ -484,6 +484,6 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
   // TODO WS2: broadcast turbulence parameters
   MPI_Bcast(&(parameters.turbulence.boundaryLayer), 1, MPI_INT, 0, communicator);
 
-  MPI_Bcast(&(parameters.particles.enable), 1, MPI_BOOL, 0, communicator);
+  MPI_Bcast(&(parameters.particles.enable), 1, MPI_C_BOOL, 0, communicator);
   MPI_Bcast(&(parameters.particles.particleCount), 1, MPI_INT, 0, communicator);
 }

@@ -58,8 +58,8 @@ int main(int argc, char* argv[]) {
   configuration.loadParameters(parameters);
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*  flowField  = NULL;
-  Simulation* simulation = NULL;
+  FlowField*          flowField          = NULL;
+  Simulation*         simulation         = NULL;
   ParticleSimulation* particleSimulation = NULL;
 
   spdlog::debug(
@@ -110,11 +110,11 @@ int main(int argc, char* argv[]) {
   if (simulation == NULL) {
     throw std::runtime_error("simulation == NULL!");
   }
-  
+
   simulation->initializeFlowField();
-  
-  if (parameters.particles.enable== true) {
-    particleSimulation = new ParticleSimulation(parameters);
+
+  if (parameters.particles.enable == true) {
+    particleSimulation = new ParticleSimulation(parameters, *flowField);
     particleSimulation->initializeParticles();
   }
 
