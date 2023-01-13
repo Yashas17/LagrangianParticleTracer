@@ -7,12 +7,13 @@
 
 class Particle {
 private:
-  RealType           x_, y_, z_; // coordinates
-  FlowField&         flowField_;
-  Parameters&        parameters_;
-  std::array<int, 3> index_; // index of cell particle is in
+  RealType                x_, y_, z_; // coordinates
+  std::array<RealType, 3> velocity_;
+  FlowField&              flowField_;
+  Parameters&             parameters_;
+  std::array<int, 3>      index_; // index of cell particle is in
 
-  RealType* calculateVelocity(); // calculate particle velocity
+  void calculateVelocity(); // calculate particle velocity
 
 public:
   Particle(RealType x, RealType y, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters);
