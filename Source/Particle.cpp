@@ -122,4 +122,90 @@ void Particle::update(RealType dt) {
       }
     }
   }
+
+  applyBoundaryCondition();
+}
+
+void Particle::applyBoundaryCondition() {
+  /******* Cavity Case *******/
+  if (parameters_.simulation.scenario == "cavity") {
+
+    // Check if particle is left of left boundary
+    if (x_ < 0) {
+      wallCorrect(x_, 0.0, velocity_[0]);
+    }
+    // Check if particle is right of right boundary
+    else if (x_ > parameters_.geometry.lengthX) {
+      wallCorrect(x_, parameters_.geometry.lengthX, velocity_[0]);
+    }
+
+    // Check if particle is below bottom boundary
+    if (y_ < 0) {
+      wallCorrect(y_, 0.0, velocity_[1]);
+    }
+    // Check if particle is above top boundary
+    else if (y_ > parameters_.geometry.lengthY) {
+      wallCorrect(y_, parameters_.geometry.lengthY, velocity_[1]);
+    }
+
+    if (parameters_.geometry.dim == 3) {
+      if (z_ < 0) {
+        wallCorrect(z_, 0.0, velocity_[2]);
+      } else if (z_ > parameters_.geometry.lengthZ) {
+        wallCorrect(z_, parameters_.geometry.lengthZ, velocity_[2]);
+      }
+    }
+
+  }
+  /******* Channel Case ********/
+  else if (parameters_.bfStep.yRatio < 0) {
+    // Check if particle is below bottom boundary
+    if (y_ < 0) {
+      wallCorrect(y_, 0.0, velocity_[1]);
+    }
+    // Check if particle is above top boundary
+    else if (y_ > parameters_.geometry.lengthY) {
+      wallCorrect(y_, parameters_.geometry.lengthY, velocity_[1]);
+    }
+
+    if (parameters_.geometry.dim == 3) {
+      if (z_ < 0) {
+        wallCorrect(z_, 0.0, velocity_[2]);
+      } else if (z_ > parameters_.geometry.lengthZ) {
+        wallCorrect(z_, parameters_.geometry.lengthZ, velocity_[2]);
+      }
+    }
+  }
+  /******* BFS Case ********/
+  else {
+    RealType stepLengthX = parameters_.geometry.lengthX * parameters_.bfStep.xRatio;
+    RealType stepLengthY = parameters_.geometry.lengthY * parameters_.bfStep.yRatio;
+    // Check if particle is inside the step
+    if (x_ < stepLengthX && y_ < stepLengthY) {
+      if (velocity_[0] < 0)
+        wallCorrect(x_, stepLengthX, velocity_[0]);
+      if (velocity_[1] < 0)
+        wallCorrect(y_, stepLengthY, velocity_[1]);
+    }
+    // Check if particle is above top boundary
+    else if (y_ > parameters_.geometry.lengthY) {
+      wallCorrect(y_, parameters_.geometry.lengthY, velocity_[1]);
+    }
+    // Check if particle is below bottom boundary
+    else if (y_ < 0) {
+      wallCorrect(y_, 0.0, velocity_[1]);
+    }
+    if (parameters_.geometry.dim == 3) {
+      if (z_ < 0) {
+        wallCorrect(z_, 0.0, velocity_[2]);
+      } else if (z_ > parameters_.geometry.lengthZ) {
+        wallCorrect(z_, parameters_.geometry.lengthZ, velocity_[2]);
+      }
+    }
+  }
+}
+
+inline void Particle::wallCorrect(RealType& x, RealType limitX, RealType& velocity) {
+  x        = 2 * limitX - x;
+  velocity = -velocity;
 }
