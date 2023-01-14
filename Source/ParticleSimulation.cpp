@@ -75,13 +75,65 @@ void ParticleSimulation::solveTimestep() {
   // TODO: for loop to handle going out of bounds (periodicity or dying out?)
 }
 
-void ParticleSimulation::plot(int timeSteps, double time) {
-  int i = 1;
+void ParticleSimulation::plot(int timeSteps, RealType time){
+    const int dim = parameters_.geometry.dim;
 
-  for (auto& particle : particles_) {
-    std::cout
-      << "Particle ID:" << i << "\t(x,y,z) = " << particle.getX() << "," << particle.getY() << "," << particle.getZ()
-      << "\n";
-    i++;
-  }
+    //open file
+    std::string prefix = parameters_.vtk.prefix; //read the prefix
+    std::string outputFolder = "Output/" + prefix;
+    std::stringstream namestream;
+    std::string       name;
+    std::string grid;
+    char        buffer[256];
+
+    namestream.precision(4);
+    namestream
+    << "Output"
+    << "/" << prefix << "/" << prefix << "particles." << parameters_.parallel.rank << "." << timeSteps << ".vtk";
+    name = namestream.str();
+    std::ofstream ofile;
+    ofile.open(name.c_str()); //open the file
+    namestream.str("");
+
+    //write header
+    ofile << "# vtk DataFile Version 2.0" << std::endl << "NS-EOF" << std::endl << "ASCII" << std::endl << std::endl;
+
+    grid.reserve((ofile.precision() + 6) * particles_.size() * 3);
+
+    sprintf(
+        buffer,
+        "DATASET POLYDATA\nPOINTS %d float\n",
+        particles_.size()
+    );
+    grid.append(buffer);
+
+    //loop over particles
+    if(dim == 3){
+        for(auto particle: particles_){
+            sprintf(
+                buffer,
+                "%f %f %f\n",
+                particle.getX(),
+                particle.getY(),
+                particle.getZ()
+            );
+            grid.append(buffer);
+        }
+    }
+    else{
+        for(auto particle: particles_){
+            sprintf(
+                buffer,
+                "%f %f 0.0\n",
+                particle.getX(),
+                particle.getY()
+            );
+            grid.append(buffer);
+        }
+    }
+    
+    //close file
+    grid.append("\n");
+    ofile << grid;
+    ofile.close();
 }
