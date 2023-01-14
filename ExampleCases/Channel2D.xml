@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="10000" />
-    <simulation finalTime="50.0" >
-        <type>turbulence</type>
+    <flow Re="100" />
+    <simulation finalTime="5.0" >
+        <type>dns</type>
         <scenario>channel</scenario>
     </simulation>
     <timestep dt="1" tau="0.5" />
@@ -10,11 +10,11 @@
     <geometry
       dim="2"
       lengthX="30.0" lengthY="1.0" lengthZ="1.0"
-      sizeX="180" sizeY="200" sizeZ="10"
+      sizeX="50" sizeY="50" sizeZ="10"
       stretchX="false" stretchY="true" stretchZ="true"
     >
       <!-- <mesh>uniform</mesh> -->
-      <mesh>stretched</mesh>
+      <mesh>uniform</mesh>
     </geometry>
     <environment gx="0" gy="0" gz="0" />
     <walls>
