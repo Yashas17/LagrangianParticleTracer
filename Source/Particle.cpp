@@ -33,7 +33,43 @@ void Particle::calculateVelocity() {
   }
 }
 
-Particle::Particle(RealType x, RealType y, std::array<int, 3> index, FlowField& flowField, Parameters& parameters):
+Particle::Particle(const Particle& p) noexcept: 
+  x_(p.x_), 
+  y_(p.y_), 
+  velocity_(p.velocity_), 
+  flowField_(p.flowField_), 
+  parameters_(p.parameters_), 
+  index_(p.index_) {}
+  
+Particle::Particle(Particle&& p) noexcept: 
+  x_(p.x_), 
+  y_(p.y_), 
+  velocity_(std::move(p.velocity_)), 
+  flowField_(p.flowField_), 
+  parameters_(p.parameters_), 
+  index_(std::move(p.index_)) {}
+  
+void Particle::serialize(double* buffer) noexcept {
+  buffer[0] = x_;
+  buffer[1] = y_;
+  buffer[2] = velocity_[0];
+  buffer[3] = velocity_[1];
+  buffer[4] = index_[0];
+  buffer[5] = index_[1];
+}
+  
+Particle::Particle(double* serialized_data, FlowField& flowField, Parameters& parameters) noexcept:
+  x_(serialized_data[0]),
+  y_(serialized_data[1]),
+  velocity_{serialized_data[2], serialized_data[3], 0.0},
+  flowField_(flowField),
+  parameters_(parameters),
+  index_{static_cast<int>(serialized_data[4] + 0.5), static_cast<int>(serialized_data[5] + 0.5), 0}
+{}
+
+Particle::Particle(
+  RealType x, RealType y, std::array<int, 3> index, FlowField& flowField, Parameters& parameters
+) noexcept:
   x_(x),
   y_(y),
   index_(index),
@@ -42,7 +78,7 @@ Particle::Particle(RealType x, RealType y, std::array<int, 3> index, FlowField& 
 
 Particle::Particle(
   RealType x, RealType y, RealType z, std::array<int, 3> index, FlowField& flowField, Parameters& parameters
-):
+) noexcept:
   x_(x),
   y_(y),
   z_(z),

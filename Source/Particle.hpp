@@ -18,11 +18,15 @@ private:
   inline void wallCorrect(RealType& x, RealType xLimit, RealType& velocity); // helper function for boundary conditions
 
 public:
-  Particle(RealType x, RealType y, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters);
-  Particle(RealType x, RealType y, RealType z, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters);
+  Particle(RealType x, RealType y, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters) noexcept;
+  Particle(RealType x, RealType y, RealType z, std::array<int, 3> index, FlowField& flowField_, Parameters& parameters) noexcept;
   RealType getX();
   RealType getY();
   RealType getZ();
+  Particle(const Particle& p) noexcept;
+  Particle(Particle&& p) noexcept;
+  void serialize(double* buffer) noexcept;
+  Particle(double* serialized_data, FlowField& flowField_, Parameters& parameters) noexcept;
 
   void update(RealType dt);
 };
