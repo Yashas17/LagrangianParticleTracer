@@ -23,6 +23,12 @@ public:
   RealType getX();
   RealType getY();
   RealType getZ();
+  RealType getU();
+  RealType getV();
+  RealType getW();
+  int getI();
+  int getJ();
+  int getK();
   Particle(const Particle& p) noexcept;
   Particle(Particle&& p) noexcept;
   void serialize(double* buffer) noexcept;

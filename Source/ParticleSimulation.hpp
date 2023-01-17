@@ -18,4 +18,11 @@ public:
   void initializeParticles();
   void solveTimestep();
   void plot(int timeSteps, RealType time);
+  void communicateParticles();
+  std::vector<RealType> collectLeftBoundaryParticles();
+  std::vector<RealType> collectRightBoundaryParticles();
+  std::vector<RealType> collectBottomBoundaryParticles();
+  std::vector<RealType> collectTopBoundaryParticles();
+  std::vector<RealType> collectFrontBoundaryParticles();
+  std::vector<RealType> collectBackBoundaryParticles();
 };

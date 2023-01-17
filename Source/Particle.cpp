@@ -89,6 +89,12 @@ Particle::Particle(
 RealType Particle::getX() { return x_; }
 RealType Particle::getY() { return y_; }
 RealType Particle::getZ() { return z_; }
+RealType Particle::getU() { return velocity_[0]; }
+RealType Particle::getV() { return velocity_[1]; }
+RealType Particle::getW() { return velocity_[2]; }
+int Particle::getI() { return index_[0]; }
+int Particle::getJ() { return index_[1]; }
+int Particle::getK() { return index_[2]; }
 
 void Particle::update(RealType dt) {
   if (parameters_.geometry.dim == 3) {

@@ -1,7 +1,5 @@
 #include "ParticleSimulation.hpp"
 
-#include <fstream>
-
 ParticleSimulation::ParticleSimulation(Parameters& parameters, FlowField& flowField):
   parameters_(parameters),
   flowField_(flowField) {}
@@ -36,7 +34,7 @@ void ParticleSimulation::initializeParticles() {
         j++;
       }
       index[1] = j;
-      particles_.push_back(Particle(x, y, index, flowField_, parameters_));
+      particles_.push_front(Particle(x, y, index, flowField_, parameters_));
     }
   } else {
     RealType z;
@@ -60,7 +58,7 @@ void ParticleSimulation::initializeParticles() {
           k++;
         }
         index[2] = k;
-        particles_.push_back(Particle(x, y, z, index, flowField_, parameters_));
+        particles_.push_front(Particle(x, y, z, index, flowField_, parameters_));
       }
     }
   }
@@ -71,8 +69,6 @@ void ParticleSimulation::solveTimestep() {
   for (auto& particle : particles_) {
     particle.update(parameters_.timestep.dt);
   }
-  // TODO: for loop to handle obstacles
-  // TODO: for loop to handle going out of bounds (periodicity or dying out?)
 }
 
 void ParticleSimulation::plot(int timeSteps, RealType time){
@@ -136,4 +132,209 @@ void ParticleSimulation::plot(int timeSteps, RealType time){
     grid.append("\n");
     ofile << grid;
     ofile.close();
+}
+
+std::vector<RealType> ParticleSimulation::collectLeftBoundaryParticles(){
+  const int dim = parameters_.geometry.dim;
+  std::vector<RealType> sendBuffer{};
+
+  for(auto& particle: particles_){
+    if(particle.getI() < 2){ //left ghost cell territory
+      if(dim == 2){
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+      }
+      else{
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getZ());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(particle.getW());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getK()));
+      }
+
+      //TODO: delete the particle
+    }
+  }
+
+  return sendBuffer;
+}
+
+std::vector<RealType> ParticleSimulation::collectRightBoundaryParticles(){
+  const int dim = parameters_.geometry.dim;
+  std::vector<RealType> sendBuffer{};
+
+  for(auto& particle: particles_){
+    if(particle.getI() >= parameters_.parallel.localSize[0] + 2){ //right ghost cell territory
+      if(dim == 2){
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+      }
+      else{
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getZ());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(particle.getW());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getK()));
+      }
+
+      //TODO: delete the particle
+    }
+  }
+
+  return sendBuffer;
+}
+
+std::vector<RealType> ParticleSimulation::collectBottomBoundaryParticles(){
+  const int dim = parameters_.geometry.dim;
+  std::vector<RealType> sendBuffer{};
+
+  for(auto& particle: particles_){
+    if(particle.getJ() < 2){ //bottom ghost cell territory
+      if(dim == 2){
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+      }
+      else{
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getZ());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(particle.getW());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getK()));
+      }
+
+      //TODO: delete the particle
+    }
+  }
+
+  return sendBuffer;
+}
+
+std::vector<RealType> ParticleSimulation::collectTopBoundaryParticles(){
+  const int dim = parameters_.geometry.dim;
+  std::vector<RealType> sendBuffer{};
+
+  for(auto& particle: particles_){
+    if(particle.getJ() >= parameters_.parallel.localSize[1] + 2){ //top ghost cell territory
+      if(dim == 2){
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+      }
+      else{
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getZ());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(particle.getW());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getK()));
+      }
+
+      //TODO: delete the particle
+    }
+  }
+
+  return sendBuffer;
+}
+
+std::vector<RealType> ParticleSimulation::collectFrontBoundaryParticles(){
+  const int dim = parameters_.geometry.dim;
+  std::vector<RealType> sendBuffer{};
+
+  for(auto& particle: particles_){
+    if(particle.getK() < 2){ //front ghost cell territory
+      if(dim == 2){
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+      }
+      else{
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getZ());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(particle.getW());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getK()));
+      }
+
+      //TODO: delete the particle
+    }
+  }
+
+  return sendBuffer;
+}
+
+std::vector<RealType> ParticleSimulation::collectBackBoundaryParticles(){
+  const int dim = parameters_.geometry.dim;
+  std::vector<RealType> sendBuffer{};
+
+  for(auto& particle: particles_){
+    if(particle.getK() >= parameters_.parallel.localSize[2] + 2){ //back ghost cell territory
+      if(dim == 2){
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+      }
+      else{
+        sendBuffer.push_back(particle.getX());
+        sendBuffer.push_back(particle.getY());
+        sendBuffer.push_back(particle.getZ());
+        sendBuffer.push_back(particle.getU());
+        sendBuffer.push_back(particle.getV());
+        sendBuffer.push_back(particle.getW());
+        sendBuffer.push_back(static_cast<RealType>(particle.getI()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        sendBuffer.push_back(static_cast<RealType>(particle.getK()));
+      }
+
+      //TODO: delete the particle
+    }
+  }
+
+  return sendBuffer;
+}
+
+void ParticleSimulation::communicateParticles(){
+  //TODO: Collect buffers
+  //TODO: MPI communication of number of particles
+  //TODO: MPI communication of buffers
+  //TODO: Particle generation
 }
