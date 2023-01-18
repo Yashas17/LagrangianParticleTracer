@@ -26,13 +26,13 @@ public:
   RealType getU();
   RealType getV();
   RealType getW();
-  int getI();
-  int getJ();
-  int getK();
+  int& getI();
+  int& getJ();
+  int& getK();
   Particle(const Particle& p) noexcept;
   Particle(Particle&& p) noexcept;
-  void serialize(double* buffer) noexcept;
-  Particle(double* serialized_data, FlowField& flowField_, Parameters& parameters) noexcept;
+  void serialize(RealType* buffer) noexcept;
+  Particle(RealType* serialized_data, FlowField& flowField_, Parameters& parameters) noexcept;
 
   void update(RealType dt);
 };

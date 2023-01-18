@@ -49,7 +49,7 @@ Particle::Particle(Particle&& p) noexcept:
   parameters_(p.parameters_), 
   index_(std::move(p.index_)) {}
   
-void Particle::serialize(double* buffer) noexcept {
+void Particle::serialize(RealType* buffer) noexcept {
   buffer[0] = x_;
   buffer[1] = y_;
   buffer[2] = velocity_[0];
@@ -58,7 +58,7 @@ void Particle::serialize(double* buffer) noexcept {
   buffer[5] = index_[1];
 }
   
-Particle::Particle(double* serialized_data, FlowField& flowField, Parameters& parameters) noexcept:
+Particle::Particle(RealType* serialized_data, FlowField& flowField, Parameters& parameters) noexcept:
   x_(serialized_data[0]),
   y_(serialized_data[1]),
   velocity_{serialized_data[2], serialized_data[3], 0.0},
@@ -92,9 +92,9 @@ RealType Particle::getZ() { return z_; }
 RealType Particle::getU() { return velocity_[0]; }
 RealType Particle::getV() { return velocity_[1]; }
 RealType Particle::getW() { return velocity_[2]; }
-int Particle::getI() { return index_[0]; }
-int Particle::getJ() { return index_[1]; }
-int Particle::getK() { return index_[2]; }
+int& Particle::getI() { return index_[0]; }
+int& Particle::getJ() { return index_[1]; }
+int& Particle::getK() { return index_[2]; }
 
 void Particle::update(RealType dt) {
   if (parameters_.geometry.dim == 3) {
