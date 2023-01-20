@@ -50,22 +50,49 @@ Particle::Particle(Particle&& p) noexcept:
   index_(std::move(p.index_)) {}
   
 void Particle::serialize(RealType* buffer) noexcept {
-  buffer[0] = x_;
-  buffer[1] = y_;
-  buffer[2] = velocity_[0];
-  buffer[3] = velocity_[1];
-  buffer[4] = index_[0];
-  buffer[5] = index_[1];
+  if (parameters_.geometry.dim == 2){
+    buffer[0] = x_;
+    buffer[1] = y_;
+    buffer[2] = velocity_[0];
+    buffer[3] = velocity_[1];
+    buffer[4] = index_[0];
+    buffer[5] = index_[1];
+  }else{
+    buffer[0] = x_;
+    buffer[1] = y_;
+    buffer[2] = z_;
+    buffer[3] = velocity_[0];
+    buffer[4] = velocity_[1];
+    buffer[5] = velocity_[2];
+    buffer[6] = index_[0];
+    buffer[7] = index_[1];
+    buffer[8] = index_[2];
+  }
 }
   
 Particle::Particle(RealType* serialized_data, FlowField& flowField, Parameters& parameters) noexcept:
-  x_(serialized_data[0]),
-  y_(serialized_data[1]),
-  velocity_{serialized_data[2], serialized_data[3], 0.0},
   flowField_(flowField),
-  parameters_(parameters),
-  index_{static_cast<int>(serialized_data[4] + 0.5), static_cast<int>(serialized_data[5] + 0.5), 0}
-{}
+  parameters_(parameters)
+{
+  if (parameters_.geometry.dim == 2){
+    x_ = serialized_data[0];
+    y_ = serialized_data[1];
+    velocity_[0] = serialized_data[2];
+    velocity_[1] = serialized_data[3];
+    index_[0] = static_cast<int>(serialized_data[4] + 0.5);
+    index_[1] = static_cast<int>(serialized_data[5] + 0.5);
+  } else {
+    x_ = serialized_data[0];
+    y_ = serialized_data[1];
+    z_ = serialized_data[2];
+    velocity_[0] = serialized_data[3];
+    velocity_[1] = serialized_data[4];
+    velocity_[2] = serialized_data[5];
+    index_[0] = static_cast<int>(serialized_data[6] + 0.5);
+    index_[1] = static_cast<int>(serialized_data[7] + 0.5);
+    index_[2] = static_cast<int>(serialized_data[8] + 0.5);
+  }
+}
 
 Particle::Particle(
   RealType x, RealType y, std::array<int, 3> index, FlowField& flowField, Parameters& parameters
