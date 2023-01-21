@@ -35,7 +35,10 @@ void ParticleSimulation::initializeParticles() {
       }
       index[1] = j;
       if(x > parameters_.meshsize->getPosX(2, 0)){
-        particles_.push_front(Particle(x, y, index, flowField_, parameters_));
+        if (index[0] >= 2 && index[0] < flowField_.getCellsX() - 1 
+          && index[1] >= 2 && index[1] < flowField_.getCellsY() - 1){
+          particles_.push_front(Particle(x, y, index, flowField_, parameters_));
+        }
       }
     }
   } else {
@@ -61,7 +64,11 @@ void ParticleSimulation::initializeParticles() {
         }
         index[2] = k;
         if(x > parameters_.meshsize->getPosX(2, 0, 0)){
-          particles_.push_front(Particle(x, y, z, index, flowField_, parameters_));
+          if (index[0] >= 2 && index[0] < flowField_.getCellsX() - 1 
+              && index[1] >= 2 && index[1] < flowField_.getCellsY() - 1 
+              && index[2] >= 2 && index[2] < flowField_.getCellsZ() - 1){
+            particles_.push_front(Particle(x, y, index, flowField_, parameters_));
+          }
         }
       }
     }
@@ -111,7 +118,7 @@ void ParticleSimulation::plot(int timeSteps, RealType time){
 
     //loop over particles
     if(dim == 3){
-        for(auto particle: particles_){
+        for(auto& particle: particles_){
             sprintf(
                 buffer,
                 "%f %f %f\n",
@@ -142,7 +149,7 @@ void ParticleSimulation::plot(int timeSteps, RealType time){
 
 std::vector<RealType> ParticleSimulation::collectLeftBoundaryParticles(){
   const int dim = parameters_.geometry.dim;
-  std::vector<RealType> sendBuffer{};
+  std::vector<RealType> sendBuffer;
 
   for(auto& particle: particles_){
     if(particle.getI() < 2){ //left ghost cell territory
@@ -165,10 +172,10 @@ std::vector<RealType> ParticleSimulation::collectLeftBoundaryParticles(){
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
         sendBuffer.push_back(static_cast<RealType>(particle.getK()));
       }
-
-      //TODO: delete the particle
     }
   }
+
+  particles_.remove_if([this](Particle& particle){ return particle.getI() < 2; });
 
   if(sendBuffer.size() == 0) sendBuffer.push_back(0.0);
   return sendBuffer;
@@ -176,7 +183,7 @@ std::vector<RealType> ParticleSimulation::collectLeftBoundaryParticles(){
 
 std::vector<RealType> ParticleSimulation::collectRightBoundaryParticles(){
   const int dim = parameters_.geometry.dim;
-  std::vector<RealType> sendBuffer{};
+  std::vector<RealType> sendBuffer;
 
   for(auto& particle: particles_){
     if(particle.getI() >= parameters_.parallel.localSize[0] + 2){ //right ghost cell territory
@@ -187,6 +194,7 @@ std::vector<RealType> ParticleSimulation::collectRightBoundaryParticles(){
         sendBuffer.push_back(particle.getV());
         sendBuffer.push_back(static_cast<RealType>(particle.getI()));
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
+        //throw std::runtime_error("EH");
       }
       else{
         sendBuffer.push_back(particle.getX());
@@ -199,10 +207,10 @@ std::vector<RealType> ParticleSimulation::collectRightBoundaryParticles(){
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
         sendBuffer.push_back(static_cast<RealType>(particle.getK()));
       }
-
-      //TODO: delete the particle
     }
   }
+
+  particles_.remove_if([this](Particle& particle){ return particle.getI() >= parameters_.parallel.localSize[0] + 2; });
 
   if(sendBuffer.size() == 0) sendBuffer.push_back(0.0);
   return sendBuffer;
@@ -210,7 +218,7 @@ std::vector<RealType> ParticleSimulation::collectRightBoundaryParticles(){
 
 std::vector<RealType> ParticleSimulation::collectBottomBoundaryParticles(){
   const int dim = parameters_.geometry.dim;
-  std::vector<RealType> sendBuffer{};
+  std::vector<RealType> sendBuffer;
 
   for(auto& particle: particles_){
     if(particle.getJ() < 2){ //bottom ghost cell territory
@@ -233,10 +241,10 @@ std::vector<RealType> ParticleSimulation::collectBottomBoundaryParticles(){
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
         sendBuffer.push_back(static_cast<RealType>(particle.getK()));
       }
-
-      //TODO: delete the particle
     }
   }
+
+  particles_.remove_if([this](Particle& particle){ return particle.getJ() < 2; });
 
   if(sendBuffer.size() == 0) sendBuffer.push_back(0.0);
   return sendBuffer;
@@ -244,7 +252,7 @@ std::vector<RealType> ParticleSimulation::collectBottomBoundaryParticles(){
 
 std::vector<RealType> ParticleSimulation::collectTopBoundaryParticles(){
   const int dim = parameters_.geometry.dim;
-  std::vector<RealType> sendBuffer{};
+  std::vector<RealType> sendBuffer;
 
   for(auto& particle: particles_){
     if(particle.getJ() >= parameters_.parallel.localSize[1] + 2){ //top ghost cell territory
@@ -267,10 +275,10 @@ std::vector<RealType> ParticleSimulation::collectTopBoundaryParticles(){
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
         sendBuffer.push_back(static_cast<RealType>(particle.getK()));
       }
-
-      //TODO: delete the particle
     }
   }
+
+  particles_.remove_if([this](Particle& particle){ return particle.getJ() >= parameters_.parallel.localSize[1] + 2; });
 
   if(sendBuffer.size() == 0) sendBuffer.push_back(0.0);
   return sendBuffer;
@@ -278,7 +286,7 @@ std::vector<RealType> ParticleSimulation::collectTopBoundaryParticles(){
 
 std::vector<RealType> ParticleSimulation::collectFrontBoundaryParticles(){
   const int dim = parameters_.geometry.dim;
-  std::vector<RealType> sendBuffer{};
+  std::vector<RealType> sendBuffer;
 
   for(auto& particle: particles_){
     if(particle.getK() < 2){ //front ghost cell territory
@@ -301,10 +309,10 @@ std::vector<RealType> ParticleSimulation::collectFrontBoundaryParticles(){
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
         sendBuffer.push_back(static_cast<RealType>(particle.getK()));
       }
-
-      //TODO: delete the particle
     }
   }
+
+  particles_.remove_if([this](Particle& particle){ return particle.getK() < 2; });
 
   if(sendBuffer.size() == 0) sendBuffer.push_back(0.0);
   return sendBuffer;
@@ -312,7 +320,7 @@ std::vector<RealType> ParticleSimulation::collectFrontBoundaryParticles(){
 
 std::vector<RealType> ParticleSimulation::collectBackBoundaryParticles(){
   const int dim = parameters_.geometry.dim;
-  std::vector<RealType> sendBuffer{};
+  std::vector<RealType> sendBuffer;
 
   for(auto& particle: particles_){
     if(particle.getK() >= parameters_.parallel.localSize[2] + 2){ //back ghost cell territory
@@ -335,10 +343,10 @@ std::vector<RealType> ParticleSimulation::collectBackBoundaryParticles(){
         sendBuffer.push_back(static_cast<RealType>(particle.getJ()));
         sendBuffer.push_back(static_cast<RealType>(particle.getK()));
       }
-
-      //TODO: delete the particle
     }
   }
+
+  particles_.remove_if([this](Particle& particle){ return particle.getK() >= parameters_.parallel.localSize[2] + 2; });
 
   if(sendBuffer.size() == 0) sendBuffer.push_back(0.0);
   return sendBuffer;
@@ -346,6 +354,7 @@ std::vector<RealType> ParticleSimulation::collectBackBoundaryParticles(){
 
 void ParticleSimulation::communicateParticles(){
   const int dim = parameters_.geometry.dim;
+  const unsigned int dimension_offset = (dim == 2)? 6 : 9;
 
   //Collect buffers
   std::vector<RealType> leftSendBuffer;
@@ -369,164 +378,188 @@ void ParticleSimulation::communicateParticles(){
   int frontRecvCount = 0;
   int backRecvCount = 0;
 
-  if(dim == 2){
-    leftSendBuffer = collectLeftBoundaryParticles();
-    rightSendBuffer = collectRightBoundaryParticles();
-    bottomSendBuffer = collectBottomBoundaryParticles();
-    topSendBuffer = collectTopBoundaryParticles();
+  leftSendBuffer = collectLeftBoundaryParticles();
+  rightSendBuffer = collectRightBoundaryParticles();
+  leftSendCount = leftSendBuffer.size();
+  rightSendCount = rightSendBuffer.size();
 
-    leftSendCount = leftSendBuffer.size();
-    rightSendCount = rightSendBuffer.size();
-    bottomSendCount = bottomSendBuffer.size();
-    topSendCount = topSendBuffer.size();
+  MPI_Sendrecv(
+    &leftSendCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.leftNb,
+    0,
+    &rightRecvCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.rightNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  // send from right, receive on left
+  MPI_Sendrecv(
+    &rightSendCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.rightNb,
+    1,
+    &leftRecvCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.leftNb,
+    1,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  std::vector<RealType> leftRecvBuffer;
+  leftRecvBuffer.reserve(leftRecvCount);
+
+  std::vector<RealType> rightRecvBuffer;
+  rightRecvBuffer.reserve(rightRecvCount);
+
+  MPI_Sendrecv(
+    leftSendBuffer.data(),
+    leftSendCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.leftNb,
+    0,
+    rightRecvBuffer.data(),
+    rightRecvCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.rightNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  // send from right, receive on left
+  MPI_Sendrecv(
+    rightSendBuffer.data(),
+    rightSendCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.rightNb,
+    1,
+    leftRecvBuffer.data(),
+    leftRecvCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.leftNb,
+    1,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+  
+  if(leftRecvCount > 1){
+    for(int i=0; i<leftRecvCount/dimension_offset; i++){
+      Particle particle(&leftRecvBuffer[i*dimension_offset], flowField_, parameters_);
+      particle.getI() = 2;
+      particles_.push_front(particle);
+    }
   }
-  else{
-    leftSendBuffer = collectLeftBoundaryParticles();
-    rightSendBuffer = collectRightBoundaryParticles();
-    bottomSendBuffer = collectBottomBoundaryParticles();
-    topSendBuffer = collectTopBoundaryParticles();
+
+  if(rightRecvCount > 1){
+    for(int i=0; i<rightRecvCount/dimension_offset; i++){
+      Particle particle(&rightRecvBuffer[i*dimension_offset], flowField_, parameters_);
+      particle.getI() = parameters_.parallel.localSize[0] + 1;
+      particles_.push_front(particle);
+    }
+  }
+
+  bottomSendBuffer = collectBottomBoundaryParticles();
+  topSendBuffer = collectTopBoundaryParticles();
+  bottomSendCount = bottomSendBuffer.size();
+  topSendCount = topSendBuffer.size();
+
+  MPI_Sendrecv(
+    &bottomSendCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.bottomNb,
+    2,
+    &topRecvCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.topNb,
+    2,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  // send from top, receive on bottom
+  MPI_Sendrecv(
+    &topSendCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.topNb,
+    3,
+    &bottomRecvCount,
+    1,
+    MPI_INT,
+    parameters_.parallel.bottomNb,
+    3,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  std::vector<RealType> bottomRecvBuffer;
+  bottomRecvBuffer.reserve(bottomRecvCount);
+
+  std::vector<RealType> topRecvBuffer;
+  topRecvBuffer.reserve(topRecvCount);
+
+  MPI_Sendrecv(
+    bottomSendBuffer.data(),
+    bottomSendCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.bottomNb,
+    2,
+    topRecvBuffer.data(),
+    topRecvCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.topNb,
+    2,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  // send from top, receive on bottom
+  MPI_Sendrecv(
+    topSendBuffer.data(),
+    topSendCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.topNb,
+    3,
+    bottomRecvBuffer.data(),
+    bottomRecvCount,
+    MY_MPI_FLOAT,
+    parameters_.parallel.bottomNb,
+    3,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  if(bottomRecvCount > 1){
+    for(int i=0; i<bottomRecvCount/dimension_offset; i++){
+      Particle particle(&bottomRecvBuffer[i*dimension_offset], flowField_, parameters_);
+      particle.getJ() = 2;
+      particles_.push_front(particle);
+    }
+  }
+  if(topRecvCount > 1){
+    for(int i=0; i<topRecvCount/dimension_offset; i++){
+      Particle particle(&topRecvBuffer[i*dimension_offset], flowField_, parameters_);
+      particle.getJ() = parameters_.parallel.localSize[1] + 1;
+      particles_.push_front(particle);
+    }
+  }
+  
+  if (dim == 3){
     frontSendBuffer = collectFrontBoundaryParticles();
     backSendBuffer = collectBackBoundaryParticles();
-
-    leftSendCount = leftSendBuffer.size();
-    rightSendCount = rightSendBuffer.size();
-    bottomSendCount = bottomSendBuffer.size();
-    topSendCount = topSendBuffer.size();
     frontSendCount = frontSendBuffer.size();
     backSendCount = backSendBuffer.size();
-  }
-
-  //MPI communication of number of particles
-  if(dim == 2){
-    // send from left, receive on right
-    MPI_Sendrecv(
-      &leftSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.leftNb,
-      0,
-      &rightRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.rightNb,
-      0,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from right, receive on left
-    MPI_Sendrecv(
-      &rightSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.rightNb,
-      1,
-      &leftRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.leftNb,
-      1,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from bottom, receive on top
-    MPI_Sendrecv(
-      &bottomSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.bottomNb,
-      2,
-      &topRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.topNb,
-      2,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from top, receive on bottom
-    MPI_Sendrecv(
-      &topSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.topNb,
-      3,
-      &bottomRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.bottomNb,
-      3,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-  }
-  else{
-    // send from left, receive on right
-    MPI_Sendrecv(
-      &leftSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.leftNb,
-      0,
-      &rightRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.rightNb,
-      0,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from right, receive on left
-    MPI_Sendrecv(
-      &rightSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.rightNb,
-      1,
-      &leftRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.leftNb,
-      1,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from bottom, receive on top
-    MPI_Sendrecv(
-      &bottomSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.bottomNb,
-      2,
-      &topRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.topNb,
-      2,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from top, receive on bottom
-    MPI_Sendrecv(
-      &topSendCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.topNb,
-      3,
-      &bottomRecvCount,
-      1,
-      MPI_INT,
-      parameters_.parallel.bottomNb,
-      3,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
 
     // send from front, receive on back
     MPI_Sendrecv(
@@ -559,157 +592,12 @@ void ParticleSimulation::communicateParticles(){
       PETSC_COMM_WORLD,
       MPI_STATUS_IGNORE
     );
-  }
+    
+    std::vector<RealType> frontRecvBuffer;
+    frontRecvBuffer.reserve(frontRecvCount);
 
-  //MPI communication of buffers
-  std::vector<RealType> leftRecvBuffer;
-  leftRecvBuffer.reserve(leftRecvCount);
-
-  std::vector<RealType> rightRecvBuffer;
-  rightRecvBuffer.reserve(rightRecvCount);
-
-  std::vector<RealType> bottomRecvBuffer;
-  bottomRecvBuffer.reserve(bottomRecvCount);
-
-  std::vector<RealType> topRecvBuffer;
-  topRecvBuffer.reserve(topRecvCount);
-
-  std::vector<RealType> frontRecvBuffer;
-  frontRecvBuffer.reserve(frontRecvCount);
-
-  std::vector<RealType> backRecvBuffer;
-  backRecvBuffer.reserve(backRecvCount);
-
-  if(dim == 2){
-    // send from left, receive on right
-    MPI_Sendrecv(
-      leftSendBuffer.data(),
-      leftSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.leftNb,
-      0,
-      rightRecvBuffer.data(),
-      rightRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.rightNb,
-      0,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from right, receive on left
-    MPI_Sendrecv(
-      rightSendBuffer.data(),
-      rightSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.rightNb,
-      1,
-      leftRecvBuffer.data(),
-      leftRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.leftNb,
-      1,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from bottom, receive on top
-    MPI_Sendrecv(
-      bottomSendBuffer.data(),
-      bottomSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.bottomNb,
-      2,
-      topRecvBuffer.data(),
-      topRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.topNb,
-      2,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from top, receive on bottom
-    MPI_Sendrecv(
-      topSendBuffer.data(),
-      topSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.topNb,
-      3,
-      bottomRecvBuffer.data(),
-      bottomRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.bottomNb,
-      3,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-  }
-  else{
-    // send from left, receive on right
-    MPI_Sendrecv(
-      leftSendBuffer.data(),
-      leftSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.leftNb,
-      0,
-      rightRecvBuffer.data(),
-      rightRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.rightNb,
-      0,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from right, receive on left
-    MPI_Sendrecv(
-      rightSendBuffer.data(),
-      rightSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.rightNb,
-      1,
-      leftRecvBuffer.data(),
-      leftRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.leftNb,
-      1,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from bottom, receive on top
-    MPI_Sendrecv(
-      bottomSendBuffer.data(),
-      bottomSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.bottomNb,
-      2,
-      topRecvBuffer.data(),
-      topRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.topNb,
-      2,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
-
-    // send from top, receive on bottom
-    MPI_Sendrecv(
-      topSendBuffer.data(),
-      topSendCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.topNb,
-      3,
-      bottomRecvBuffer.data(),
-      bottomRecvCount,
-      MY_MPI_FLOAT,
-      parameters_.parallel.bottomNb,
-      3,
-      PETSC_COMM_WORLD,
-      MPI_STATUS_IGNORE
-    );
+    std::vector<RealType> backRecvBuffer;
+    backRecvBuffer.reserve(backRecvCount);
 
     // send from front, receive on back
     MPI_Sendrecv(
@@ -742,40 +630,21 @@ void ParticleSimulation::communicateParticles(){
       PETSC_COMM_WORLD,
       MPI_STATUS_IGNORE
     );
-  }
 
-  //Particle generation
-  if(dim == 2){
-    if(leftRecvCount >= 6){
-      for(int i; i<leftRecvCount/6; i++){
-        Particle particle(&leftRecvBuffer[i*6], flowField_, parameters_);
-        particle.getI() = 2;
-        particles_.push_back(particle);
+    if(backRecvCount > 1){
+      for(int i=0; i<backRecvCount/dimension_offset; i++){
+        Particle particle(&backRecvBuffer[i*dimension_offset], flowField_, parameters_);
+        particle.getK() = 2;
+        particles_.push_front(particle);
       }
     }
-    if(rightRecvCount >= 6){
-      for(int i; i<rightRecvCount/6; i++){
-        Particle particle(&rightRecvBuffer[i*6], flowField_, parameters_);
-        particle.getI() = parameters_.parallel.localSize[0] + 1;
-        particles_.push_back(particle);
+
+    if(frontRecvCount > 1){
+      for(int i=0; i<frontRecvCount/dimension_offset; i++){
+        Particle particle(&frontRecvBuffer[i*dimension_offset], flowField_, parameters_);
+        particle.getK() = parameters_.parallel.localSize[2] + 1;
+        particles_.push_front(particle);
       }
     }
-    if(bottomRecvCount >= 6){
-      for(int i; i<bottomRecvCount/6; i++){
-        Particle particle(&bottomRecvBuffer[i*6], flowField_, parameters_);
-        particle.getJ() = 2;
-        particles_.push_back(particle);
-      }
-    }
-    if(topRecvCount >= 6){
-      for(int i; i<topRecvCount/6; i++){
-        Particle particle(&topRecvBuffer[i*6], flowField_, parameters_);
-        particle.getJ() = parameters_.parallel.localSize[1] + 1;
-        particles_.push_back(particle);
-      }
-    }
-  }
-  else{
-    //TODO: Initialize the particles in 3D case
-  }
+  } 
 }

@@ -35,7 +35,8 @@ void Particle::calculateVelocity() {
 
 Particle::Particle(const Particle& p) noexcept: 
   x_(p.x_), 
-  y_(p.y_), 
+  y_(p.y_),
+  z_(p.z_),
   velocity_(p.velocity_), 
   flowField_(p.flowField_), 
   parameters_(p.parameters_), 
@@ -43,7 +44,8 @@ Particle::Particle(const Particle& p) noexcept:
   
 Particle::Particle(Particle&& p) noexcept: 
   x_(p.x_), 
-  y_(p.y_), 
+  y_(p.y_),
+  z_(p.z_),
   velocity_(std::move(p.velocity_)), 
   flowField_(p.flowField_), 
   parameters_(p.parameters_), 
