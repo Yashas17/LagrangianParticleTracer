@@ -33,33 +33,33 @@ void Particle::calculateVelocity() {
   }
 }
 
-Particle::Particle(const Particle& p) noexcept: 
-  x_(p.x_), 
+Particle::Particle(const Particle& p) noexcept:
+  x_(p.x_),
   y_(p.y_),
   z_(p.z_),
-  velocity_(p.velocity_), 
-  flowField_(p.flowField_), 
-  parameters_(p.parameters_), 
+  velocity_(p.velocity_),
+  flowField_(p.flowField_),
+  parameters_(p.parameters_),
   index_(p.index_) {}
-  
-Particle::Particle(Particle&& p) noexcept: 
-  x_(p.x_), 
+
+Particle::Particle(Particle&& p) noexcept:
+  x_(p.x_),
   y_(p.y_),
   z_(p.z_),
-  velocity_(std::move(p.velocity_)), 
-  flowField_(p.flowField_), 
-  parameters_(p.parameters_), 
+  velocity_(std::move(p.velocity_)),
+  flowField_(p.flowField_),
+  parameters_(p.parameters_),
   index_(std::move(p.index_)) {}
-  
+
 void Particle::serialize(RealType* buffer) noexcept {
-  if (parameters_.geometry.dim == 2){
+  if (parameters_.geometry.dim == 2) {
     buffer[0] = x_;
     buffer[1] = y_;
     buffer[2] = velocity_[0];
     buffer[3] = velocity_[1];
     buffer[4] = index_[0];
     buffer[5] = index_[1];
-  }else{
+  } else {
     buffer[0] = x_;
     buffer[1] = y_;
     buffer[2] = z_;
@@ -71,28 +71,27 @@ void Particle::serialize(RealType* buffer) noexcept {
     buffer[8] = index_[2];
   }
 }
-  
+
 Particle::Particle(RealType* serialized_data, FlowField& flowField, Parameters& parameters) noexcept:
   flowField_(flowField),
-  parameters_(parameters)
-{
-  if (parameters_.geometry.dim == 2){
-    x_ = serialized_data[0];
-    y_ = serialized_data[1];
+  parameters_(parameters) {
+  if (parameters_.geometry.dim == 2) {
+    x_           = serialized_data[0];
+    y_           = serialized_data[1];
     velocity_[0] = serialized_data[2];
     velocity_[1] = serialized_data[3];
-    index_[0] = static_cast<int>(serialized_data[4] + 0.5);
-    index_[1] = static_cast<int>(serialized_data[5] + 0.5);
+    index_[0]    = static_cast<int>(serialized_data[4] + 0.5);
+    index_[1]    = static_cast<int>(serialized_data[5] + 0.5);
   } else {
-    x_ = serialized_data[0];
-    y_ = serialized_data[1];
-    z_ = serialized_data[2];
+    x_           = serialized_data[0];
+    y_           = serialized_data[1];
+    z_           = serialized_data[2];
     velocity_[0] = serialized_data[3];
     velocity_[1] = serialized_data[4];
     velocity_[2] = serialized_data[5];
-    index_[0] = static_cast<int>(serialized_data[6] + 0.5);
-    index_[1] = static_cast<int>(serialized_data[7] + 0.5);
-    index_[2] = static_cast<int>(serialized_data[8] + 0.5);
+    index_[0]    = static_cast<int>(serialized_data[6] + 0.5);
+    index_[1]    = static_cast<int>(serialized_data[7] + 0.5);
+    index_[2]    = static_cast<int>(serialized_data[8] + 0.5);
   }
 }
 
@@ -121,9 +120,9 @@ RealType Particle::getZ() { return z_; }
 RealType Particle::getU() { return velocity_[0]; }
 RealType Particle::getV() { return velocity_[1]; }
 RealType Particle::getW() { return velocity_[2]; }
-int& Particle::getI() { return index_[0]; }
-int& Particle::getJ() { return index_[1]; }
-int& Particle::getK() { return index_[2]; }
+int&     Particle::getI() { return index_[0]; }
+int&     Particle::getJ() { return index_[1]; }
+int&     Particle::getK() { return index_[2]; }
 
 void Particle::update(RealType dt) {
   if (parameters_.geometry.dim == 3) {

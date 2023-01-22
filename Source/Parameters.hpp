@@ -138,10 +138,10 @@ public:
   int boundaryLayer = 0;
 };
 
-class ParticleParameters{
-  public:
-  bool enable = 0;
-  int particleCount = 0;
+class ParticleParameters {
+public:
+  bool enable        = 0;
+  int  particleCount = 0;
 };
 
 //@}
