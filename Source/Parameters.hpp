@@ -137,6 +137,13 @@ class TurbulenceParameters {
 public:
   int boundaryLayer = 0;
 };
+
+class ParticleParameters{
+  public:
+  bool enable = 0;
+  int particleCount = 0;
+};
+
 //@}
 
 /** A class to store and pass around the parameters
@@ -158,5 +165,6 @@ public:
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
   TurbulenceParameters    turbulence;
+  ParticleParameters      particles;
   Meshsize*               meshsize;
 };

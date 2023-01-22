@@ -3,6 +3,7 @@
 #include "Clock.hpp"
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
+#include "ParticleSimulation.hpp"
 #include "Simulation.hpp"
 #include "TurbulentSimulation.hpp"
 
@@ -57,8 +58,9 @@ int main(int argc, char* argv[]) {
   configuration.loadParameters(parameters);
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*  flowField  = NULL;
-  Simulation* simulation = NULL;
+  FlowField*          flowField          = NULL;
+  Simulation*         simulation         = NULL;
+  ParticleSimulation* particleSimulation = NULL;
 
   spdlog::debug(
     "Processor {} with index {}, {}, {} is computing the size of its subdomain and obtains {}, {} and {}.",
@@ -108,7 +110,13 @@ int main(int argc, char* argv[]) {
   if (simulation == NULL) {
     throw std::runtime_error("simulation == NULL!");
   }
+
   simulation->initializeFlowField();
+
+  if (parameters.particles.enable == true) {
+    particleSimulation = new ParticleSimulation(parameters, *flowField);
+    particleSimulation->initializeParticles();
+  }
 
   // flowField->getFlags().show();
 
@@ -119,14 +127,15 @@ int main(int argc, char* argv[]) {
 
   // Plot initial state
 #ifndef DISABLE_OUTPUT
-  //simulation->plotVTK(timeSteps, time);
+  simulation->plotVTK(timeSteps, time);
 #endif
 
   Clock clock;
   // Time loop
   while (time < parameters.simulation.finalTime) {
     simulation->solveTimestep();
-
+    if (particleSimulation)
+      particleSimulation->solveTimestep();
     timeSteps++;
     time += parameters.timestep.dt;
 
@@ -135,23 +144,29 @@ int main(int argc, char* argv[]) {
       timeStdOut += parameters.stdOut.interval;
     }
 
-    //if (timeVtk <= time) {
+    if (timeVtk <= time) {
 #ifndef DISABLE_OUTPUT
-      //simulation->plotVTK(timeSteps, time);
+      simulation->plotVTK(timeSteps, time);
+      if (particleSimulation)
+        particleSimulation->plot(timeSteps, time);
 #endif
-      //timeVtk += parameters.vtk.interval;
-    //}
+      timeVtk += parameters.vtk.interval;
+    }
   }
+
   if (parameters.parallel.rank == 0)
     spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
     // Plot final solution
 #ifndef DISABLE_OUTPUT
-  //simulation->plotVTK(timeSteps, time);
+  simulation->plotVTK(timeSteps, time);
 #endif
 
   delete simulation;
   simulation = NULL;
+
+  delete particleSimulation;
+  particleSimulation = NULL;
 
   delete flowField;
   flowField = NULL;

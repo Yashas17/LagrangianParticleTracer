@@ -15,6 +15,7 @@ Parameters::Parameters():
   stdOut{},
   bfStep{},
   turbulence{},
+  particles{},
   meshsize(NULL) {}
 
 Parameters::~Parameters() {
