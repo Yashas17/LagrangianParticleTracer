@@ -39,11 +39,11 @@
     </walls>
     <vtk interval="1">Channel2D</vtk>
     <stdOut interval="1" />
-    <parallel numProcessorsX="14" numProcessorsY="2" numProcessorsZ="1" />
+    <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
     <turbulence>
         <!-- <boundaryLayer>turbulent</boundaryLayer> -->
         <!-- <boundaryLayer>laminar</boundaryLayer> -->
         <boundaryLayer>turbulent</boundaryLayer>
     </turbulence>
-    <particles particleCount = "10"/>
+    <particles particleCount = "10" injectInterval="1"/>
 </configuration>

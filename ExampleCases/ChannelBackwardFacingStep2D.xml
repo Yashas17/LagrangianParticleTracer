@@ -46,4 +46,5 @@
         <!-- <boundaryLayer>laminar</boundaryLayer> -->
         <!-- <boundaryLayer>none</boundaryLayer> -->
     </turbulence>
+    <particles particleCount="10" injectInterval="2"/>
 </configuration>
