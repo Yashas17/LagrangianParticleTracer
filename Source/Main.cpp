@@ -123,19 +123,27 @@ int main(int argc, char* argv[]) {
   RealType time       = 0.0;
   RealType timeVtk    = parameters.vtk.interval;
   RealType timeStdOut = parameters.stdOut.interval;
+  RealType timeInject = parameters.particles.injectInterval;
   int      timeSteps  = 0;
 
   // Plot initial state
 #ifndef DISABLE_OUTPUT
   simulation->plotVTK(timeSteps, time);
+  if (particleSimulation)
+    particleSimulation->plot(timeSteps, time);
 #endif
 
   Clock clock;
   // Time loop
   while (time < parameters.simulation.finalTime) {
     simulation->solveTimestep();
-    if (particleSimulation)
+    if (particleSimulation) {
       particleSimulation->solveTimestep();
+      if (timeInject <= time) {
+        particleSimulation->initializeParticles();
+        timeInject += parameters.particles.injectInterval;
+      }
+    }
     timeSteps++;
     time += parameters.timestep.dt;
 
@@ -147,8 +155,9 @@ int main(int argc, char* argv[]) {
     if (timeVtk <= time) {
 #ifndef DISABLE_OUTPUT
       simulation->plotVTK(timeSteps, time);
-      if (particleSimulation)
+      if (particleSimulation) {
         particleSimulation->plot(timeSteps, time);
+      }
 #endif
       timeVtk += parameters.vtk.interval;
     }

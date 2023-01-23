@@ -140,8 +140,9 @@ public:
 
 class ParticleParameters {
 public:
-  bool enable        = 0;
-  int  particleCount = 0;
+  bool     enable         = false;
+  int      particleCount  = 0;
+  RealType injectInterval = 0.0;
 };
 
 //@}

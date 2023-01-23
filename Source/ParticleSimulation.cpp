@@ -22,6 +22,19 @@ void ParticleSimulation::initializeParticles() {
   RealType y = (parameters_.bfStep.yRatio >= 0) ? (parameters_.bfStep.yRatio * parameters_.geometry.lengthY) : 0;
   std::array<int, 3> index = {2, 0, 0};
 
+  if (parameters_.simulation.scenario == "cavity") {
+    x = (parameters_.geometry.lengthX + parameters_.meshsize->getDx(2, 1)) / 2.0;
+    if (parameters_.meshsize->getPosX(2, 0) <= x && x <= parameters_.meshsize->getPosX(parameters_.parallel.localSize[0] + 2, 0)) {
+      int i = 2;
+      while (parameters_.meshsize->getPosX(i, 0) + parameters_.meshsize->getDx(i, 0) / 2 <= x) {
+        i++;
+      }
+      index[0] = i;
+    } else {
+      index[0] = -1;
+    }
+  }
+
   ASSERTION(dim == 2 || dim == 3);
 
   if (dim == 2) {

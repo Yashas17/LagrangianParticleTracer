@@ -423,6 +423,8 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     if (node != NULL) {
       parameters.particles.enable = true;
       readIntMandatory(parameters.particles.particleCount, node, "particleCount");
+      parameters.particles.injectInterval = parameters.simulation.finalTime + 1.0;
+      readFloatOptional(parameters.particles.injectInterval, node, "injectInterval");
     }
   }
 
@@ -486,4 +488,5 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
 
   MPI_Bcast(&(parameters.particles.enable), 1, MPI_C_BOOL, 0, communicator);
   MPI_Bcast(&(parameters.particles.particleCount), 1, MPI_INT, 0, communicator);
+  MPI_Bcast(&(parameters.particles.injectInterval), 1, MY_MPI_FLOAT, 0, communicator);
 }
