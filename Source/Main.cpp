@@ -4,6 +4,7 @@
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
+#include "TurbulentSimulation.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
 
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
 
 #ifndef NDEBUG
   spdlog::warn("Running in Debug mode; make sure to switch to Release mode for production/benchmark runs.");
-  feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW);
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
 #else
   spdlog::info("Running in Release mode");
 #endif
@@ -81,7 +82,15 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    // WS2: initialise turbulent flow field and turbulent simulation object
+    if (rank == 0) {
+      spdlog::info("Start Turbulent simulation in {}D", parameters.geometry.dim);
+    }
+    flowField = new FlowField(parameters);
+    if (flowField == NULL) {
+      throw std::runtime_error("flowField == NULL!");
+    }
+    simulation = new TurbulentSimulation(parameters, *flowField);
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
       spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
@@ -109,7 +118,9 @@ int main(int argc, char* argv[]) {
   int      timeSteps  = 0;
 
   // Plot initial state
-  simulation->plotVTK(timeSteps, time);
+#ifndef DISABLE_OUTPUT
+  //simulation->plotVTK(timeSteps, time);
+#endif
 
   Clock clock;
   // Time loop
@@ -124,15 +135,20 @@ int main(int argc, char* argv[]) {
       timeStdOut += parameters.stdOut.interval;
     }
 
-    if (timeVtk <= time) {
-      simulation->plotVTK(timeSteps, time);
-      timeVtk += parameters.vtk.interval;
-    }
+    //if (timeVtk <= time) {
+#ifndef DISABLE_OUTPUT
+      //simulation->plotVTK(timeSteps, time);
+#endif
+      //timeVtk += parameters.vtk.interval;
+    //}
   }
-  spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
+  if (parameters.parallel.rank == 0)
+    spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
-  // Plot final solution
-  simulation->plotVTK(timeSteps, time);
+    // Plot final solution
+#ifndef DISABLE_OUTPUT
+  //simulation->plotVTK(timeSteps, time);
+#endif
 
   delete simulation;
   simulation = NULL;

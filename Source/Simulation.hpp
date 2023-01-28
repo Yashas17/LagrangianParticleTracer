@@ -5,6 +5,7 @@
 #include "GlobalBoundaryFactory.hpp"
 #include "Iterators.hpp"
 
+#include "ParallelManagers/PetscParallelManager.hpp"
 #include "Solvers/LinearSolver.hpp"
 #include "Stencils/BFInputStencils.hpp"
 #include "Stencils/BFStepInitStencil.hpp"
@@ -42,9 +43,11 @@ protected:
   FieldIterator<FlowField>  velocityIterator_;
   FieldIterator<FlowField>  obstacleIterator_;
 
-  Stencils::RHSStencil rhsStencil_;
+  Stencils::RHSStencil     rhsStencil_;
   FieldIterator<FlowField> rhsIterator_;
-  
+
+  ParallelManagers::PetscParallelManager petscParallelManager_;
+
   std::unique_ptr<Solvers::LinearSolver> solver_;
 
   virtual void setTimeStep();

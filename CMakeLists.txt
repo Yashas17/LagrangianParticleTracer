@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
+endif()
+
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(
         COMMAND git rev-parse --abbrev-ref HEAD
@@ -47,6 +52,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${META_PROJECT_NAME})
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
+option(DISABLE_OUTPUT ON)
+
+if(DISABLE_OUTPUT)
+    add_compile_definitions(DISABLE_OUTPUT)
+endif()
 
 set(OPT_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 include(FetchContent)
